@@ -42,13 +42,6 @@ export function Header() {
           <span className="sr-only">Help</span>
         </Button>
 
-         {/* Points Counter Button - Matched styling */}
-         <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary/10 hover:text-primary gap-1 px-2.5 h-9 rounded-lg">
-             <Zap className="h-4 w-4 fill-primary" strokeWidth={1.5}/> {/* Filled Zap icon */}
-             <span className="font-semibold">20</span>
-             <CircleHelp className="h-4 w-4 text-muted-foreground ml-1" />
-         </Button>
-
         {/* Upgrade Button - Matched styling */}
         <Button variant="primary" size="sm" className="px-4 font-semibold h-9 rounded-lg"> {/* Used primary variant */}
             Upgrade
