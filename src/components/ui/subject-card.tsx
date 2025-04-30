@@ -1,4 +1,5 @@
 
+
 'use client'; // This component needs client-side JS for interaction
 
 import React, { useRef, useState } from 'react';
@@ -84,3 +85,4 @@ export function SubjectCard({ title, imageUrl, bgColorClass, className }: Subjec
     </div>
   );
 }
+
