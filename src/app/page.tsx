@@ -1,4 +1,5 @@
 
+
 import Image from 'next/image';
 import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
@@ -198,8 +199,8 @@ export default function Home() {
                       title={subject.title} // Title still used for alt text
                       imageUrl={subject.imageUrl}
                       bgColorClass={subject.bgColorClass}
-                      // Restore previous dimensions
-                      className="w-[180px] h-[120px] md:w-[200px] md:h-[140px] flex-shrink-0"
+                      // Adjusted size to match the image aspect ratio better
+                      className="w-[180px] h-[190px] md:w-[200px] md:h-[210px] flex-shrink-0"
                     />
                   ))}
                 </div>
@@ -213,4 +214,5 @@ export default function Home() {
     </div>
   );
 }
+
 
