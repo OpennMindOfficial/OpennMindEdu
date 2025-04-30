@@ -45,8 +45,8 @@ export function ExamCard({ title, imageUrl, bgColorClass, isNew, className }: Ex
               fill
               style={{ objectFit: 'contain', objectPosition: 'center bottom' }} // Contain makes sure image scales down, bottom aligned
               className="opacity-80 p-4 pt-10 transition-opacity duration-300" // Add transition
-              priority={false}
-              unoptimized // Necessary if using external URLs not in next.config.js images domains
+              priority={false} // Less critical images
+              // Removed unoptimized as local images don't need it
            />
         </div>
 
