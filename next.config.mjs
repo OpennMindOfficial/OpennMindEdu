@@ -1,3 +1,4 @@
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
@@ -6,25 +7,15 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'picsum.photos',
         port: '',
-        pathname: '/seed/**',
+        pathname: '/**',
       },
-       {
+      {
         protocol: 'https',
-        hostname: 'picsum.photos',
+        hostname: 'surveys.opennmind.com', // Add the new domain
         port: '',
-        pathname: '/**', // Allow any path on picsum.photos
+        pathname: '/wp-content/uploads/**',
       },
-       {
-         protocol: 'https',
-         hostname: 'surveys.opennmind.com',
-         port: '',
-         pathname: '/wp-content/uploads/**',
-       },
     ],
-     // Add support for SVG images if needed (optional)
-     dangerouslyAllowSVG: true,
-     contentDispositionType: 'attachment',
-     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
 };
 
