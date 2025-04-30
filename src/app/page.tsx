@@ -36,23 +36,23 @@ const subjects = [
   },
 ];
 
-// Data for Exam Cards
+// Data for Exam Cards - Updated Image URLs
 const examCards = [
   {
     title: "Random exam",
-    imageUrl: "https://picsum.photos/seed/randomexam/400/300", // Placeholder
+    imageUrl: "https://surveys.opennmind.com/wp-content/uploads/2025/04/undraw_collaborative-writing_ir40-removebg-preview.png",
     bgColorClass: "bg-gradient-to-br from-exam-blue-light to-white dark:from-exam-blue-dark/30 dark:to-background",
     isNew: false,
   },
   {
     title: "Custom exam",
-    imageUrl: "https://picsum.photos/seed/customexam/400/300", // Placeholder
+    imageUrl: "https://surveys.opennmind.com/wp-content/uploads/2025/04/undraw_preferences_2bda-removebg-preview.png",
     bgColorClass: "bg-gradient-to-br from-exam-green-light to-white dark:from-exam-green-dark/30 dark:to-background",
     isNew: true,
   },
-    {
+  {
     title: "Timed exam",
-    imageUrl: "https://picsum.photos/seed/timedexam/400/300", // Placeholder
+    imageUrl: "https://surveys.opennmind.com/wp-content/uploads/2025/04/undraw_screen-time_ys34-removebg-preview.png",
     bgColorClass: "bg-gradient-to-br from-exam-pink-light to-white dark:from-exam-pink-dark/30 dark:to-background",
     isNew: true,
   },
@@ -148,6 +148,7 @@ export default function Home() {
                       title={subject.title}
                       imageUrl={subject.imageUrl}
                       className="w-[200px] md:w-[220px] flex-shrink-0"
+                      priority={index < 3} // Prioritize first few images
                     />
                   ))}
                 </div>

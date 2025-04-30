@@ -6,8 +6,14 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'picsum.photos',
         port: '',
-        pathname: '/**',
+        pathname: '/seed/**',
       },
+       {
+         protocol: 'https',
+         hostname: 'surveys.opennmind.com', // Added this domain
+         port: '',
+         pathname: '/wp-content/uploads/**',
+       },
     ],
   },
 };
