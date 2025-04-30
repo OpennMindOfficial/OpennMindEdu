@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Bot } from 'lucide-react';
 
@@ -86,6 +88,7 @@ export function HeroSection() {
           font-weight: bold;
           color: hsl(var(--foreground));
           opacity: 0.8;
+          --cube-size: 16rem; /* Default for mobile */
         }
         .front  { transform: rotateY(  0deg) translateZ(calc(var(--cube-size) / 2)); }
         .back   { transform: rotateY(180deg) translateZ(calc(var(--cube-size) / 2)); }
@@ -100,9 +103,7 @@ export function HeroSection() {
         @media (min-width: 1024px) {
            .face { --cube-size: 24rem; } /* 384px */
         }
-        @media (max-width: 767px) {
-           .face { --cube-size: 16rem; } /* 256px */
-        }
+
 
         @keyframes spin-slow {
           from { transform: rotateX(-30deg) rotateY(-45deg); }
