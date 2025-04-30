@@ -1,4 +1,6 @@
 import type { Config } from "tailwindcss";
+import plugin from 'tailwindcss/plugin';
+
 
 export default {
     darkMode: ["class"],
@@ -64,7 +66,8 @@ export default {
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
-  			sm: 'calc(var(--radius) - 4px)'
+  			sm: 'calc(var(--radius) - 4px)',
+        xl: 'calc(var(--radius) + 4px)', // Added for 12px rounded corners
   		},
   		keyframes: {
   			'accordion-down': {
@@ -82,13 +85,34 @@ export default {
   				to: {
   					height: '0'
   				}
-  			}
+  			},
+        'spin-slow': { // Added for cube animation
+           from: { transform: 'rotateX(-30deg) rotateY(-45deg)' },
+           to: { transform: 'rotateX(-30deg) rotateY(315deg)' },
+        }
   		},
   		animation: {
   			'accordion-down': 'accordion-down 0.2s ease-out',
-  			'accordion-up': 'accordion-up 0.2s ease-out'
-  		}
+  			'accordion-up': 'accordion-up 0.2s ease-out',
+        'spin-slow': 'spin-slow 25s linear infinite', // Added for cube animation
+  		},
+      fontFamily: {
+        sans: ['var(--font-geist-sans)', 'sans-serif'], // Ensure Geist Sans is primary
+        mono: ['var(--font-geist-mono)', 'monospace'],
+      },
   	}
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    plugin(function({ addUtilities }) {
+      addUtilities({
+        '.perspective': {
+          perspective: '1000px',
+        },
+        '.transform-style-3d': {
+            'transform-style': 'preserve-3d',
+        },
+      })
+    })
+  ],
 } satisfies Config;
