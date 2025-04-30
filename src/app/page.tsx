@@ -4,7 +4,7 @@ import { Sidebar } from "@/components/layout/sidebar";
 import { SubjectCard } from "@/components/ui/subject-card";
 import { ExamCard } from "@/components/ui/exam-card";
 import { LearnWithCard } from "@/components/ui/learn-with-card";
-import { Card, CardContent } from "@/components/ui/card"; // Import Card and CardContent
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import {
@@ -21,36 +21,55 @@ import {
   Layers
 } from "lucide-react";
 
-// Import local images
+// Import local images for subjects
+import itImage from './it.png';
+import englishLitImage from './english_lit.png'; // Added import
+import socialSciImage from './social_sci.png'; // Assuming file name exists
+import englishCommImage from './english_comm.png'; // Added import
+import mathImage from './maths.png'; // Changed to maths.png
+import scienceImage from './science.png'; // Assuming file name exists
+import hindiImage from './hindi.png'; // Added import
+
+// Import local images for exams
 import i1 from './i1.png';
 import i2 from './i2.png';
 import i3 from './i3.png';
-import itImage from './it.png'; // Import the IT image
 
 const subjects = [
   {
     title: "Information Technology",
-    imageUrl: itImage, // Use the imported local image for IT
+    imageUrl: itImage,
+    bgColorClass: "bg-blue-100 dark:bg-blue-900/30", // Example background color
   },
   {
     title: "English Language & Literature",
-    imageUrl: "https://picsum.photos/seed/englishlit/300/200",
+    imageUrl: englishLitImage, // Use imported local image
+    bgColorClass: "bg-pink-100 dark:bg-pink-900/30", // Example background color
   },
   {
     title: "Social Science",
-    imageUrl: "https://picsum.photos/seed/socialsci/300/200",
+    imageUrl: socialSciImage, // Assuming this file exists
+    bgColorClass: "bg-orange-100 dark:bg-orange-900/30", // Example background color
   },
   {
     title: "English Communicative",
-    imageUrl: "https://picsum.photos/seed/englishcomm/300/200",
+    imageUrl: englishCommImage, // Use imported local image
+    bgColorClass: "bg-yellow-100 dark:bg-yellow-900/30", // Example background color
   },
   {
     title: "Mathematics",
-    imageUrl: "https://picsum.photos/seed/math/300/200",
+    imageUrl: mathImage, // Use imported local image
+    bgColorClass: "bg-teal-100 dark:bg-teal-900/30", // Example background color
   },
   {
     title: "Science",
-    imageUrl: "https://picsum.photos/seed/science/300/200",
+    imageUrl: scienceImage, // Assuming this file exists
+    bgColorClass: "bg-indigo-100 dark:bg-indigo-900/30", // Example background color
+  },
+  {
+    title: "Hindi",
+    imageUrl: hindiImage, // Use imported local image
+    bgColorClass: "bg-red-100 dark:bg-red-900/30", // Example background color
   },
 ];
 
@@ -176,7 +195,8 @@ export default function Home() {
                     <SubjectCard
                       key={index}
                       title={subject.title}
-                      imageUrl={subject.imageUrl} // Pass the image URL or imported object
+                      imageUrl={subject.imageUrl} // Pass the imported image object or URL
+                      bgColorClass={subject.bgColorClass} // Pass the background color class
                       className="w-[200px] md:w-[220px] flex-shrink-0"
                     />
                   ))}
@@ -191,3 +211,5 @@ export default function Home() {
     </div>
   );
 }
+
+    

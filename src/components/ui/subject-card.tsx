@@ -9,10 +9,11 @@ import { cn } from '@/lib/utils';
 interface SubjectCardProps {
   title: string;
   imageUrl: string | StaticImageData; // Allow string or StaticImageData
+  bgColorClass?: string; // Add optional background color class prop
   className?: string;
 }
 
-export function SubjectCard({ title, imageUrl, className }: SubjectCardProps) {
+export function SubjectCard({ title, imageUrl, bgColorClass, className }: SubjectCardProps) {
   const imageRef = useRef<HTMLDivElement>(null); // Ref for the image container
   const [rotate, setRotate] = useState({ x: 0, y: 0 });
 
@@ -42,7 +43,8 @@ export function SubjectCard({ title, imageUrl, className }: SubjectCardProps) {
     <div
       className={cn(
         "overflow-hidden transition-all duration-300 ease-out hover:shadow-xl rounded-xl", // Keep hover shadow on the main container
-        "border-0 bg-card/60 dark:bg-muted/40",
+        "border-0", // Removed specific bg-card/60 dark:bg-muted/40
+        bgColorClass || "bg-card/60 dark:bg-muted/40", // Apply bgColorClass or default
         "transform-style-preserve-3d", // Keep 3D context on parent
         className
       )}
@@ -69,7 +71,7 @@ export function SubjectCard({ title, imageUrl, className }: SubjectCardProps) {
                   width={300}
                   height={200}
                   className="block w-full h-auto rounded-t-xl transition-transform duration-300" // Removed group-hover scale
-                  priority={false}
+                  priority={false} // Setting priority to false as these might be many images
                   style={{
                       // Removed translateZ from here, handled by wrapper now
                   }}
@@ -95,3 +97,4 @@ export function SubjectCard({ title, imageUrl, className }: SubjectCardProps) {
   );
 }
 
+    
