@@ -25,12 +25,12 @@ import {
 import i1 from './i1.png';
 import i2 from './i2.png';
 import i3 from './i3.png';
-
+import itImage from './it.png'; // Import the IT image
 
 const subjects = [
   {
     title: "Information Technology",
-    imageUrl: "https://picsum.photos/seed/infotech/300/200",
+    imageUrl: itImage, // Use the imported local image for IT
   },
   {
     title: "English Language & Literature",
@@ -176,7 +176,7 @@ export default function Home() {
                     <SubjectCard
                       key={index}
                       title={subject.title}
-                      imageUrl={subject.imageUrl}
+                      imageUrl={subject.imageUrl} // Pass the image URL or imported object
                       className="w-[200px] md:w-[220px] flex-shrink-0"
                     />
                   ))}

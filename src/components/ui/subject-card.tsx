@@ -1,13 +1,13 @@
 'use client'; // This component needs client-side JS for interaction
 
 import React, { useRef, useState } from 'react';
-import Image from 'next/image';
+import Image, { StaticImageData } from 'next/image'; // Import StaticImageData
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { cn } from '@/lib/utils';
 
 interface SubjectCardProps {
   title: string;
-  imageUrl: string;
+  imageUrl: string | StaticImageData; // Allow string or StaticImageData
   className?: string;
 }
 
@@ -60,10 +60,10 @@ export function SubjectCard({ title, imageUrl, className }: SubjectCardProps) {
       )}>
         <CardContent className="p-0 relative">
             <Image
-              src={imageUrl}
+              src={imageUrl} // src can now be string or StaticImageData
               alt={title}
-              width={300}
-              height={200}
+              width={300} // Provide width for non-fill images
+              height={200} // Provide height for non-fill images
               className="rounded-t-xl w-full h-auto transition-transform duration-300 group-hover:scale-105" // Scale image slightly on hover
               priority={false} // Assuming these are lower priority
               style={{
