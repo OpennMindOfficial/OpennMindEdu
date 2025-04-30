@@ -6,6 +6,7 @@ import { ExamCard } from "@/components/ui/exam-card"; // Import ExamCard
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge"; // Import Badge
+import { Card, CardContent } from "@/components/ui/card"; // Import Card and CardContent
 import { ArrowRight, Bookmark, ChevronRight, PlusCircle, Lightbulb } from "lucide-react"; // Added icons
 
 const subjects = [
@@ -155,7 +156,10 @@ export default function Home() {
              </div>
           </div>
 
-          {/* Footer remains hidden as per previous structure */}
+          {/* Footer - Added simple footer */}
+          <footer className="bg-gradient-to-r from-purple-600 via-purple-700 to-purple-800 text-primary-foreground p-4 rounded-lg text-center mt-auto mx-[-1rem] mb-[-1rem] md:mx-[-2rem] md:mb-[-2rem]">
+            <p className="font-semibold">How did RevisionDojo help your predicted grades?</p>
+          </footer>
         </main>
       </div>
     </div>
