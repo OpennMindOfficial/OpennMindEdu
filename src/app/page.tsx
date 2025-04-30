@@ -198,7 +198,7 @@ export default function Home() {
                       title={subject.title} // Title still used for alt text
                       imageUrl={subject.imageUrl}
                       bgColorClass={subject.bgColorClass}
-                      // Adjusted size to fit image-only card
+                      // Restore previous dimensions
                       className="w-[180px] h-[120px] md:w-[200px] md:h-[140px] flex-shrink-0"
                     />
                   ))}
@@ -213,3 +213,4 @@ export default function Home() {
     </div>
   );
 }
+
