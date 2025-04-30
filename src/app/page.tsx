@@ -123,7 +123,7 @@ export default function Home() {
            <div className="bg-gradient-to-r from-purple-900 via-purple-800 to-purple-900/80 text-primary-foreground p-6 rounded-xl shadow-lg flex items-center justify-between relative overflow-hidden">
              <div className="z-10">
                <h2 className="text-xl md:text-2xl font-semibold mb-2">How did OpennMind help your predicted grades?</h2>
-               <Button variant="secondary" size="sm" className="bg-white/20 hover:bg-white/30 text-white px-4 py-1 text-xs h-auto">
+               <Button variant="secondary" size="sm" className="bg-white/20 hover:bg-white/30 text-white px-4 py-1 text-xs h-auto rounded-full">
                  Share your wins with us &lt;3
                </Button>
              </div>
@@ -185,8 +185,8 @@ export default function Home() {
                  <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
                </div>
                <div className="flex items-center space-x-4 text-sm">
-                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">Change subjects</Button>
-                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">Browse all</Button>
+                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground rounded-full">Change subjects</Button>
+                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground rounded-full">Browse all</Button>
                </div>
             </div>
 
@@ -199,8 +199,8 @@ export default function Home() {
                       title={subject.title} // Title still used for alt text
                       imageUrl={subject.imageUrl}
                       bgColorClass={subject.bgColorClass}
-                      // Adjusted size to match the image aspect ratio better
-                      className="w-[180px] h-[190px] md:w-[200px] md:h-[210px] flex-shrink-0"
+                      // Adjusted size to match the image aspect ratio better and increased height
+                      className="w-[180px] h-[250px] md:w-[200px] md:h-[270px] flex-shrink-0"
                     />
                   ))}
                 </div>
