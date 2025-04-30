@@ -1,3 +1,4 @@
+
 import Image from 'next/image';
 import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
@@ -23,12 +24,12 @@ import {
 
 // Import local images for subjects
 import itImage from './it.png';
-import englishLitImage from './english_lit.png'; // Added import
+import englishLitImage from './english_lit.png';
 import socialSciImage from './social_sci.png'; // Assuming file name exists
-import englishCommImage from './english_comm.png'; // Added import
-import mathImage from './maths.png'; // Changed to maths.png
-import scienceImage from './science.png'; // Assuming file name exists
-import hindiImage from './hindi.png'; // Added import
+import englishCommImage from './english_comm.png';
+import mathImage from './maths.png';
+import scienceImage from './science.png'; // Assuming this file exists
+import hindiImage from './hindi.png';
 
 // Import local images for exams
 import i1 from './i1.png';
@@ -39,37 +40,37 @@ const subjects = [
   {
     title: "Information Technology",
     imageUrl: itImage,
-    bgColorClass: "bg-blue-100 dark:bg-blue-900/30", // Example background color
+    bgColorClass: "bg-blue-100 dark:bg-blue-900/30", // Example: Light blueish
   },
   {
     title: "English Language & Literature",
-    imageUrl: englishLitImage, // Use imported local image
-    bgColorClass: "bg-pink-100 dark:bg-pink-900/30", // Example background color
+    imageUrl: englishLitImage,
+    bgColorClass: "bg-pink-100 dark:bg-pink-900/30", // Example: Light pinkish
   },
   {
     title: "Social Science",
     imageUrl: socialSciImage, // Assuming this file exists
-    bgColorClass: "bg-orange-100 dark:bg-orange-900/30", // Example background color
+    bgColorClass: "bg-orange-100 dark:bg-orange-900/30", // Example: Light orangeish
   },
   {
     title: "English Communicative",
-    imageUrl: englishCommImage, // Use imported local image
-    bgColorClass: "bg-yellow-100 dark:bg-yellow-900/30", // Example background color
+    imageUrl: englishCommImage,
+    bgColorClass: "bg-yellow-100 dark:bg-yellow-900/30", // Example: Light yellowish
   },
   {
     title: "Mathematics",
-    imageUrl: mathImage, // Use imported local image
-    bgColorClass: "bg-teal-100 dark:bg-teal-900/30", // Example background color
+    imageUrl: mathImage,
+    bgColorClass: "bg-teal-100 dark:bg-teal-900/30", // Example: Light tealish
   },
   {
     title: "Science",
     imageUrl: scienceImage, // Assuming this file exists
-    bgColorClass: "bg-indigo-100 dark:bg-indigo-900/30", // Example background color
+    bgColorClass: "bg-indigo-100 dark:bg-indigo-900/30", // Example: Light indigosh
   },
   {
     title: "Hindi",
-    imageUrl: hindiImage, // Use imported local image
-    bgColorClass: "bg-red-100 dark:bg-red-900/30", // Example background color
+    imageUrl: hindiImage,
+    bgColorClass: "bg-red-100 dark:bg-red-900/30", // Example: Light reddish
   },
 ];
 
@@ -194,10 +195,11 @@ export default function Home() {
                   {subjects.map((subject, index) => (
                     <SubjectCard
                       key={index}
-                      title={subject.title}
-                      imageUrl={subject.imageUrl} // Pass the imported image object or URL
-                      bgColorClass={subject.bgColorClass} // Pass the background color class
-                      className="w-[200px] md:w-[220px] flex-shrink-0"
+                      title={subject.title} // Title still used for alt text
+                      imageUrl={subject.imageUrl}
+                      bgColorClass={subject.bgColorClass}
+                      // Adjusted size to fit image-only card
+                      className="w-[180px] h-[120px] md:w-[200px] md:h-[140px] flex-shrink-0"
                     />
                   ))}
                 </div>
@@ -211,5 +213,3 @@ export default function Home() {
     </div>
   );
 }
-
-    
