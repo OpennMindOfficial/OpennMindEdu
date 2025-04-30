@@ -199,8 +199,8 @@ export default function Home() {
                       title={subject.title} // Title still used for alt text
                       imageUrl={subject.imageUrl}
                       bgColorClass={subject.bgColorClass}
-                      // Adjusted size to match the image aspect ratio better and increased height
-                      className="w-[180px] h-[250px] md:w-[200px] md:h-[270px] flex-shrink-0"
+                      // Adjusted size to match the image aspect ratio better and increased height further
+                      className="w-[180px] h-[270px] md:w-[200px] md:h-[290px] flex-shrink-0"
                     />
                   ))}
                 </div>
