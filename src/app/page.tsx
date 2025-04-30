@@ -186,10 +186,6 @@ export default function Home() {
              </div>
           </div>
 
-          {/* Footer */}
-          <footer className="bg-gradient-to-r from-purple-600 via-purple-700 to-purple-800 text-primary-foreground p-4 rounded-lg text-center mt-auto mx-[-1rem] mb-[-1rem] md:mx-[-2rem] md:mb-[-2rem]">
-            <p className="font-semibold">How did OpennMind help your predicted grades?</p>
-          </footer>
         </main>
       </div>
     </div>
