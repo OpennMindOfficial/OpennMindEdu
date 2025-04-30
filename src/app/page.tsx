@@ -1,4 +1,4 @@
-
+'use client'; // Add 'use client' directive for useState and useEffect
 
 import Image from 'next/image';
 import { Header } from "@/components/layout/header";
@@ -22,6 +22,7 @@ import {
   FileText,
   Layers
 } from "lucide-react";
+import React, { useState, useEffect } from 'react'; // Import useState and useEffect
 
 // Import local images for subjects
 import itImage from './it.png';
@@ -123,7 +124,24 @@ const studyQuotes = [
 
 export default function Home() {
   const userName = "Rudransh"; // Mock user name
-  const randomQuote = studyQuotes[Math.floor(Math.random() * studyQuotes.length)]; // Select a random quote
+  const [randomQuote, setRandomQuote] = useState('');
+  const [greeting, setGreeting] = useState('');
+
+  useEffect(() => {
+    // Select a random quote on client-side mount
+    setRandomQuote(studyQuotes[Math.floor(Math.random() * studyQuotes.length)]);
+
+    // Determine greeting based on local time
+    const hour = new Date().getHours();
+    if (hour < 12) {
+      setGreeting("Good morning");
+    } else if (hour < 17) {
+      setGreeting("Good afternoon");
+    } else {
+      setGreeting("Good evening");
+    }
+  }, []); // Empty dependency array ensures this runs only once on mount
+
 
   return (
     <div className="flex h-screen bg-background text-foreground overflow-hidden">
@@ -131,12 +149,13 @@ export default function Home() {
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header />
         <main className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 bg-background">
-          <h1 className="text-3xl font-bold text-foreground">Good morning, {userName}</h1>
+          {/* Dynamic Greeting */}
+          <h1 className="text-3xl font-bold text-foreground">{greeting}, {userName}</h1>
 
            {/* Top Promotional Banner */}
            <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900/80 text-primary-foreground p-6 rounded-xl shadow-lg flex items-center justify-between relative overflow-hidden">
              <div className="z-10">
-               <h2 className="text-xl md:text-2xl font-semibold mb-2">{randomQuote}</h2>
+               <h2 className="text-xl md:text-2xl font-semibold mb-2">{randomQuote || "Loading quote..."}</h2> {/* Display quote or loading message */}
                <Button variant="secondary" size="sm" className="bg-white/20 hover:bg-white/30 text-white px-4 py-1 text-xs h-auto rounded-full">
                  Keep pushing! &lt;3
                </Button>
@@ -148,39 +167,25 @@ export default function Home() {
               </div>
            </div>
 
-           {/* My Subjects Section - Moved Up */}
-           <div className="space-y-4">
-             <div className="flex justify-between items-center">
+           {/* Mock Exams Section - Moved Up */}
+            <div className="space-y-4">
                <div className="flex items-center space-x-2 cursor-pointer group">
-                 <Bookmark className="w-5 h-5 text-primary" />
-                 <h2 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">My subjects</h2>
-                 <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
+                  <PlusCircle className="w-5 h-5 text-primary" />
+                  <h2 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">Mock exams</h2>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
                </div>
-               <div className="flex items-center space-x-4 text-sm">
-                 <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">Change subjects</Button>
-                 <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">Browse all</Button>
-               </div>
-             </div>
-
-             <div className="relative">
-               <ScrollArea className="w-full whitespace-nowrap">
-                 <div className="flex w-max space-x-4 pb-4">
-                   {subjects.map((subject, index) => (
-                     <SubjectCard
-                       key={index}
-                       title={subject.title} // Title still used for alt text
-                       imageUrl={subject.imageUrl}
-                       bgColorClass={subject.bgColorClass}
-                       // Adjusted size to match the image aspect ratio better and increased height further
-                       // Increased horizontal size slightly more
-                       className="w-[195px] h-[320px] md:w-[225px] md:h-[340px] flex-shrink-0"
-                     />
-                   ))}
-                 </div>
-                 <ScrollBar orientation="horizontal" className="h-2" />
-               </ScrollArea>
-             </div>
-           </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {examCards.map((card, index) => (
+                    <ExamCard
+                      key={index}
+                      title={card.title}
+                      imageUrl={card.imageUrl}
+                      bgColorClass={card.bgColorClass}
+                      isNew={card.isNew}
+                    />
+                  ))}
+                </div>
+            </div>
 
            {/* Learn With Section */}
            <div className="space-y-4">
@@ -209,30 +214,41 @@ export default function Home() {
               </div>
            </div>
 
-
-           {/* Mock Exams Section - Moved Down */}
+            {/* My Subjects Section - Moved Down */}
            <div className="space-y-4">
+             <div className="flex justify-between items-center">
                <div className="flex items-center space-x-2 cursor-pointer group">
-                  <PlusCircle className="w-5 h-5 text-primary" />
-                  <h2 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">Mock exams</h2>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
+                 <Bookmark className="w-5 h-5 text-primary" />
+                 <h2 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">My subjects</h2>
+                 <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {examCards.map((card, index) => (
-                    <ExamCard
-                      key={index}
-                      title={card.title}
-                      imageUrl={card.imageUrl}
-                      bgColorClass={card.bgColorClass}
-                      isNew={card.isNew}
-                    />
-                  ))}
-                </div>
-            </div>
+               <div className="flex items-center space-x-4 text-sm">
+                 <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">Change subjects</Button>
+                 <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">Browse all</Button>
+               </div>
+             </div>
+
+             <div className="relative">
+               <ScrollArea className="w-full whitespace-nowrap">
+                 <div className="flex w-max space-x-4 pb-4">
+                   {subjects.map((subject, index) => (
+                     <SubjectCard
+                       key={index}
+                       title={subject.title} // Title still used for alt text
+                       imageUrl={subject.imageUrl}
+                       bgColorClass={subject.bgColorClass}
+                       className="w-[195px] h-[320px] md:w-[225px] md:h-[340px] flex-shrink-0"
+                     />
+                   ))}
+                 </div>
+                 <ScrollBar orientation="horizontal" className="h-2" />
+               </ScrollArea>
+             </div>
+           </div>
+
 
         </main>
       </div>
     </div>
   );
 }
-
