@@ -3,10 +3,8 @@ import type { Config } from "tailwindcss"
 const config = {
   darkMode: ["class"],
   content: [
-    './pages/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './app/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
+    './src/app/**/*.{ts,tsx}', // Include files in the app directory
+    './src/components/**/*.{ts,tsx}', // Include files in the components directory
 	],
   prefix: "",
   theme: {
@@ -18,6 +16,9 @@ const config = {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ["var(--font-sans)", "sans-serif"], // Ensure Inter font variable is applied
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
