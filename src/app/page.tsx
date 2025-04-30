@@ -107,9 +107,23 @@ const learnWithCards = [
     { title: 'Flashcards', icon: Layers, bgColorClass: 'bg-learn-indigo', textColorClass: 'text-learn-indigo-foreground' },
 ];
 
+// Motivational Study Quotes
+const studyQuotes = [
+    "Believe you can and you're halfway there.",
+    "The expert in anything was once a beginner.",
+    "Success is the sum of small efforts, repeated day in and day out.",
+    "Don't watch the clock; do what it does. Keep going.",
+    "The only way to do great work is to love what you do.",
+    "Push yourself, because no one else is going to do it for you.",
+    "Your limitation—it's only your imagination.",
+    "The future belongs to those who believe in the beauty of their dreams.",
+    "Study hard, do good, and the good life will follow.",
+    "It always seems impossible until it's done."
+];
 
 export default function Home() {
   const userName = "Rudransh"; // Mock user name
+  const randomQuote = studyQuotes[Math.floor(Math.random() * studyQuotes.length)]; // Select a random quote
 
   return (
     <div className="flex h-screen bg-background text-foreground overflow-hidden">
@@ -122,9 +136,9 @@ export default function Home() {
            {/* Top Promotional Banner */}
            <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900/80 text-primary-foreground p-6 rounded-xl shadow-lg flex items-center justify-between relative overflow-hidden">
              <div className="z-10">
-               <h2 className="text-xl md:text-2xl font-semibold mb-2">How did OpennMind help your predicted grades?</h2>
+               <h2 className="text-xl md:text-2xl font-semibold mb-2">{randomQuote}</h2>
                <Button variant="secondary" size="sm" className="bg-white/20 hover:bg-white/30 text-white px-4 py-1 text-xs h-auto rounded-full">
-                 Share your wins with us &lt;3
+                 Keep pushing! &lt;3
                </Button>
              </div>
              <div className="absolute right-0 bottom-[-20px] opacity-70 z-0 w-32 h-32 md:w-40 md:h-40">
@@ -134,7 +148,56 @@ export default function Home() {
               </div>
            </div>
 
-            {/* My Subjects Section - Moved Up */}
+            {/* Mock Exams Section - Moved Up */}
+             <div className="space-y-4">
+                <div className="flex items-center space-x-2 cursor-pointer group">
+                   <PlusCircle className="w-5 h-5 text-primary" />
+                   <h2 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">Mock exams</h2>
+                   <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
+                </div>
+                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                   {examCards.map((card, index) => (
+                     <ExamCard
+                       key={index}
+                       title={card.title}
+                       imageUrl={card.imageUrl}
+                       bgColorClass={card.bgColorClass}
+                       isNew={card.isNew}
+                     />
+                   ))}
+                 </div>
+             </div>
+
+
+           {/* Learn With Section */}
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2 cursor-pointer group">
+                 <Lightbulb className="w-5 h-5 text-yellow-500" />
+                 <h2 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">Learn with</h2>
+                 <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
+              </div>
+               {/* Use LearnWithCard component */}
+               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {learnWithCards.map((card, index) => (
+                     <LearnWithCard
+                       key={index}
+                       title={card.title}
+                       icon={card.icon}
+                       bgColorClass={card.bgColorClass}
+                       textColorClass={card.textColorClass}
+                     />
+                  ))}
+                  {/* Placeholder Card */}
+                  <Card className="p-4 bg-muted/50 dark:bg-card/80 rounded-xl border-0 flex items-center justify-center h-full">
+                     <CardContent className="text-center p-0">
+                       <p className="text-muted-foreground text-sm">Learning content coming soon...</p>
+                     </CardContent>
+                  </Card>
+               </div>
+            </div>
+
+
+             {/* My Subjects Section - Moved Down */}
             <div className="space-y-4">
                <div className="flex justify-between items-center">
                  <div className="flex items-center space-x-2 cursor-pointer group">
@@ -167,47 +230,6 @@ export default function Home() {
                 </ScrollArea>
                </div>
             </div>
-
-           {/* Learn With Section */}
-            <div className="space-y-4">
-              <div className="flex items-center space-x-2 cursor-pointer group">
-                 <Lightbulb className="w-5 h-5 text-yellow-500" />
-                 <h2 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">Learn with</h2>
-                 <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
-              </div>
-               {/* Use LearnWithCard component */}
-               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {learnWithCards.map((card, index) => (
-                     <LearnWithCard
-                       key={index}
-                       title={card.title}
-                       icon={card.icon}
-                       bgColorClass={card.bgColorClass}
-                       textColorClass={card.textColorClass}
-                     />
-                  ))}
-               </div>
-            </div>
-
-            {/* Mock Exams Section - Moved Down */}
-             <div className="space-y-4">
-                <div className="flex items-center space-x-2 cursor-pointer group">
-                   <PlusCircle className="w-5 h-5 text-primary" />
-                   <h2 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">Mock exams</h2>
-                   <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
-                </div>
-                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                   {examCards.map((card, index) => (
-                     <ExamCard
-                       key={index}
-                       title={card.title}
-                       imageUrl={card.imageUrl}
-                       bgColorClass={card.bgColorClass}
-                       isNew={card.isNew}
-                     />
-                   ))}
-                 </div>
-             </div>
 
         </main>
       </div>
