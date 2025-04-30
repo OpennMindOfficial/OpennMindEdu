@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { Card, CardContent, CardFooter } from "@/components/ui/card"; // Removed unused imports
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { cn } from '@/lib/utils';
 
 interface SubjectCardProps {
@@ -16,17 +16,15 @@ export function SubjectCard({ title, imageUrl, className }: SubjectCardProps) {
       className
     )}>
       <CardContent className="p-0">
-        <div className="relative aspect-[3/2.2] w-full"> {/* Slightly adjusted aspect ratio */}
+          {/* Using width/height for explicit sizing */}
           <Image
             src={imageUrl}
             alt={title}
-            fill // Changed layout to fill
-            objectFit="cover"
-            className="rounded-t-xl" // Match card rounding
+            width={300}
+            height={200}
+            className="rounded-t-xl w-full h-auto" // Ensure image scales width-wise, maintaining aspect ratio defined by width/height
+            priority={false} // Optional: set to true for images above the fold
           />
-           {/* Optional: Add a subtle overlay */}
-           {/* <div className="absolute inset-0 bg-black/5"></div> */}
-        </div>
       </CardContent>
       {/* Adjusted footer styling */}
       <CardFooter className="p-3 bg-transparent backdrop-blur-sm rounded-b-xl mt-[-4px]"> {/* Transparent background, slight blur */}

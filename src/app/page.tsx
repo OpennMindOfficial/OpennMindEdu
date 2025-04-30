@@ -72,13 +72,7 @@ export default function Home() {
                 </div>
                 <ScrollBar orientation="horizontal" className="h-2" />
               </ScrollArea>
-               {/* Add functional navigation arrows if needed */}
-               {/* <Button variant="outline" size="icon" className="absolute left-[-10px] top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-card hover:bg-muted z-10">
-                 <ChevronLeft className="h-4 w-4" />
-               </Button>
-               <Button variant="outline" size="icon" className="absolute right-[-10px] top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-card hover:bg-muted z-10">
-                 <ChevronRight className="h-4 w-4" />
-               </Button> */}
+               {/* Functional navigation arrows removed as they were commented out */}
              </div>
           </div>
 
