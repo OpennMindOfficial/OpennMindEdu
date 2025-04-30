@@ -101,7 +101,7 @@ export default function Home() {
            {/* Top Promotional Banner */}
            <div className="bg-gradient-to-r from-purple-900 via-purple-800 to-purple-900/80 text-primary-foreground p-6 rounded-xl shadow-lg flex items-center justify-between relative overflow-hidden">
              <div className="z-10">
-               <h2 className="text-xl md:text-2xl font-semibold mb-2">How did RevisionDojo help your predicted grades?</h2>
+               <h2 className="text-xl md:text-2xl font-semibold mb-2">How did OpennMind help your predicted grades?</h2>
                <Button variant="secondary" size="sm" className="bg-white/20 hover:bg-white/30 text-white rounded-full px-4 py-1 text-xs h-auto">
                  Share your wins with us &lt;3
                </Button>
@@ -188,7 +188,7 @@ export default function Home() {
 
           {/* Footer */}
           <footer className="bg-gradient-to-r from-purple-600 via-purple-700 to-purple-800 text-primary-foreground p-4 rounded-lg text-center mt-auto mx-[-1rem] mb-[-1rem] md:mx-[-2rem] md:mb-[-2rem]">
-            <p className="font-semibold">How did RevisionDojo help your predicted grades?</p>
+            <p className="font-semibold">How did OpennMind help your predicted grades?</p>
           </footer>
         </main>
       </div>

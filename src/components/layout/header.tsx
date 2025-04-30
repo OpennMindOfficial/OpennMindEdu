@@ -13,7 +13,7 @@ export function Header() {
              {/* Using GraduationCap directly */}
              <GraduationCap className="w-5 h-5" strokeWidth={2} />
             </div>
-             RevisionDojo
+             OpennMind
              {/* Using ShieldQuestion directly */}
              <ShieldQuestion className="w-4 h-4 text-muted-foreground ml-[-4px]" /> {/* Adjusted margin */}
          </div>

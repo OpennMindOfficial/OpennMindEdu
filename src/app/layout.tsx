@@ -7,8 +7,8 @@ import { ThemeProvider } from "@/components/theme-provider";
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
-  title: "RevisionDojo Clone",
-  description: "A clone of the RevisionDojo UI",
+  title: "OpennMind Clone",
+  description: "A clone of the OpennMind UI",
 };
 
 export default function RootLayout({
