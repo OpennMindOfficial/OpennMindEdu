@@ -200,7 +200,8 @@ export default function Home() {
                       imageUrl={subject.imageUrl}
                       bgColorClass={subject.bgColorClass}
                       // Adjusted size to match the image aspect ratio better and increased height further
-                      className="w-[185px] h-[320px] md:w-[210px] md:h-[340px] flex-shrink-0" // Increased horizontal size
+                      // Increased horizontal size slightly more
+                      className="w-[195px] h-[320px] md:w-[225px] md:h-[340px] flex-shrink-0"
                     />
                   ))}
                 </div>
