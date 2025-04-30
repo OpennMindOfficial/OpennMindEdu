@@ -148,87 +148,86 @@ export default function Home() {
               </div>
            </div>
 
-            {/* Mock Exams Section - Moved Up */}
-             <div className="space-y-4">
-                <div className="flex items-center space-x-2 cursor-pointer group">
-                   <PlusCircle className="w-5 h-5 text-primary" />
-                   <h2 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">Mock exams</h2>
-                   <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
-                </div>
-                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                   {examCards.map((card, index) => (
-                     <ExamCard
+           {/* My Subjects Section - Moved Up */}
+           <div className="space-y-4">
+             <div className="flex justify-between items-center">
+               <div className="flex items-center space-x-2 cursor-pointer group">
+                 <Bookmark className="w-5 h-5 text-primary" />
+                 <h2 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">My subjects</h2>
+                 <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
+               </div>
+               <div className="flex items-center space-x-4 text-sm">
+                 <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">Change subjects</Button>
+                 <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">Browse all</Button>
+               </div>
+             </div>
+
+             <div className="relative">
+               <ScrollArea className="w-full whitespace-nowrap">
+                 <div className="flex w-max space-x-4 pb-4">
+                   {subjects.map((subject, index) => (
+                     <SubjectCard
                        key={index}
-                       title={card.title}
-                       imageUrl={card.imageUrl}
-                       bgColorClass={card.bgColorClass}
-                       isNew={card.isNew}
+                       title={subject.title} // Title still used for alt text
+                       imageUrl={subject.imageUrl}
+                       bgColorClass={subject.bgColorClass}
+                       // Adjusted size to match the image aspect ratio better and increased height further
+                       // Increased horizontal size slightly more
+                       className="w-[195px] h-[320px] md:w-[225px] md:h-[340px] flex-shrink-0"
                      />
                    ))}
                  </div>
+                 <ScrollBar orientation="horizontal" className="h-2" />
+               </ScrollArea>
              </div>
-
+           </div>
 
            {/* Learn With Section */}
-            <div className="space-y-4">
-              <div className="flex items-center space-x-2 cursor-pointer group">
-                 <Lightbulb className="w-5 h-5 text-yellow-500" />
-                 <h2 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">Learn with</h2>
-                 <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
+           <div className="space-y-4">
+             <div className="flex items-center space-x-2 cursor-pointer group">
+                <Lightbulb className="w-5 h-5 text-yellow-500" />
+                <h2 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">Learn with</h2>
+                <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
+             </div>
+              {/* Use LearnWithCard component */}
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                 {learnWithCards.map((card, index) => (
+                    <LearnWithCard
+                      key={index}
+                      title={card.title}
+                      icon={card.icon}
+                      bgColorClass={card.bgColorClass}
+                      textColorClass={card.textColorClass}
+                    />
+                 ))}
+                 {/* Placeholder Card */}
+                 <Card className="p-4 bg-muted/50 dark:bg-card/80 rounded-xl border-0 flex items-center justify-center h-full">
+                    <CardContent className="text-center p-0">
+                      <p className="text-muted-foreground text-sm">Learning content coming soon...</p>
+                    </CardContent>
+                 </Card>
               </div>
-               {/* Use LearnWithCard component */}
-               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {learnWithCards.map((card, index) => (
-                     <LearnWithCard
-                       key={index}
-                       title={card.title}
-                       icon={card.icon}
-                       bgColorClass={card.bgColorClass}
-                       textColorClass={card.textColorClass}
-                     />
+           </div>
+
+
+           {/* Mock Exams Section - Moved Down */}
+           <div className="space-y-4">
+               <div className="flex items-center space-x-2 cursor-pointer group">
+                  <PlusCircle className="w-5 h-5 text-primary" />
+                  <h2 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">Mock exams</h2>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
+               </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {examCards.map((card, index) => (
+                    <ExamCard
+                      key={index}
+                      title={card.title}
+                      imageUrl={card.imageUrl}
+                      bgColorClass={card.bgColorClass}
+                      isNew={card.isNew}
+                    />
                   ))}
-                  {/* Placeholder Card */}
-                  <Card className="p-4 bg-muted/50 dark:bg-card/80 rounded-xl border-0 flex items-center justify-center h-full">
-                     <CardContent className="text-center p-0">
-                       <p className="text-muted-foreground text-sm">Learning content coming soon...</p>
-                     </CardContent>
-                  </Card>
-               </div>
-            </div>
-
-
-             {/* My Subjects Section - Moved Down */}
-            <div className="space-y-4">
-               <div className="flex justify-between items-center">
-                 <div className="flex items-center space-x-2 cursor-pointer group">
-                   <Bookmark className="w-5 h-5 text-primary" />
-                   <h2 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">My subjects</h2>
-                   <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
-                 </div>
-                 <div className="flex items-center space-x-4 text-sm">
-                    <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground rounded-full">Change subjects</Button>
-                    <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground rounded-full">Browse all</Button>
-                 </div>
-              </div>
-
-              <div className="relative">
-                 <ScrollArea className="w-full whitespace-nowrap">
-                  <div className="flex w-max space-x-4 pb-4">
-                    {subjects.map((subject, index) => (
-                      <SubjectCard
-                        key={index}
-                        title={subject.title} // Title still used for alt text
-                        imageUrl={subject.imageUrl}
-                        bgColorClass={subject.bgColorClass}
-                        // Adjusted size to match the image aspect ratio better and increased height further
-                        // Increased horizontal size slightly more
-                        className="w-[195px] h-[320px] md:w-[225px] md:h-[340px] flex-shrink-0"
-                      />
-                    ))}
-                  </div>
-                  <ScrollBar orientation="horizontal" className="h-2" />
-                </ScrollArea>
-               </div>
+                </div>
             </div>
 
         </main>
