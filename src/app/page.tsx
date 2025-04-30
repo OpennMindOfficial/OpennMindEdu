@@ -102,7 +102,7 @@ export default function Home() {
            <div className="bg-gradient-to-r from-purple-900 via-purple-800 to-purple-900/80 text-primary-foreground p-6 rounded-xl shadow-lg flex items-center justify-between relative overflow-hidden">
              <div className="z-10">
                <h2 className="text-xl md:text-2xl font-semibold mb-2">How did OpennMind help your predicted grades?</h2>
-               <Button variant="secondary" size="sm" className="bg-white/20 hover:bg-white/30 text-white rounded-full px-4 py-1 text-xs h-auto">
+               <Button variant="secondary" size="sm" className="bg-white/20 hover:bg-white/30 text-white px-4 py-1 text-xs h-auto">
                  Share your wins with us &lt;3
                </Button>
              </div>

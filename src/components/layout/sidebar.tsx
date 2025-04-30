@@ -17,9 +17,9 @@ import {
   BookOpen, // Used for Notes
   FileStack, // Used for PDF to Notes
   Bookmark, // Used for Saved
-  ChevronDown,
-  Badge // Import Badge component
+  ChevronDown
 } from 'lucide-react';
+import { Badge } from "@/components/ui/badge"; // Import Badge component
 import * as React from 'react';
 
 interface NavItemProps {
@@ -34,22 +34,23 @@ interface NavItemProps {
 function NavItem({ href, icon: Icon, label, isNew, isActive }: NavItemProps) {
   return (
     <Link href={href} legacyBehavior passHref>
-      <a
+      <Button
+        variant={isActive ? 'secondary' : 'ghost'} // Use secondary for active, ghost for inactive
         className={cn(
-          'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all',
+          'w-full justify-start text-sm font-medium transition-all h-9 px-3', // Use button base styles
           isActive
             ? 'bg-primary/10 text-primary dark:bg-primary dark:text-primary-foreground' // Active state with purple background/text
             : 'text-muted-foreground hover:text-foreground hover:bg-muted', // Inactive state
         )}
       >
-        <Icon className={cn("h-4 w-4", isActive ? "text-primary dark:text-primary-foreground" : "")} />
+        <Icon className={cn("h-4 w-4 mr-3", isActive ? "text-primary dark:text-primary-foreground" : "")} />
         {label}
         {isNew && (
-          <Badge className="ml-auto flex h-5 shrink-0 items-center justify-center rounded-full bg-blue-500 px-2 text-[10px] font-medium text-white"> {/* Adjusted badge style */}
+          <Badge variant="default" className="ml-auto flex h-5 shrink-0 items-center justify-center rounded-full bg-blue-500 px-2 text-[10px] font-medium text-white"> {/* Use default badge, style overrides */}
             New
           </Badge>
         )}
-      </a>
+      </Button>
     </Link>
   );
 }
@@ -107,15 +108,15 @@ export function Sidebar() {
         <ScrollArea className="flex-1 py-4">
             {/* Top Dropdown - Matched styling */}
             <div className="px-4 mb-4">
-                <Button variant="outline" className="w-full justify-between border-muted-foreground/30 h-9 rounded-lg text-sm font-normal text-foreground">
+                <Button variant="outline" className="w-full justify-between border-muted-foreground/30 h-9 text-sm font-normal text-foreground px-3"> {/* Adjusted padding */}
                     <span>CBSE</span>
                     <div className='flex items-center gap-1'>
-                        <span className={cn(
-                          "text-[10px] font-semibold px-1.5 py-0.5 rounded-sm", // Adjusted styling
-                           isFreePlan ? "bg-green-100 text-green-800 dark:bg-green-800/30 dark:text-green-300" : "bg-primary text-primary-foreground"
+                        <Badge variant={isFreePlan ? 'secondary' : 'primary'} className={cn(
+                          "text-[10px] font-semibold px-1.5 py-0.5 rounded-sm h-auto", // Adjusted styling
+                           isFreePlan ? "bg-green-100 text-green-800 dark:bg-green-800/30 dark:text-green-300 border-transparent" : "" // Specific free plan styles
                            )}>
                          {isFreePlan ? "FREE" : "PRO"}
-                        </span>
+                        </Badge>
                         <ChevronDown className="h-4 w-4 text-muted-foreground" />
                     </div>
                 </Button>

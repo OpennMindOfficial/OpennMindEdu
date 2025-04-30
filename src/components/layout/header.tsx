@@ -26,7 +26,7 @@ export function Header() {
           <Input
             type="search"
             placeholder="Search for anything..."
-            className="pl-10 w-full bg-background md:bg-muted dark:bg-input" // Adjusted background for better contrast based on theme
+            className="pl-10 w-full bg-background md:bg-muted dark:bg-input rounded-full" // Rounded search bar
           />
         </div>
       </div>
@@ -43,7 +43,7 @@ export function Header() {
         </Button>
 
         {/* Upgrade Button - Matched styling */}
-        <Button variant="primary" size="sm" className="px-4 font-semibold h-9 rounded-lg"> {/* Used primary variant */}
+        <Button variant="primary" size="sm" className="px-4 font-semibold"> {/* Adjusted padding via size="sm" */}
             Upgrade
         </Button>
 
