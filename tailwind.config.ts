@@ -53,11 +53,25 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Custom colors for exam cards based on screenshot
+        'exam-blue': {
+          light: '#E0F2FE', // light sky blue
+          dark: '#3B82F6', // blue-500
+        },
+        'exam-green': {
+          light: '#D1FAE5', // light emerald green
+          dark: '#10B981', // emerald-500
+        },
+        'exam-pink': {
+          light: '#FCE7F3', // light pink
+          dark: '#EC4899', // pink-500
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        xl: "calc(var(--radius) + 4px)", // Added for consistency with page
       },
       keyframes: {
         "accordion-down": {
