@@ -1,11 +1,11 @@
-import Image from 'next/image';
+import Image, { type StaticImageData } from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from '@/lib/utils';
 
 interface ExamCardProps {
   title: string;
-  imageUrl: string; // Placeholder for illustration
+  imageUrl: string | StaticImageData; // Accept string URL or imported image object
   bgColorClass: string; // Tailwind class for background gradient/color
   isNew?: boolean;
   className?: string;

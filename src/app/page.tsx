@@ -3,7 +3,8 @@ import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
 import { SubjectCard } from "@/components/ui/subject-card";
 import { ExamCard } from "@/components/ui/exam-card";
-import { LearnWithCard } from "@/components/ui/learn-with-card"; // Import LearnWithCard
+import { LearnWithCard } from "@/components/ui/learn-with-card";
+import { Card, CardContent } from "@/components/ui/card"; // Import Card and CardContent
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import {
@@ -19,6 +20,12 @@ import {
   FileText,
   Layers
 } from "lucide-react";
+
+// Import local images
+import i1 from './i1.png';
+import i2 from './i2.png';
+import i3 from './i3.png';
+
 
 const subjects = [
   {
@@ -47,23 +54,23 @@ const subjects = [
   },
 ];
 
-// Data for Exam Cards
+// Data for Exam Cards using local images
 const examCards = [
   {
     title: "Random exam",
-    imageUrl: "https://surveys.opennmind.com/wp-content/uploads/2025/04/undraw_collaborative-writing_ir40-removebg-preview.png",
+    imageUrl: i1, // Use imported image i1
     bgColorClass: "bg-gradient-to-br from-exam-blue-light to-white dark:from-exam-blue-dark/30 dark:to-background",
     isNew: false,
   },
   {
     title: "Custom exam",
-    imageUrl: "https://surveys.opennmind.com/wp-content/uploads/2025/04/undraw_preferences_2bda-removebg-preview.png",
+    imageUrl: i2, // Use imported image i2
     bgColorClass: "bg-gradient-to-br from-exam-green-light to-white dark:from-exam-green-dark/30 dark:to-background",
     isNew: true,
   },
   {
     title: "Timed exam",
-    imageUrl: "https://surveys.opennmind.com/wp-content/uploads/2025/04/undraw_screen-time_ys34-removebg-preview.png",
+    imageUrl: i3, // Use imported image i3
     bgColorClass: "bg-gradient-to-br from-exam-pink-light to-white dark:from-exam-pink-dark/30 dark:to-background",
     isNew: true,
   },
