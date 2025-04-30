@@ -3,8 +3,8 @@ import type { Config } from "tailwindcss"
 const config = {
   darkMode: ["class"],
   content: [
-    './src/app/**/*.{ts,tsx}', // Include files in the app directory
-    './src/components/**/*.{ts,tsx}', // Include files in the components directory
+    './src/app/**/*.{ts,tsx}',
+    './src/components/**/*.{ts,tsx}',
 	],
   prefix: "",
   theme: {
@@ -17,7 +17,7 @@ const config = {
     },
     extend: {
       fontFamily: {
-        sans: ["var(--font-sans)", "sans-serif"], // Ensure Inter font variable is applied
+        sans: ["var(--font-sans)", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -53,25 +53,50 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // Custom colors for exam cards based on screenshot
+        // Custom colors for exam cards
         'exam-blue': {
-          light: '#E0F2FE', // light sky blue
-          dark: '#3B82F6', // blue-500
+          light: '#E0F2FE',
+          dark: '#3B82F6',
         },
         'exam-green': {
-          light: '#D1FAE5', // light emerald green
-          dark: '#10B981', // emerald-500
+          light: '#D1FAE5',
+          dark: '#10B981',
         },
         'exam-pink': {
-          light: '#FCE7F3', // light pink
-          dark: '#EC4899', // pink-500
+          light: '#FCE7F3',
+          dark: '#EC4899',
+        },
+        // Custom colors for "Learn with" cards
+        'learn-purple': {
+          DEFAULT: 'hsl(270, 50%, 30%)', // Darker purple
+          foreground: 'hsl(270, 50%, 95%)', // Lighter purple text
+        },
+        'learn-blue': {
+           DEFAULT: 'hsl(210, 50%, 30%)', // Darker blue
+           foreground: 'hsl(210, 50%, 95%)', // Lighter blue text
+         },
+        'learn-yellow': {
+          DEFAULT: 'hsl(45, 70%, 30%)', // Darker yellow/brown
+          foreground: 'hsl(45, 70%, 95%)', // Lighter yellow text
+        },
+        'learn-green': {
+          DEFAULT: 'hsl(145, 50%, 25%)', // Darker green
+          foreground: 'hsl(145, 50%, 95%)', // Lighter green text
+        },
+        'learn-red': {
+          DEFAULT: 'hsl(0, 50%, 35%)', // Darker red/maroon
+          foreground: 'hsl(0, 50%, 95%)', // Lighter red text
+        },
+        'learn-indigo': {
+          DEFAULT: 'hsl(240, 40%, 35%)', // Darker indigo/blue-purple
+          foreground: 'hsl(240, 40%, 95%)', // Lighter indigo text
         },
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
-        xl: "calc(var(--radius) + 4px)", // Added for consistency with page
+        xl: "calc(var(--radius) + 4px)",
       },
       keyframes: {
         "accordion-down": {

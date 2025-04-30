@@ -2,12 +2,23 @@ import Image from 'next/image';
 import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
 import { SubjectCard } from "@/components/ui/subject-card";
-import { ExamCard } from "@/components/ui/exam-card"; // Import ExamCard
+import { ExamCard } from "@/components/ui/exam-card";
+import { LearnWithCard } from "@/components/ui/learn-with-card"; // Import LearnWithCard
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge"; // Import Badge
-import { Card, CardContent } from "@/components/ui/card"; // Import Card and CardContent
-import { ArrowRight, Bookmark, ChevronRight, PlusCircle, Lightbulb } from "lucide-react"; // Added icons
+import {
+  ArrowRight,
+  Bookmark,
+  ChevronRight,
+  PlusCircle,
+  Lightbulb,
+  PlayCircle,
+  BookOpen,
+  HelpCircle,
+  ClipboardCheck,
+  FileText,
+  Layers
+} from "lucide-react";
 
 const subjects = [
   {
@@ -36,7 +47,7 @@ const subjects = [
   },
 ];
 
-// Data for Exam Cards - Updated Image URLs
+// Data for Exam Cards
 const examCards = [
   {
     title: "Random exam",
@@ -58,9 +69,19 @@ const examCards = [
   },
 ];
 
+// Data for Learn With Cards
+const learnWithCards = [
+    { title: 'Videos', icon: PlayCircle, bgColorClass: 'bg-learn-purple', textColorClass: 'text-learn-purple-foreground' },
+    { title: 'Lessons', icon: BookOpen, bgColorClass: 'bg-learn-blue', textColorClass: 'text-learn-blue-foreground' },
+    { title: 'Questions', icon: HelpCircle, bgColorClass: 'bg-learn-yellow', textColorClass: 'text-learn-yellow-foreground' },
+    { title: 'Mock exams', icon: ClipboardCheck, bgColorClass: 'bg-learn-green', textColorClass: 'text-learn-green-foreground' },
+    { title: 'Notes', icon: FileText, bgColorClass: 'bg-learn-red', textColorClass: 'text-learn-red-foreground' },
+    { title: 'Flashcards', icon: Layers, bgColorClass: 'bg-learn-indigo', textColorClass: 'text-learn-indigo-foreground' },
+];
+
+
 export default function Home() {
-  // In a real app, user name would come from auth context or props
-  const userName = "Rudransh";
+  const userName = "Rudransh"; // Mock user name
 
   return (
     <div className="flex h-screen bg-background text-foreground overflow-hidden">
@@ -70,7 +91,7 @@ export default function Home() {
         <main className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 bg-background">
           <h1 className="text-3xl font-bold text-foreground">Good morning, {userName}</h1>
 
-           {/* Top Promotional Banner - New Style */}
+           {/* Top Promotional Banner */}
            <div className="bg-gradient-to-r from-purple-900 via-purple-800 to-purple-900/80 text-primary-foreground p-6 rounded-xl shadow-lg flex items-center justify-between relative overflow-hidden">
              <div className="z-10">
                <h2 className="text-xl md:text-2xl font-semibold mb-2">How did RevisionDojo help your predicted grades?</h2>
@@ -78,9 +99,7 @@ export default function Home() {
                  Share your wins with us &lt;3
                </Button>
              </div>
-             {/* Placeholder for character image */}
              <div className="absolute right-0 bottom-[-20px] opacity-70 z-0 w-32 h-32 md:w-40 md:h-40">
-                {/* Simple placeholder - replace with actual image/SVG if available */}
                  <svg viewBox="0 0 100 100" fill="currentColor" className="text-purple-400 w-full h-full">
                     <path d="M50,0 C22.4,0 0,22.4 0,50 C0,77.6 22.4,100 50,100 C77.6,100 100,77.6 100,50 C100,22.4 77.6,0 50,0 Z M50,10 C66.6,10 80,23.4 80,40 C80,56.6 66.6,70 50,70 C33.4,70 20,56.6 20,40 C20,23.4 33.4,10 50,10 Z M50,80 C38.9,80 30,71.1 30,60 L70,60 C70,71.1 61.1,80 50,80 Z"/>
                  </svg>
@@ -110,22 +129,26 @@ export default function Home() {
            {/* Learn With Section */}
             <div className="space-y-4">
               <div className="flex items-center space-x-2 cursor-pointer group">
-                 <Lightbulb className="w-5 h-5 text-yellow-500" /> {/* Updated Icon */}
+                 <Lightbulb className="w-5 h-5 text-yellow-500" />
                  <h2 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">Learn with</h2>
+                 <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
               </div>
-              {/* Content for Learn With section goes here - placeholder for now */}
-               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                 {/* Example Placeholder Card - Replace with actual content */}
-                 <Card className="p-4 bg-muted/50 dark:bg-card/80 rounded-xl border-0">
-                   <CardContent>
-                     <p className="text-muted-foreground">Learning content coming soon...</p>
-                   </CardContent>
-                 </Card>
+               {/* Use LearnWithCard component */}
+               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {learnWithCards.map((card, index) => (
+                     <LearnWithCard
+                       key={index}
+                       title={card.title}
+                       icon={card.icon}
+                       bgColorClass={card.bgColorClass}
+                       textColorClass={card.textColorClass}
+                     />
+                  ))}
                </div>
             </div>
 
 
-           {/* My Subjects Section (existing) - no visual changes needed based on screenshot */}
+           {/* My Subjects Section */}
           <div className="space-y-4">
              <div className="flex justify-between items-center">
                <div className="flex items-center space-x-2 cursor-pointer group">
@@ -148,7 +171,6 @@ export default function Home() {
                       title={subject.title}
                       imageUrl={subject.imageUrl}
                       className="w-[200px] md:w-[220px] flex-shrink-0"
-                      priority={index < 3} // Prioritize first few images
                     />
                   ))}
                 </div>
@@ -157,7 +179,7 @@ export default function Home() {
              </div>
           </div>
 
-          {/* Footer - Added simple footer */}
+          {/* Footer */}
           <footer className="bg-gradient-to-r from-purple-600 via-purple-700 to-purple-800 text-primary-foreground p-4 rounded-lg text-center mt-auto mx-[-1rem] mb-[-1rem] md:mx-[-2rem] md:mb-[-2rem]">
             <p className="font-semibold">How did RevisionDojo help your predicted grades?</p>
           </footer>
