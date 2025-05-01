@@ -33,8 +33,10 @@ import {
   BookOpen,
   FileStack,
   Bookmark,
+  GraduationCap // OpennMind logo icon
 } from 'lucide-react';
 import * as React from 'react';
+import { motion } from 'framer-motion'; // Import motion
 
 interface NavItemProps {
   href: string;
@@ -47,7 +49,7 @@ interface NavItemProps {
   isDropdown?: boolean; // Flag for dropdown items like Q4 updates
 }
 
-// Updated NavItem for active state styling matching the screenshot
+// Updated NavItem for active state styling and hover animation
 function NavItem({
   href,
   icon: Icon,
@@ -58,27 +60,44 @@ function NavItem({
   isActive,
   isDropdown,
 }: NavItemProps) {
+  const [isHovered, setIsHovered] = React.useState(false);
+
   return (
     <Link href={href} legacyBehavior passHref>
-      <a
+      <motion.a
         className={cn(
-          'flex items-center justify-between text-sm font-medium transition-colors h-9 px-3 rounded-md', // Adjusted rounding and height
+          'relative flex items-center justify-between text-sm font-medium transition-colors h-9 px-3 rounded-md group', // Added group class, removed background classes
           isSubItem ? 'pl-9' : '', // Indent sub-items
           isActive
-            ? 'bg-muted text-foreground dark:bg-muted/50' // Active state background
-            : 'text-muted-foreground hover:text-foreground hover:bg-muted/50', // Inactive state
+            ? 'text-foreground' // Active text color
+            : 'text-muted-foreground hover:text-foreground', // Inactive text color and hover
         )}
+        onHoverStart={() => setIsHovered(true)}
+        onHoverEnd={() => setIsHovered(false)}
       >
-        <div className="flex items-center overflow-hidden"> {/* Container for icon and label */}
+        {/* Animated Background Highlight */}
+        {(isHovered || isActive) && (
+            <motion.span
+                layoutId="sidebarHighlight" // Unique ID for layout animation
+                className="absolute inset-0 z-0 rounded-md bg-muted dark:bg-muted/50"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.15 }}
+            />
+        )}
+
+        {/* Content (Icon, Label, Badge) - Ensure it's above the highlight */}
+        <div className="relative z-10 flex items-center overflow-hidden flex-grow"> {/* Use flex-grow */}
             <Icon className={cn("h-4 w-4 mr-3 flex-shrink-0", isActive ? "text-foreground" : "")} />
             <span className="truncate">{label}</span> {/* Truncate long labels */}
             {isDropdown && <ChevronDown className="h-4 w-4 ml-1 text-muted-foreground" />}
         </div>
-        <div className="flex items-center ml-2 flex-shrink-0"> {/* Container for badge/secondary text */}
+        <div className="relative z-10 flex items-center ml-2 flex-shrink-0"> {/* Container for badge/secondary text */}
             {badgeCount && (
                 <Badge
-                 variant="secondary" // Use secondary variant for subtle background
-                 className="ml-auto flex h-5 w-5 shrink-0 items-center justify-center rounded-full p-0 text-xs font-semibold bg-muted text-foreground border border-border/50" // Adjust badge style
+                 variant="count" // Use count variant
+                 className="ml-auto flex h-5 w-5 shrink-0 items-center justify-center rounded-full p-0 text-xs font-semibold" // Simplified classes
                  >
                  {badgeCount}
                 </Badge>
@@ -87,7 +106,7 @@ function NavItem({
                 <span className="text-xs text-muted-foreground">{secondaryText}</span>
             )}
         </div>
-      </a>
+      </motion.a>
     </Link>
   );
 }
@@ -111,60 +130,49 @@ function NavSection({ title, children }: NavSectionProps) {
 export function Sidebar() {
     const pathname = usePathname();
 
-    // Example data structure matching the image
+    // Example data structure matching the image - adjusted for OpennMind context
     const mainNavItems = [
         { href: '/', icon: LayoutDashboard, label: 'Dashboard'},
         { href: '/notifications', icon: Bell, label: 'Notifications', badgeCount: 8},
     ];
 
+    // Favourites Section - can be customized
     const favouritesItems = [
-        { href: '#', icon: FolderOpen, label: 'Q4 updates', isDropdown: true }, // Placeholder for dropdown
-        { href: '/q4-conversions', icon: BarChart3, label: 'Q4 conversions', secondaryText: 'Report', isSubItem: true },
-        { href: '/q4-customers', icon: Users, label: 'Q4 customers', secondaryText: 'Cohort', isSubItem: true },
-        { href: '/weekly-update', icon: BarChartHorizontal, label: 'Weekly update', secondaryText: 'Report', isSubItem: true },
-        { href: '/non-staff-visits', icon: UsersRound, label: 'Non-staff site visit...', secondaryText: 'Cohort', isSubItem: true },
+        { href: '#', icon: FolderOpen, label: 'My Courses', isDropdown: true }, // Placeholder for dropdown
+        { href: '/courses/math-q4', icon: BarChart3, label: 'Math Q4 progress', secondaryText: 'Report', isSubItem: true },
+        { href: '/courses/science-q4', icon: Users, label: 'Science Q4 cohort', secondaryText: 'Cohort', isSubItem: true },
+        { href: '/courses/weekly-summary', icon: BarChartHorizontal, label: 'Weekly Summary', secondaryText: 'Report', isSubItem: true },
     ];
 
-    const analysisItems = [
-        { href: '/cohorts', icon: Users2, label: 'Cohorts'},
-        { href: '/funnels', icon: Filter, label: 'Funnels'},
-        { href: '/conversions', icon: CheckCircle2, label: 'Conversions'},
-    ];
-
-    const reportsItems = [
-        { href: '/reports', icon: BarChart2, label: 'Reports'},
-        { href: '/recent-sessions', icon: Clock, label: 'Recent sessions'},
-    ];
-
-    // OpennMind specific items (Can be integrated or kept separate)
+    // OpennMind specific items (Integrate or separate as needed)
     const opennMindItems = [
         { href: '/chat', icon: MessageSquare, label: 'Chat With Jojo'},
-        { href: '/predicted-papers', icon: FileText, label: 'Predicted Papers', isNew: true },
-        { href: '/predict-grade', icon: Lightbulb, label: 'Predict Grade', isNew: true },
+        { href: '/predicted-papers', icon: FileText, label: 'Predicted Papers'},
+        { href: '/predict-grade', icon: Lightbulb, label: 'Predict Grade' },
         { href: '/mock-exams', icon: PlusCircle, label: 'Mock Exams'},
         { href: '/timed-exams', icon: Clock, label: 'Timed Exams'},
         { href: '/questionbank', icon: HelpCircle, label: 'Questionbank'},
         { href: '/notes', icon: BookOpen, label: 'Notes'},
         { href: '/pdf-to-notes', icon: FileStack, label: 'PDF To Notes'},
         { href: '/saved', icon: Bookmark, label: 'Saved'},
-        { href: '/all-subjects', icon: Home, label: 'All Subjects'}, // Example re-integration
+        { href: '/all-subjects', icon: Home, label: 'All Subjects'},
     ];
 
 
   return (
     <aside className="hidden md:flex flex-col w-64 border-r bg-card shrink-0 h-screen"> {/* Adjusted width */}
-        {/* Top Section */}
+        {/* Top Section - OpennMind Branding */}
         <div className="flex items-center justify-between h-16 px-4 border-b">
             <div className="flex items-center gap-2">
-                 <Avatar className="h-7 w-7">
-                    <AvatarFallback className="bg-primary text-primary-foreground text-xs font-bold">
-                         OM {/* Initials for OpennMind */}
-                    </AvatarFallback>
-                 </Avatar>
+                <div className="bg-foreground text-background rounded-md p-1.5">
+                     <GraduationCap className="w-5 h-5" strokeWidth={2} />
+                </div>
                  <span className="font-semibold text-sm">OpennMind</span>
-                 <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                 <Badge variant="outline" className="border-primary/50 text-primary text-[9px] px-1.5 py-0 leading-tight">
+                    FREE
+                 </Badge>
             </div>
-            <Button variant="ghost" size="icon" className="h-7 w-7">
+            <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground">
                  <ChevronLeft className="h-4 w-4" />
                  <ChevronLeft className="h-4 w-4 -ml-2" /> {/* Double chevron */}
             </Button>
@@ -183,32 +191,14 @@ export function Sidebar() {
             {/* Favourites Section */}
             <NavSection title="Favourites">
                 {favouritesItems.map((item) => (
-                   <NavItem key={item.href} {...item} isActive={pathname === item.href} />
+                   <NavItem key={item.href} {...item} isActive={pathname.startsWith(item.href) && item.href !== '#'} />
                 ))}
             </NavSection>
 
             <Separator className="mx-4 my-4" />
 
-             {/* Analysis Section */}
-            <NavSection title="Analysis">
-                 {analysisItems.map((item) => (
-                   <NavItem key={item.href} {...item} isActive={pathname === item.href} />
-                 ))}
-            </NavSection>
-
-            <Separator className="mx-4 my-4" />
-
-             {/* Reports Section */}
-             <NavSection title="Reports">
-                  {reportsItems.map((item) => (
-                    <NavItem key={item.href} {...item} isActive={pathname === item.href} />
-                  ))}
-             </NavSection>
-
-            <Separator className="mx-4 my-4" />
-
             {/* OpennMind Specific Section */}
-             <NavSection title="OpennMind Tools">
+             <NavSection title="Study Tools">
                   {opennMindItems.map((item) => (
                     <NavItem key={item.href} {...item} isActive={pathname === item.href} />
                   ))}
