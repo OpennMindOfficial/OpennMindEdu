@@ -8,6 +8,11 @@ import {
   Wrench, // For Tools
   HelpCircle, // For Ask Doubt
   Notebook, // For Notes
+  Calculator, // For Calculator
+  FunctionSquare, // For Scientific Calculator
+  LineChart, // For Graphing Calculator
+  Timer, // For Pomodoro Timer
+  BookText, // For Formula booklet
   Github,
   Slack,
   FileText, // Example icon for demo data
@@ -49,8 +54,11 @@ function FloatingNavItem({ href, icon: Icon, label, isActive, onMouseEnter }: Fl
 // Demo data for the popover content - updated keys and content
 const demoData: { [key: string]: { icon: React.ElementType, title: string; date: string; href: string }[] } = {
   Tools: [
-    { icon: Wrench, title: 'PDF Converter', date: 'Jul, 2024', href: '#' },
-    { icon: Github, title: 'Code Snippets', date: 'Jun, 2024', href: '#' },
+    { icon: Calculator, title: 'Calculator', date: 'Tool', href: '#' },
+    { icon: FunctionSquare, title: 'Scientific Calculator', date: 'Tool', href: '#' },
+    { icon: LineChart, title: 'Graphing Calculator', date: 'Tool', href: '#' },
+    { icon: Timer, title: 'Pomodoro Timer', date: 'Tool', href: '#' },
+    { icon: BookText, title: 'Formula booklet', date: 'Tool', href: '#' },
   ],
   "Ask Doubt": [
     { icon: HelpCircle, title: 'Ask the Community', date: 'Jul, 2024', href: '#' },
@@ -142,3 +150,4 @@ export function FloatingNav() {
     </div>
   );
 }
+
