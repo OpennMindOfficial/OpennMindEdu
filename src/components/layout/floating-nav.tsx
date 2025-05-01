@@ -21,6 +21,7 @@ import {
 import { usePathname } from 'next/navigation';
 import { Separator } from '@/components/ui/separator'; // Import Separator
 import { motion, AnimatePresence } from 'framer-motion'; // Import framer-motion
+import { Switch } from '@/components/ui/switch'; // Import Switch
 
 interface FloatingNavItemProps {
   href: string;
@@ -52,14 +53,14 @@ function FloatingNavItem({ href, icon: Icon, label, isActive, onMouseEnter }: Fl
 }
 
 // Demo data for the popover content - updated keys and content
-// Ensuring the 'date' field for Tools section is 'Tool' as per screenshot
-const demoData: { [key: string]: { icon: React.ElementType, title: string; date: string; href: string }[] } = {
+// Removing the 'date' field for Tools as it will be replaced by a Switch
+const demoData: { [key: string]: { icon: React.ElementType, title: string; date?: string; href: string }[] } = {
   Tools: [
-    { icon: Calculator, title: 'Calculator', date: 'Tool', href: '#' },
-    { icon: FunctionSquare, title: 'Scientific Calculator', date: 'Tool', href: '#' },
-    { icon: LineChart, title: 'Graphing Calculator', date: 'Tool', href: '#' },
-    { icon: Timer, title: 'Pomodoro Timer', date: 'Tool', href: '#' },
-    { icon: BookText, title: 'Formula booklet', date: 'Tool', href: '#' },
+    { icon: Calculator, title: 'Calculator', href: '#' },
+    { icon: FunctionSquare, title: 'Scientific Calculator', href: '#' },
+    { icon: LineChart, title: 'Graphing Calculator', href: '#' },
+    { icon: Timer, title: 'Pomodoro Timer', href: '#' },
+    { icon: BookText, title: 'Formula booklet', href: '#' },
   ],
   "Ask Doubt": [
     { icon: HelpCircle, title: 'Ask the Community', date: 'Jul, 2024', href: '#' },
@@ -76,6 +77,22 @@ export function FloatingNav() {
   const pathname = usePathname();
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [isHoveringNav, setIsHoveringNav] = useState(false); // Track hover on the nav itself
+
+  // State to manage the switch toggles (optional, can be expanded)
+  const [toolToggles, setToolToggles] = useState<{ [key: string]: boolean }>({
+    Calculator: false,
+    'Scientific Calculator': true, // Example: default checked
+    'Graphing Calculator': false,
+    'Pomodoro Timer': true, // Example: default checked
+    'Formula booklet': false,
+  });
+
+  // Function to handle toggle changes (optional)
+  const handleToggleChange = (toolTitle: string, checked: boolean) => {
+    setToolToggles(prev => ({ ...prev, [toolTitle]: checked }));
+    // Add logic here to enable/disable the tool based on the toggle state
+    console.log(`${toolTitle} toggled: ${checked}`);
+  };
 
   // Updated nav items
   const navItems = [
@@ -112,16 +129,24 @@ export function FloatingNav() {
             <div className="p-4 space-y-2">
               {demoData[hoveredItem].map((item, index) => (
                 <React.Fragment key={index}>
-                  <Link href={item.href} legacyBehavior passHref>
-                    <a className="flex items-center justify-between text-sm text-foreground hover:text-primary group">
-                      <div className="flex items-center">
-                        <item.icon className="h-4 w-4 mr-2 text-muted-foreground group-hover:text-primary" />
-                        <span>{item.title}</span>
-                      </div>
-                      {/* Displaying the date/label from demoData */}
-                      <span className="text-muted-foreground text-xs">{item.date}</span>
-                    </a>
-                  </Link>
+                  <div className="flex items-center justify-between text-sm text-foreground group">
+                    <Link href={item.href} legacyBehavior passHref>
+                      <a className="flex items-center flex-grow hover:text-primary">
+                          <item.icon className="h-4 w-4 mr-2 text-muted-foreground group-hover:text-primary" />
+                          <span>{item.title}</span>
+                      </a>
+                    </Link>
+                    {/* Conditionally render Switch for Tools or date for others */}
+                    {hoveredItem === 'Tools' ? (
+                       <Switch
+                          checked={toolToggles[item.title] || false}
+                          onCheckedChange={(checked) => handleToggleChange(item.title, checked)}
+                          aria-label={`Enable ${item.title}`}
+                       />
+                    ) : (
+                      item.date && <span className="text-muted-foreground text-xs ml-2">{item.date}</span>
+                    )}
+                  </div>
                   {index < demoData[hoveredItem].length - 1 && <Separator className="bg-border/50 my-1" />}
                 </React.Fragment>
               ))}
