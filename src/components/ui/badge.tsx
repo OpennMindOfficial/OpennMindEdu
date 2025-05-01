@@ -4,7 +4,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const badgeVariants = cva(
-  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  "inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2", // Adjusted base rounding
   {
     variants: {
       variant: {
@@ -16,9 +16,11 @@ const badgeVariants = cva(
           "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
         outline: "text-foreground",
         // Variant for the "New" badge (can be adjusted or removed if not used)
-        new: "border-transparent bg-blue-500 text-white text-[10px] h-5 px-2", // Specific style for 'New'
+        new: "border-transparent bg-blue-500 text-white text-[10px] h-5 px-2 rounded-full", // Keep New badge round
         // Sidebar count badge style
-        count: "border-border/50 bg-muted text-foreground text-[10px] h-5 w-5 p-0 items-center justify-center",
+        count: "border-border/50 bg-muted text-foreground text-[10px] h-5 w-5 p-0 items-center justify-center rounded-full", // Keep count badge round
+        // Sidebar FREE badge style
+        free: "border-transparent bg-green-600/90 dark:bg-green-700/90 text-white font-bold", // Specific style for 'FREE'
       },
     },
     defaultVariants: {

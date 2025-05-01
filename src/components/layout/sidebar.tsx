@@ -20,7 +20,7 @@ import {
   BookOpen,
   FileStack,
   Bookmark,
-  GraduationCap, // OpennMind logo icon
+  GraduationCap, // OpennMind logo icon (now unused)
   ChevronDown, // Added for dropdown indicator
   Clock, // Import Clock icon
 } from 'lucide-react';
@@ -78,7 +78,14 @@ function NavItem({
 
         {/* Content (Icon, Label, Badge) - Ensure it's above the highlight */}
         <div className="relative z-10 flex items-center overflow-hidden flex-grow"> {/* Use flex-grow */}
-            <Icon className={cn("h-4 w-4 mr-3 flex-shrink-0", isActive ? "text-foreground" : "")} />
+             {/* Animated Icon */}
+             <motion.div
+                whileHover={{ scale: 1.1, rotate: -5 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+                className="flex-shrink-0 mr-3"
+             >
+                <Icon className={cn("h-4 w-4", isActive ? "text-foreground" : "")} />
+             </motion.div>
             <span className="truncate">{label}</span> {/* Truncate long labels */}
             {isDropdown && <ChevronDown className="h-4 w-4 ml-1 text-muted-foreground" />}
         </div>
@@ -136,21 +143,20 @@ export function Sidebar() {
 
   return (
     <aside className="hidden md:flex flex-col w-64 border-r bg-card shrink-0 h-screen"> {/* Adjusted width */}
-        {/* Top Section - OpennMind Branding */}
-        <div className="flex items-center justify-between h-16 px-4 border-b">
-            <div className="flex items-center gap-2">
-                <div className="bg-foreground text-background rounded-md p-1.5">
-                     <GraduationCap className="w-5 h-5" strokeWidth={2} />
-                </div>
-                 <span className="font-semibold text-sm">OpennMind</span>
-                 <Badge variant="outline" className="border-primary/50 text-primary text-[9px] px-1.5 py-0 leading-tight">
-                    FREE
-                 </Badge>
-            </div>
-            <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground">
-                 <ChevronLeft className="h-4 w-4" />
-                 <ChevronLeft className="h-4 w-4 -ml-2" /> {/* Double chevron */}
-            </Button>
+        {/* Top Section - CBSE Selector */}
+        <div className="flex items-center justify-between h-16 px-3 border-b"> {/* Reduced padding to px-3 */}
+             {/* CBSE Selector Button */}
+             <Button
+                 variant="outline" // Use outline variant for the base style
+                 className="w-full justify-between border-muted-foreground/30 hover:bg-muted/50 h-9 text-sm font-normal text-foreground px-3" // Match styling: padding, height, border
+             >
+                 <span className="font-medium">CBSE</span>
+                 <div className="flex items-center gap-1.5">
+                     <Badge variant="free" className="px-1.5 py-0.5 text-[10px] leading-tight">FREE</Badge> {/* Custom 'free' variant */}
+                     <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                 </div>
+             </Button>
+             {/* Removed original collapse button */}
         </div>
 
         <ScrollArea className="flex-1 py-4">
