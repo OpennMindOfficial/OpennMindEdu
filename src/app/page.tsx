@@ -9,7 +9,7 @@ import { ExamCard } from "@/components/ui/exam-card";
 import { LearnWithCard } from "@/components/ui/learn-with-card";
 import { Card, CardContent } from "@/components/ui/card"; // Ensure Card is imported
 import { Button } from "@/components/ui/button";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+// Remove ScrollArea and ScrollBar imports
 import {
   ArrowRight,
   Bookmark,
@@ -21,10 +21,12 @@ import {
   HelpCircle,
   ClipboardCheck,
   FileText,
-  Layers
+  Layers,
+  ChevronLeft, // Import ChevronLeft
 } from "lucide-react";
-import React, { useState, useEffect } from 'react'; // Import useState and useEffect
+import React, { useState, useEffect, useRef } from 'react'; // Import useRef
 import Link from 'next/link'; // Import Link
+import { cn } from '@/lib/utils';
 
 // Import local images for subjects
 import itImage from './it.png';
@@ -131,6 +133,9 @@ export default function Home() {
   const userName = "Rudransh"; // Mock user name
   const [randomQuote, setRandomQuote] = useState('');
   const [greeting, setGreeting] = useState('');
+  const scrollContainerRef = useRef<HTMLDivElement>(null); // Ref for scroll container
+  const [showLeftArrow, setShowLeftArrow] = useState(false);
+  const [showRightArrow, setShowRightArrow] = useState(false);
 
   useEffect(() => {
     // Select a random quote on client-side mount
@@ -145,7 +150,43 @@ export default function Home() {
     } else {
       setGreeting("Good evening");
     }
+
+    // Check scroll arrows initially and on resize/scroll
+    checkScrollArrows();
+    const container = scrollContainerRef.current;
+    if (container) {
+        container.addEventListener('scroll', checkScrollArrows);
+        window.addEventListener('resize', checkScrollArrows);
+    }
+
+    return () => {
+        if (container) {
+            container.removeEventListener('scroll', checkScrollArrows);
+            window.removeEventListener('resize', checkScrollArrows);
+        }
+    };
   }, []); // Empty dependency array ensures this runs only once on mount
+
+  const checkScrollArrows = () => {
+      const container = scrollContainerRef.current;
+      if (!container) return;
+      const scrollLeft = container.scrollLeft;
+      const scrollWidth = container.scrollWidth;
+      const clientWidth = container.clientWidth;
+
+      setShowLeftArrow(scrollLeft > 0);
+      setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 1); // Use a small tolerance
+  };
+
+  const scroll = (direction: 'left' | 'right') => {
+      const container = scrollContainerRef.current;
+      if (!container) return;
+      const scrollAmount = container.clientWidth * 0.8; // Scroll by 80% of visible width
+      container.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth',
+      });
+  };
 
 
   return (
@@ -172,7 +213,73 @@ export default function Home() {
               </div>
            </div>
 
-           {/* Mock Exams Section */}
+           {/* My Subjects Section */}
+            <div className="space-y-4">
+             <div className="flex justify-between items-center">
+               <div className="flex items-center space-x-2 cursor-pointer group">
+                 <Bookmark className="w-5 h-5 text-primary" />
+                 <h2 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">My subjects</h2>
+                 <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
+               </div>
+               <div className="flex items-center space-x-4 text-sm">
+                 <Link href="/all-subjects" passHref legacyBehavior>
+                   <a><Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground rounded-full">Change subjects</Button></a>
+                 </Link>
+                 <Link href="/all-subjects" passHref legacyBehavior>
+                   <a><Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground rounded-full">Browse all</Button></a>
+                 </Link>
+               </div>
+             </div>
+
+             {/* Horizontal scroll container with arrows */}
+             <div className="relative group">
+                <div
+                   ref={scrollContainerRef}
+                   className="flex w-full space-x-4 pb-4 overflow-x-auto scroll-smooth scrollbar-hide" // scrollbar-hide utility might need Tailwind config
+                >
+                   {subjects.map((subject, index) => (
+                     <SubjectCard
+                       key={index}
+                       title={subject.title} // Pass title for overlay/alt text
+                       imageUrl={subject.imageUrl}
+                       bgColorClass={subject.bgColorClass}
+                       className="w-[225px] h-[340px] flex-shrink-0" // Adjust size as needed
+                       data-ai-hint={subject.title?.toLowerCase().split(" ")[0]}
+                     />
+                   ))}
+                 </div>
+
+                 {/* Left Scroll Button */}
+                 <Button
+                     variant="secondary"
+                     size="icon"
+                     className={cn(
+                         "absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 z-10 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300",
+                         showLeftArrow ? "visible" : "invisible" // Control visibility via state
+                     )}
+                     onClick={() => scroll('left')}
+                     aria-label="Scroll left"
+                 >
+                    <ChevronLeft className="h-5 w-5" />
+                 </Button>
+
+                 {/* Right Scroll Button */}
+                 <Button
+                     variant="secondary"
+                     size="icon"
+                     className={cn(
+                         "absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-10 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300",
+                         showRightArrow ? "visible" : "invisible" // Control visibility via state
+                     )}
+                     onClick={() => scroll('right')}
+                     aria-label="Scroll right"
+                 >
+                    <ChevronRight className="h-5 w-5" />
+                 </Button>
+             </div>
+           </div>
+
+            {/* Mock Exams Section */}
             <div className="space-y-4">
                <div className="flex items-center space-x-2 cursor-pointer group">
                   <PlusCircle className="w-5 h-5 text-primary" />
@@ -192,43 +299,6 @@ export default function Home() {
                   ))}
                 </div>
             </div>
-
-            {/* My Subjects Section */}
-            <div className="space-y-4">
-             <div className="flex justify-between items-center">
-               <div className="flex items-center space-x-2 cursor-pointer group">
-                 <Bookmark className="w-5 h-5 text-primary" />
-                 <h2 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">My subjects</h2>
-                 <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
-               </div>
-               <div className="flex items-center space-x-4 text-sm">
-                 <Link href="/all-subjects" passHref>
-                   <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">Change subjects</Button>
-                 </Link>
-                 <Link href="/all-subjects" passHref>
-                   <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">Browse all</Button>
-                 </Link>
-               </div>
-             </div>
-
-             <div className="relative">
-               <ScrollArea className="w-full whitespace-nowrap">
-                 <div className="flex w-max space-x-4 pb-4">
-                   {subjects.map((subject, index) => (
-                     <SubjectCard
-                       key={index}
-                       title={subject.title} // Pass title for overlay
-                       imageUrl={subject.imageUrl}
-                       bgColorClass={subject.bgColorClass}
-                       className="w-[225px] h-[340px] flex-shrink-0" // Keep original size or adjust as needed
-                       data-ai-hint={subject.title?.toLowerCase().split(" ")[0]}
-                     />
-                   ))}
-                 </div>
-                 <ScrollBar orientation="horizontal" className="h-2" />
-               </ScrollArea>
-             </div>
-           </div>
 
 
            {/* Learn With Section */}
@@ -264,3 +334,24 @@ export default function Home() {
     </div>
   );
 }
+
+// Add scrollbar-hide utility to tailwind.config.js if it doesn't exist
+// // tailwind.config.js
+// module.exports = {
+//   // ... other config
+//   plugins: [
+//     // ... other plugins
+//     require('tailwind-scrollbar-hide'), // Add this line
+//   ],
+// }
+// Make sure to install the plugin: npm install tailwind-scrollbar-hide
+// Or define the utility manually in globals.css:
+// @layer utilities {
+//   .scrollbar-hide::-webkit-scrollbar {
+//     display: none;
+//   }
+//   .scrollbar-hide {
+//     -ms-overflow-style: none; /* IE and Edge */
+//     scrollbar-width: none; /* Firefox */
+//   }
+// }

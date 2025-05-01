@@ -97,6 +97,7 @@ const config = {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
         xl: "calc(var(--radius) + 4px)",
+        full: "9999px", // Ensure full is defined if needed
       },
       keyframes: {
         "accordion-down": {
@@ -114,7 +115,10 @@ const config = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    require('tailwind-scrollbar-hide') // Add the scrollbar-hide plugin
+  ],
 } satisfies Config
 
 export default config

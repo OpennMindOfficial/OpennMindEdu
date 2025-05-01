@@ -19,14 +19,17 @@
     --border: 215 20.2% 65.1%; /* Gray */
     --input: 215 20.2% 65.1%; /* Gray */
 
+    /* --primary: 260 70% 55%; /* Purple */
+    /* --accent: 260 70% 55%; /* Purple */
     --primary: 215 80% 55%; /* Blue */
+    --accent: 215 80% 55%; /* Blue */
     --primary-foreground: 210 20% 98%; /* Almost White */
+    --accent-foreground: 210 20% 98%; /* Almost White */
+
 
     --secondary: 210 40% 96.1%; /* Light Gray */
     --secondary-foreground: 224 71.4% 4.1%; /* Dark Blue/Black */
 
-    --accent: 215 80% 55%; /* Blue */
-    --accent-foreground: 210 20% 98%; /* Almost White */
 
     --destructive: 0 84.2% 60.2%; /* Red */
     --destructive-foreground: 210 20% 98%; /* Almost White */
@@ -52,14 +55,16 @@
     --border: 216 15% 25%; /* Medium Dark Gray */
     --input: 216 15% 25%; /* Medium Dark Gray */
 
+    /* --primary: 260 85% 65%; /* Purple */
+    /* --accent: 260 85% 65%; /* Purple */
     --primary: 215 85% 65%; /* Blue */
+    --accent: 215 85% 65%; /* Blue */
     --primary-foreground: 210 20% 98%; /* Almost White */
+    --accent-foreground: 210 20% 98%; /* Almost White */
 
     --secondary: 216 15% 18%; /* Dark Gray */
     --secondary-foreground: 210 20% 98%; /* Almost White */
 
-    --accent: 215 85% 65%; /* Blue */
-    --accent-foreground: 210 20% 98%; /* Almost White */
 
     --destructive: 0 62.8% 30.6%; /* Dark Red */
     --destructive-foreground: 210 20% 98%; /* Almost White */
@@ -82,6 +87,14 @@
   .transform-style-preserve-3d {
     transform-style: preserve-3d;
   }
+   /* Add scrollbar-hide utility classes */
+   .scrollbar-hide::-webkit-scrollbar {
+     display: none;
+   }
+   .scrollbar-hide {
+     -ms-overflow-style: none; /* IE and Edge */
+     scrollbar-width: none; /* Firefox */
+   }
 }
 
 /* Custom scrollbar for Webkit browsers */
