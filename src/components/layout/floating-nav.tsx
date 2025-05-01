@@ -5,15 +5,10 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import {
-  Home,
-  LayoutDashboard, // Used for All Subjects
-  MessageSquare, // Used for Chat
-  FileText, // Used for Predicted Papers
-  Lightbulb, // Used for Predict Grade
-  // Icons matching the new design
+  // Use appropriate icons based on the target design
   AppWindow, // For Apps
   Code, // For Components
-  Link2, // For Notes (Link is a good representation)
+  Link2, // For Notes
 } from 'lucide-react';
 import { usePathname } from 'next/navigation'; // Import usePathname
 
@@ -29,11 +24,12 @@ function FloatingNavItem({ href, icon: Icon, label, isActive }: FloatingNavItemP
     <Link href={href} legacyBehavior passHref>
       <a
         className={cn(
-          'relative inline-flex items-center justify-center whitespace-nowrap rounded-full text-sm font-medium transition-colors duration-300 px-4 py-2', // Adjusted padding
-          // Use foreground/background for text/bg
+          'relative inline-flex items-center justify-center whitespace-nowrap rounded-full text-sm font-medium transition-colors duration-200 px-4 py-2', // Base styles
+          // Active state: Darker text, no specific background unless needed
           isActive
-            ? 'bg-background text-foreground shadow-inner' // Active state style
-            : 'text-muted-foreground hover:text-foreground' // Inactive state style
+            ? 'text-foreground'
+            // Inactive state: Muted text, subtle gray background on hover
+            : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground'
         )}
       >
         <Icon className="h-4 w-4 mr-2 flex-shrink-0" />
@@ -50,61 +46,15 @@ export function FloatingNav() {
     { href: '/', icon: AppWindow, label: 'Apps' },
     { href: '/components-placeholder', icon: Code, label: 'Components' }, // Placeholder link
     { href: '/notes-placeholder', icon: Link2, label: 'Notes' }, // Placeholder link
-    // Keep original items for reference or future use if needed, commented out
-    // { href: '/', icon: Home, label: 'Home' },
-    // { href: '/all-subjects', icon: LayoutDashboard, label: 'Subjects' },
-    // { href: '/chat', icon: MessageSquare, label: 'Chat' },
-    // { href: '/predicted-papers', icon: FileText, label: 'Papers' },
-    // { href: '/predict-grade', icon: Lightbulb, label: 'Grade' },
   ];
-
-  // State to track the bounding box of the hovered item
-  const [hoveredItemRect, setHoveredItemRect] = useState<DOMRect | null>(null);
-  const navRef = React.useRef<HTMLDivElement>(null);
-
-  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
-    const target = event.target as HTMLElement;
-    const navItem = target.closest('a'); // Find the closest link ancestor
-    if (navItem && navRef.current) {
-      const itemRect = navItem.getBoundingClientRect();
-      const navRect = navRef.current.getBoundingClientRect();
-      // Calculate relative position
-      setHoveredItemRect(new DOMRect(
-        itemRect.left - navRect.left,
-        itemRect.top - navRect.top,
-        itemRect.width,
-        itemRect.height
-      ));
-    }
-  };
-
-  const handleMouseLeave = () => {
-    setHoveredItemRect(null); // Clear hover state when mouse leaves the container
-  };
 
   return (
     // Container with slight transparency and blur
     <div
-      ref={navRef}
-      className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-secondary/80 dark:bg-secondary/70 rounded-full shadow-lg backdrop-blur-sm z-50 p-1" // Add padding for the hover effect
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
+      className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-secondary/80 dark:bg-secondary/70 rounded-full shadow-lg backdrop-blur-sm z-50 p-1" // Keep padding p-1 for visual spacing around items
     >
       <nav className="flex items-center space-x-1 relative">
-        {/* Animated background indicator */}
-        {hoveredItemRect && (
-          <div
-            className="absolute bg-background rounded-full transition-all duration-300 ease-out shadow-md"
-            style={{
-              left: `${hoveredItemRect.left}px`,
-              top: `${hoveredItemRect.top}px`,
-              width: `${hoveredItemRect.width}px`,
-              height: `${hoveredItemRect.height}px`,
-              zIndex: 0, // Ensure it's behind the text/icons
-            }}
-          />
-        )}
-        {/* Render actual nav items */}
+        {/* Render actual nav items - Hover effect is now handled within FloatingNavItem */}
         {navItems.map((item) => (
           <FloatingNavItem
             key={item.href}
@@ -116,3 +66,4 @@ export function FloatingNav() {
     </div>
   );
 }
+
