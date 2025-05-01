@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef } from 'react';
 
-// Declare Desmos globally or install @types/desmos if available
+// Declare Desmos globally. Ensure the Desmos script is loaded in layout.tsx
 declare const Desmos: any;
 
 export function ScientificCalculator() {
@@ -14,18 +14,21 @@ export function ScientificCalculator() {
     if (typeof Desmos !== 'undefined' && calculatorRef.current) {
       // Initialize the calculator only if it hasn't been initialized yet
       if (!desmosInstance.current) {
-         // Using GraphingCalculator as per user's provided script
-         // If Scientific Calculator is needed, use Desmos.ScientificCalculator(calculatorRef.current);
-        desmosInstance.current = Desmos.GraphingCalculator(calculatorRef.current, {
-            // Optional: Add Desmos configuration options here if needed
-            // e.g., keypad: false, expressions: false
+        // Use ScientificCalculator as requested
+        desmosInstance.current = Desmos.ScientificCalculator(calculatorRef.current, {
+          // Optional: Add Desmos configuration options here if needed
+          // e.g., keypad: false, expressions: false (though keypad is usually desired for scientific)
         });
+        // Make sure the container div has size. Flex-grow helps fill ToolWindow.
+        calculatorRef.current.style.width = '100%';
+        calculatorRef.current.style.height = '100%';
       }
     }
 
     // Cleanup function to destroy the calculator instance when the component unmounts
     return () => {
       if (desmosInstance.current) {
+        console.log("Destroying Desmos scientific calculator instance");
         desmosInstance.current.destroy();
         desmosInstance.current = null; // Clear the ref
       }
@@ -33,17 +36,16 @@ export function ScientificCalculator() {
   }, []); // Empty dependency array ensures this runs only once on mount
 
   return (
-    <div className="p-0 h-full overflow-hidden bg-background text-foreground flex flex-col">
+    <div className="p-0 h-full w-full overflow-hidden bg-background text-foreground flex flex-col">
       {/* Container for the Desmos calculator */}
-      {/* Use flex-grow to make it fill available space */}
+      {/* Use flex-grow to make it fill available space within ToolWindow */}
       <div
-        id="desmos-calculator-container" // Changed id to avoid potential global conflicts if 'calculator' is used elsewhere
+        id="desmos-scientific-calculator-container" // Unique ID
         ref={calculatorRef}
-        className="w-full flex-grow" // Use flex-grow and ensure width/height are controlled by parent (ToolWindow)
-        style={{ minHeight: '100px' }} // Ensure it has some minimum height
+        className="w-full h-full flex-grow" // Use flex-grow and h-full/w-full
+        style={{ minHeight: '200px' }} // Ensure it has some minimum height initially
       ></div>
-       {/* You might need to adjust ToolWindow's initial/min height/width
-           for the Desmos calculator to render correctly */}
+       {/* ToolWindow controls the outer size and resizing */}
     </div>
   );
 }
