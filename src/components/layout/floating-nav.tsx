@@ -5,11 +5,13 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import {
-  AppWindow, // For Apps
-  Code, // For Components
-  Link2, // For Notes
+  Wrench, // For Tools
+  HelpCircle, // For Ask Doubt
+  Notebook, // For Notes
   Github,
   Slack,
+  FileText, // Example icon for demo data
+  BookOpen, // Example icon for demo data
 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { Separator } from '@/components/ui/separator'; // Import Separator
@@ -44,19 +46,20 @@ function FloatingNavItem({ href, icon: Icon, label, isActive, onMouseEnter }: Fl
   );
 }
 
-// Demo data for the popover content
+// Demo data for the popover content - updated keys and content
 const demoData: { [key: string]: { icon: React.ElementType, title: string; date: string; href: string }[] } = {
-  Apps: [
-    { icon: AppWindow, title: 'Launch new dashboard', date: 'Jul, 2024', href: '#' },
-    { icon: AppWindow, title: 'Mobile app beta', date: 'Jun, 2024', href: '#' },
+  Tools: [
+    { icon: Wrench, title: 'PDF Converter', date: 'Jul, 2024', href: '#' },
+    { icon: Github, title: 'Code Snippets', date: 'Jun, 2024', href: '#' },
   ],
-  Components: [
-    { icon: Code, title: 'New Button variants', date: 'Jul, 2024', href: '#' },
-    { icon: Code, title: 'Refactor Card component', date: 'Jun, 2024', href: '#' },
+  "Ask Doubt": [
+    { icon: HelpCircle, title: 'Ask the Community', date: 'Jul, 2024', href: '#' },
+    { icon: Slack, title: 'Chat with AI Tutor', date: 'Jun, 2024', href: '#' },
   ],
   Notes: [
-    { icon: Github, title: 'Changelog using GitHub', date: 'Jun, 2024', href: '#' },
-    { icon: Slack, title: 'Feedback in Slack', date: 'May, 2024', href: '#' },
+    { icon: Notebook, title: 'My Math Notes', date: 'Jul, 2024', href: '#' },
+    { icon: FileText, title: 'Science Chapter 1', date: 'Jun, 2024', href: '#' },
+    { icon: BookOpen, title: 'History Timeline', date: 'May, 2024', href: '#' },
   ],
 };
 
@@ -65,10 +68,11 @@ export function FloatingNav() {
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [isHoveringNav, setIsHoveringNav] = useState(false); // Track hover on the nav itself
 
+  // Updated nav items
   const navItems = [
-    { href: '/', icon: AppWindow, label: 'Apps' },
-    { href: '/components-placeholder', icon: Code, label: 'Components' },
-    { href: '/notes-placeholder', icon: Link2, label: 'Notes' },
+    { href: '/tools-placeholder', icon: Wrench, label: 'Tools' },
+    { href: '/ask-doubt-placeholder', icon: HelpCircle, label: 'Ask Doubt' },
+    { href: '/notes-placeholder', icon: Notebook, label: 'Notes' },
   ];
 
   const popoverVariants = {
@@ -122,7 +126,8 @@ export function FloatingNav() {
       >
         <nav className="flex items-center space-x-1">
           {navItems.map((item) => {
-            const isActive = pathname === item.href;
+            // Check if the current path matches the item's href. Handle the root path '/' specifically.
+            const isActive = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href) && item.href !== '/';
             return (
               <FloatingNavItem
                 key={item.href}
