@@ -133,24 +133,23 @@ function NavSection({ title, children }: NavSectionProps) {
 export function Sidebar() {
     const pathname = usePathname();
 
-    // OpennMind specific items (Study Tools)
+    // Reordered items based on priority
     const opennMindItems = [
-        { href: '/chat', icon: MessageSquare, label: 'Chat With AI'}, // Changed label here
-        { href: '/predicted-papers', icon: FileText, label: 'Predicted Papers'},
-        { href: '/predict-grade', icon: Lightbulb, label: 'Predict Grade' },
+        { href: '/chat', icon: MessageSquare, label: 'Chat With AI'},
         { href: '/mock-exams', icon: PlusCircle, label: 'Mock Exams'},
-        { href: '/timed-exams', icon: Clock, label: 'Timed Exams'}, // Added timed exams
+        { href: '/timed-exams', icon: Clock, label: 'Timed Exams'},
         { href: '/questionbank', icon: HelpCircle, label: 'Questionbank'},
         { href: '/notes', icon: BookOpen, label: 'Notes'},
+        { href: '/ncert-explanations', icon: BookOpenCheck, label: 'NCERT Explanations'},
+        { href: '/predicted-papers', icon: FileText, label: 'Predicted Papers'},
+        { href: '/predict-grade', icon: Lightbulb, label: 'Predict Grade' },
+        { href: '/study-plan', icon: CalendarCheck, label: 'Study Plan'},
+        { href: '/performance-tracking', icon: TrendingUp, label: 'Performance Tracking'},
         { href: '/pdf-to-notes', icon: FileStack, label: 'PDF To Notes'},
         { href: '/saved', icon: Bookmark, label: 'Saved'},
         { href: '/all-subjects', icon: Home, label: 'All Subjects'},
-        // New Items Added Here
-        { href: '/study-plan', icon: CalendarCheck, label: 'Study Plan'},
-        { href: '/performance-tracking', icon: TrendingUp, label: 'Performance Tracking'},
         { href: '/fun-shun', icon: Gamepad2, label: 'Fun Shun'},
         { href: '/extra-courses', icon: Layers, label: 'Extra Courses'},
-        { href: '/ncert-explanations', icon: BookOpenCheck, label: 'NCERT Explanations'},
         { href: '/exam-mode', icon: Target, label: 'Exam Mode'},
     ];
 
