@@ -3,13 +3,12 @@
 
 import Image from 'next/image';
 import { Header } from "@/components/layout/header";
-import { Sidebar } from "@/components/layout/sidebar";
+import { Sidebar } from "@/components/layout/sidebar"; // Updated Sidebar import
 import { SubjectCard } from "@/components/ui/subject-card";
 import { ExamCard } from "@/components/ui/exam-card";
 import { LearnWithCard } from "@/components/ui/learn-with-card";
 import { Card, CardContent } from "@/components/ui/card"; // Ensure Card is imported
 import { Button } from "@/components/ui/button";
-// Remove ScrollArea and ScrollBar imports
 import {
   ArrowRight,
   Bookmark,
@@ -47,38 +46,46 @@ const subjects = [
     title: "Information Technology",
     imageUrl: itImage,
     bgColorClass: "bg-blue-100 dark:bg-blue-900/30", // Example: Light blueish
+    dataAiHint: "technology computer",
   },
   {
     title: "English Language & Literature",
     imageUrl: englishLitImage,
     bgColorClass: "bg-pink-100 dark:bg-pink-900/30", // Example: Light pinkish
+    dataAiHint: "english literature book",
   },
   {
     title: "Social Science",
     imageUrl: socialSciImage, // Assuming this file exists
     bgColorClass: "bg-orange-100 dark:bg-orange-900/30", // Example: Light orangeish
+    dataAiHint: "social science globe",
   },
   {
     title: "English Communicative",
     imageUrl: englishCommImage,
     bgColorClass: "bg-yellow-100 dark:bg-yellow-900/30", // Example: Light yellowish
+    dataAiHint: "english communication speech",
   },
   {
     title: "Mathematics",
     imageUrl: mathImage,
     bgColorClass: "bg-teal-100 dark:bg-teal-900/30", // Example: Light tealish
+    dataAiHint: "math formula",
   },
   {
     title: "Science",
     imageUrl: scienceImage, // Assuming this file exists
     bgColorClass: "bg-indigo-100 dark:bg-indigo-900/30", // Example: Light indigosh
+    dataAiHint: "science atom",
   },
   {
     title: "Hindi",
     imageUrl: hindiImage,
     bgColorClass: "bg-red-100 dark:bg-red-900/30", // Example: Light reddish
+    dataAiHint: "hindi language script",
   },
 ];
+
 
 // Data for Exam Cards using local images
 const examCards = [
@@ -191,7 +198,7 @@ export default function Home() {
 
   return (
     <div className="flex h-screen bg-background text-foreground overflow-hidden">
-      <Sidebar />
+      <Sidebar /> {/* Use updated Sidebar */}
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header />
         <main className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 bg-background">
@@ -212,6 +219,27 @@ export default function Home() {
                  </svg>
               </div>
            </div>
+
+            {/* Mock Exams Section */}
+            <div className="space-y-4">
+               <div className="flex items-center space-x-2 cursor-pointer group">
+                  <PlusCircle className="w-5 h-5 text-primary" />
+                  <h2 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">Mock exams</h2>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
+               </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {examCards.map((card, index) => (
+                    <ExamCard
+                      key={index}
+                      title={card.title}
+                      imageUrl={card.imageUrl}
+                      bgColorClass={card.bgColorClass}
+                      isNew={card.isNew}
+                      dataAiHint={card.dataAiHint}
+                    />
+                  ))}
+                </div>
+            </div>
 
            {/* My Subjects Section */}
             <div className="space-y-4">
@@ -244,7 +272,7 @@ export default function Home() {
                        imageUrl={subject.imageUrl}
                        bgColorClass={subject.bgColorClass}
                        className="w-[225px] h-[340px] flex-shrink-0" // Adjust size as needed
-                       data-ai-hint={subject.title?.toLowerCase().split(" ")[0]}
+                       data-ai-hint={subject.dataAiHint}
                      />
                    ))}
                  </div>
@@ -279,28 +307,6 @@ export default function Home() {
              </div>
            </div>
 
-            {/* Mock Exams Section */}
-            <div className="space-y-4">
-               <div className="flex items-center space-x-2 cursor-pointer group">
-                  <PlusCircle className="w-5 h-5 text-primary" />
-                  <h2 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">Mock exams</h2>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
-               </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {examCards.map((card, index) => (
-                    <ExamCard
-                      key={index}
-                      title={card.title}
-                      imageUrl={card.imageUrl}
-                      bgColorClass={card.bgColorClass}
-                      isNew={card.isNew}
-                      dataAiHint={card.dataAiHint}
-                    />
-                  ))}
-                </div>
-            </div>
-
-
            {/* Learn With Section */}
            <div className="space-y-4">
              <div className="flex items-center space-x-2 cursor-pointer group">
@@ -334,24 +340,3 @@ export default function Home() {
     </div>
   );
 }
-
-// Add scrollbar-hide utility to tailwind.config.js if it doesn't exist
-// // tailwind.config.js
-// module.exports = {
-//   // ... other config
-//   plugins: [
-//     // ... other plugins
-//     require('tailwind-scrollbar-hide'), // Add this line
-//   ],
-// }
-// Make sure to install the plugin: npm install tailwind-scrollbar-hide
-// Or define the utility manually in globals.css:
-// @layer utilities {
-//   .scrollbar-hide::-webkit-scrollbar {
-//     display: none;
-//   }
-//   .scrollbar-hide {
-//     -ms-overflow-style: none; /* IE and Edge */
-//     scrollbar-width: none; /* Firefox */
-//   }
-// }

@@ -11,12 +11,14 @@ const badgeVariants = cva(
         default:
           "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
         secondary:
-          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
+          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80", // Use for subtle backgrounds like in the sidebar
         destructive:
           "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
         outline: "text-foreground",
-        // Variant for the "New" badge as seen in the screenshot
-        new: "border-transparent bg-primary text-primary-foreground text-[10px] h-5",
+        // Variant for the "New" badge (can be adjusted or removed if not used)
+        new: "border-transparent bg-blue-500 text-white text-[10px] h-5 px-2", // Specific style for 'New'
+        // Sidebar count badge style
+        count: "border-border/50 bg-muted text-foreground text-[10px] h-5 w-5 p-0 items-center justify-center",
       },
     },
     defaultVariants: {
