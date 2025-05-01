@@ -23,6 +23,13 @@ import {
   Bookmark,
   ChevronDown, // Added for dropdown indicator
   Clock, // Import Clock icon
+  GraduationCap, // Added for CBSE logo
+  CalendarCheck, // Icon for Study Plan
+  TrendingUp, // Icon for Performance Tracking
+  Gamepad2, // Icon for Fun Shun
+  Layers, // Icon for Extra Courses
+  BookOpenCheck, // Icon for NCERT Explanations
+  Target, // Icon for Exam Mode
 } from 'lucide-react';
 import * as React from 'react';
 import { motion } from 'framer-motion'; // Import motion
@@ -138,6 +145,13 @@ export function Sidebar() {
         { href: '/pdf-to-notes', icon: FileStack, label: 'PDF To Notes'},
         { href: '/saved', icon: Bookmark, label: 'Saved'},
         { href: '/all-subjects', icon: Home, label: 'All Subjects'},
+        // New Items Added Here
+        { href: '/study-plan', icon: CalendarCheck, label: 'Study Plan'},
+        { href: '/performance-tracking', icon: TrendingUp, label: 'Performance Tracking'},
+        { href: '/fun-shun', icon: Gamepad2, label: 'Fun Shun'},
+        { href: '/extra-courses', icon: Layers, label: 'Extra Courses'},
+        { href: '/ncert-explanations', icon: BookOpenCheck, label: 'NCERT Explanations'},
+        { href: '/exam-mode', icon: Target, label: 'Exam Mode'},
     ];
 
 
@@ -154,7 +168,10 @@ export function Sidebar() {
                      "hover:scale-100 active:scale-100" // Ensure no scaling
                  )}
              >
-                 <span className="font-medium">CBSE</span>
+                 <div className="flex items-center gap-2">
+                    <GraduationCap className="w-4 h-4 text-primary" /> {/* Logo Icon */}
+                    <span className="font-medium">CBSE</span>
+                 </div>
                  <div className="flex items-center gap-1.5">
                      <Badge variant="free" className="px-1.5 py-0.5 text-[10px] leading-tight">FREE</Badge> {/* Custom 'free' variant */}
                      <ChevronDown className="h-4 w-4 text-muted-foreground" />
