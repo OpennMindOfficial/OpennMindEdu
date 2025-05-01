@@ -21,7 +21,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={cn(
-          "min-h-screen bg-background font-sans antialiased overflow-hidden", // Added overflow-hidden to prevent body scroll with RND
+          "min-h-screen bg-background font-sans antialiased", // Removed overflow-hidden from body
           inter.variable
         )}
       >
@@ -31,8 +31,8 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {/* Added relative positioning container for RND bounds */}
-          <div className="relative min-h-screen w-full">
+          {/* Added relative positioning and overflow-hidden container for RND bounds */}
+          <div className="relative min-h-screen w-full overflow-hidden">
              {children}
              <FloatingNav />
           </div>

@@ -118,7 +118,8 @@ export function FloatingNav() {
   return (
     <>
       {/* Tool Windows Area - Rendered outside the nav itself */}
-      <div className="absolute inset-0 pointer-events-none"> {/* Container for positioning */}
+      {/* Added pointer-events-none to allow clicks through this container */}
+      <div className="absolute inset-0 pointer-events-none z-40"> {/* Container for positioning */}
           {Object.entries(openTools).map(([toolTitle, isOpen]) => {
             if (!isOpen) return null;
             const ToolComponent = toolComponents[toolTitle];

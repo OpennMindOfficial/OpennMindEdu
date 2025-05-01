@@ -56,7 +56,7 @@ export function ToolWindow({
       minHeight={minHeight}
       bounds="parent" // Constrain dragging within the viewport or a specific parent
       className={cn(
-        "bg-card shadow-2xl rounded-lg overflow-hidden border border-border flex flex-col",
+        "bg-card shadow-2xl rounded-lg overflow-hidden border border-border flex flex-col pointer-events-auto", // Added pointer-events-auto
         className
       )}
       style={{ zIndex }}
@@ -74,7 +74,7 @@ export function ToolWindow({
         topRight: true,
       }}
     >
-      {/* Header Bar */}
+      {/* Header Bar - Added drag-handle class and cursor */}
       <div className="drag-handle flex items-center justify-between px-3 py-1.5 bg-secondary border-b border-border cursor-move h-8">
         <GripVertical className="w-4 h-4 text-muted-foreground" />
         <span className="text-xs font-semibold text-foreground truncate flex-1 text-center mx-2">
