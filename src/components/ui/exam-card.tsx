@@ -1,4 +1,3 @@
-
 'use client'; // Add 'use client' for state and event handling
 
 import Image, { type StaticImageData } from 'next/image';
@@ -26,8 +25,8 @@ export function ExamCard({ title, icon: Icon, bgColorClass, textColorClass, isNe
   return (
     <Card
       className={cn(
-        "overflow-hidden rounded-xl border-0 shadow-md hover:shadow-lg transition-shadow relative h-[250px] md:h-[280px]", // Adjusted height
-        "flex flex-col", // Use flex column layout
+        "overflow-hidden rounded-xl border-0 shadow-md hover:shadow-lg transition-shadow relative h-[180px] md:h-[200px]", // Decreased height
+        "flex flex-col justify-between", // Use flex column layout and space between
         bgColorClass, // Apply background color class
         className
       )}
@@ -37,22 +36,20 @@ export function ExamCard({ title, icon: Icon, bgColorClass, textColorClass, isNe
     >
       <CardHeader className="p-4 pb-2 z-10 relative flex-shrink-0">
         <div className="flex justify-between items-start">
-          <CardTitle className="text-lg font-semibold text-foreground">{title}</CardTitle>
-          {isNew && <Badge variant="new" className="ml-2 self-start">New</Badge>}
+          <CardTitle className="text-base font-semibold text-foreground">{title}</CardTitle> {/* Slightly smaller title */}
+          {isNew && <Badge variant="new" className="ml-2 self-start text-[10px] h-5 px-1.5">New</Badge>} {/* Adjusted badge */}
         </div>
       </CardHeader>
-      <CardContent className="p-4 flex-grow flex items-center justify-center relative overflow-hidden">
-        {/* Icon */}
-        <div className="relative z-10">
-          <Icon
-            className={cn(
-              "w-24 h-24 md:w-32 md:h-32 opacity-80 transition-transform duration-300 ease-in-out",
-              isHovered ? "scale-110" : "",
-              textColorClass || "text-foreground/70" // Default or provided text color
-            )}
-            strokeWidth={1.5}
-          />
-        </div>
+      <CardContent className="p-4 pt-0 flex-grow flex items-end justify-end relative overflow-hidden"> {/* Align items end for bottom */}
+        {/* Icon positioned at bottom right */}
+        <Icon
+          className={cn(
+            "absolute right-[-10px] bottom-[-10px] w-20 h-20 opacity-30 z-0 transition-transform duration-300 ease-in-out", // Match LearnWithCard icon styling
+            isHovered ? "scale-110" : "",
+            textColorClass || "text-foreground/70" // Default or provided text color
+          )}
+          strokeWidth={1.5}
+        />
 
         {/* Hover Overlay & Button */}
         <div className={cn(
@@ -63,11 +60,11 @@ export function ExamCard({ title, icon: Icon, bgColorClass, textColorClass, isNe
              variant="secondary"
              size="sm"
              className={cn(
-                "px-4 font-semibold",
+                "px-4 font-semibold h-8 text-xs", // Adjusted size
                 "hover:scale-110 active:scale-95" // Bubble effect
              )}
            >
-             <Play className="mr-2 h-4 w-4" />
+             <Play className="mr-1 h-3 w-3" /> {/* Smaller icon */}
              Start Now
            </Button>
          </div>
@@ -75,6 +72,3 @@ export function ExamCard({ title, icon: Icon, bgColorClass, textColorClass, isNe
     </Card>
   );
 }
-
-
-    
