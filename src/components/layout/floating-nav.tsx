@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -20,7 +21,8 @@ interface FloatingNavItemProps {
 
 function FloatingNavItem({ href, icon: Icon, label, isActive }: FloatingNavItemProps) {
   return (
-    <Link href={href} passHref>
+    // Add legacyBehavior to keep the <a> tag for styling purposes
+    <Link href={href} legacyBehavior passHref>
       <a
         className={cn(
           'inline-flex items-center justify-center whitespace-nowrap rounded-full text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 transition-transform duration-150 ease-in-out hover:scale-105 active:scale-95 focus-visible:scale-105 px-3 py-1.5 bg-secondary text-secondary-foreground hover:bg-secondary/80',
@@ -54,3 +56,4 @@ export function FloatingNav() {
     </div>
   );
 }
+
