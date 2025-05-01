@@ -348,4 +348,3 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
     </div>
   );
 }
-```
