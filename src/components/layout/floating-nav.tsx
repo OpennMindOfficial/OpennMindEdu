@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState } from 'react';
@@ -8,7 +7,7 @@ import {
   Wrench, // For Tools
   HelpCircle, // For Ask Doubt
   Notebook, // For Notes
-  Calculator, // For Calculator
+  Calculator as CalculatorIcon, // For Calculator
   FunctionSquare, // For Scientific Calculator
   LineChart, // For Graphing Calculator
   Timer, // For Pomodoro Timer
@@ -19,9 +18,17 @@ import {
   BookOpen, // Example icon for demo data
 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
-import { Separator } from '@/components/ui/separator'; // Import Separator
-import { motion, AnimatePresence } from 'framer-motion'; // Import framer-motion
-import { Switch } from '@/components/ui/switch'; // Import Switch
+import { Separator } from '@/components/ui/separator';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Switch } from '@/components/ui/switch';
+import { ToolWindow } from '@/components/tools/tool-window'; // Import ToolWindow
+
+// Import tool components
+import { Calculator } from '@/components/tools/calculator';
+import { ScientificCalculator } from '@/components/tools/scientific-calculator';
+import { GraphingCalculator } from '@/components/tools/graphing-calculator';
+import { PomodoroTimer } from '@/components/tools/pomodoro-timer';
+import { FormulaBooklet } from '@/components/tools/formula-booklet';
 
 interface FloatingNavItemProps {
   href: string;
@@ -38,10 +45,8 @@ function FloatingNavItem({ href, icon: Icon, label, isActive, onMouseEnter }: Fl
         onMouseEnter={onMouseEnter}
         className={cn(
           'relative inline-flex items-center justify-center whitespace-nowrap rounded-full text-sm font-medium transition-colors duration-200 px-4 py-2 cursor-pointer', // Base styles, added cursor-pointer
-          // Active state: Darker background, brighter text
           isActive
-            ? 'bg-foreground/10 dark:bg-foreground/20 text-foreground shadow-inner' // Adjusted active style
-            // Inactive state: Muted text, subtle gray background on hover
+            ? 'bg-foreground/10 dark:bg-foreground/20 text-foreground shadow-inner'
             : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground'
         )}
       >
@@ -52,15 +57,23 @@ function FloatingNavItem({ href, icon: Icon, label, isActive, onMouseEnter }: Fl
   );
 }
 
-// Demo data for the popover content - updated keys and content
-// Removing the 'date' field for Tools as it will be replaced by a Switch
-const demoData: { [key: string]: { icon: React.ElementType, title: string; date?: string; href: string }[] } = {
+// Define tool components mapping
+const toolComponents: { [key: string]: React.ElementType } = {
+  Calculator: Calculator,
+  'Scientific Calculator': ScientificCalculator,
+  'Graphing Calculator': GraphingCalculator,
+  'Pomodoro Timer': PomodoroTimer,
+  'Formula booklet': FormulaBooklet,
+};
+
+// Demo data structure remains similar, but href is now less important for tools
+const demoData: { [key: string]: { icon: React.ElementType, title: string; date?: string; href?: string }[] } = {
   Tools: [
-    { icon: Calculator, title: 'Calculator', href: '#' },
-    { icon: FunctionSquare, title: 'Scientific Calculator', href: '#' },
-    { icon: LineChart, title: 'Graphing Calculator', href: '#' },
-    { icon: Timer, title: 'Pomodoro Timer', href: '#' },
-    { icon: BookText, title: 'Formula booklet', href: '#' },
+    { icon: CalculatorIcon, title: 'Calculator' },
+    { icon: FunctionSquare, title: 'Scientific Calculator' },
+    { icon: LineChart, title: 'Graphing Calculator' },
+    { icon: Timer, title: 'Pomodoro Timer' },
+    { icon: BookText, title: 'Formula booklet' },
   ],
   "Ask Doubt": [
     { icon: HelpCircle, title: 'Ask the Community', date: 'Jul, 2024', href: '#' },
@@ -76,104 +89,139 @@ const demoData: { [key: string]: { icon: React.ElementType, title: string; date?
 export function FloatingNav() {
   const pathname = usePathname();
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
-  const [isHoveringNav, setIsHoveringNav] = useState(false); // Track hover on the nav itself
+  const [isHoveringNav, setIsHoveringNav] = useState(false);
 
-  // State to manage the switch toggles (optional, can be expanded)
-  const [toolToggles, setToolToggles] = useState<{ [key: string]: boolean }>({
-    Calculator: false,
-    'Scientific Calculator': true, // Example: default checked
-    'Graphing Calculator': false,
-    'Pomodoro Timer': true, // Example: default checked
-    'Formula booklet': false,
-  });
+  // State to manage the open/closed state of each tool window
+  const [openTools, setOpenTools] = useState<{ [key: string]: boolean }>({});
 
-  // Function to handle toggle changes (optional)
+  // Toggle tool window visibility and update switch state
   const handleToggleChange = (toolTitle: string, checked: boolean) => {
-    setToolToggles(prev => ({ ...prev, [toolTitle]: checked }));
-    // Add logic here to enable/disable the tool based on the toggle state
-    console.log(`${toolTitle} toggled: ${checked}`);
+    setOpenTools(prev => ({ ...prev, [toolTitle]: checked }));
   };
 
-  // Updated nav items
+  // Close tool window function
+  const handleCloseTool = (toolTitle: string) => {
+    setOpenTools(prev => ({ ...prev, [toolTitle]: false }));
+  };
+
   const navItems = [
-    { href: '/tools-placeholder', icon: Wrench, label: 'Tools' },
+    { href: '#', icon: Wrench, label: 'Tools' }, // href can be '#' if it just opens the menu
     { href: '/ask-doubt-placeholder', icon: HelpCircle, label: 'Ask Doubt' },
     { href: '/notes-placeholder', icon: Notebook, label: 'Notes' },
   ];
 
   const popoverVariants = {
     hidden: { opacity: 0, y: 10, height: 0, marginBottom: 0 },
-    visible: { opacity: 1, y: 0, height: 'auto', marginBottom: '0.5rem' }, // Add margin-bottom when visible
+    visible: { opacity: 1, y: 0, height: 'auto', marginBottom: '0.5rem' },
   };
 
   return (
-    <div
-      className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center"
-      onMouseEnter={() => setIsHoveringNav(true)}
-      onMouseLeave={() => {
-        setIsHoveringNav(false);
-        setHoveredItem(null); // Close popover when leaving the entire nav area
-      }}
-    >
-      {/* Popover Content Area */}
-      <AnimatePresence>
-        {hoveredItem && demoData[hoveredItem] && (
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            exit="hidden"
-            variants={popoverVariants}
-            transition={{ duration: 0.2, ease: 'easeInOut' }}
-            className="w-[320px] bg-secondary/80 dark:bg-secondary/70 rounded-lg shadow-lg backdrop-blur-sm overflow-hidden mb-2" // Style matches image
-          >
-            <div className="p-4 space-y-2">
-              {demoData[hoveredItem].map((item, index) => (
-                <React.Fragment key={index}>
-                  <div className="flex items-center justify-between text-sm text-foreground group">
-                    <Link href={item.href} legacyBehavior passHref>
-                      <a className="flex items-center flex-grow hover:text-primary">
-                          <item.icon className="h-4 w-4 mr-2 text-muted-foreground group-hover:text-primary" />
-                          <span>{item.title}</span>
-                      </a>
-                    </Link>
-                    {/* Conditionally render Switch for Tools or date for others */}
-                    {hoveredItem === 'Tools' ? (
-                       <Switch
-                          checked={toolToggles[item.title] || false}
-                          onCheckedChange={(checked) => handleToggleChange(item.title, checked)}
-                          aria-label={`Enable ${item.title}`}
-                       />
-                    ) : (
-                      item.date && <span className="text-muted-foreground text-xs ml-2">{item.date}</span>
-                    )}
-                  </div>
-                  {index < demoData[hoveredItem].length - 1 && <Separator className="bg-border/50 my-1" />}
-                </React.Fragment>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+    <>
+      {/* Tool Windows Area - Rendered outside the nav itself */}
+      <div className="absolute inset-0 pointer-events-none"> {/* Container for positioning */}
+          {Object.entries(openTools).map(([toolTitle, isOpen]) => {
+            if (!isOpen) return null;
+            const ToolComponent = toolComponents[toolTitle];
+            if (!ToolComponent) return null; // Handle cases where component might not exist
 
-      {/* Navigation Buttons */}
-      <div
-        className="bg-secondary/80 dark:bg-secondary/70 rounded-full shadow-lg backdrop-blur-sm p-1 relative" // Keep padding p-1
-      >
-        <nav className="flex items-center space-x-1">
-          {navItems.map((item) => {
-            // Check if the current path matches the item's href. Handle the root path '/' specifically.
-            const isActive = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href) && item.href !== '/';
+            // Find the icon for the title
+            const toolData = demoData.Tools.find(t => t.title === toolTitle);
+
             return (
-              <FloatingNavItem
-                key={item.href}
-                {...item}
-                isActive={isActive}
-                onMouseEnter={() => setHoveredItem(item.label)}
-              />
+              <ToolWindow
+                key={toolTitle}
+                title={toolTitle}
+                isOpen={isOpen}
+                onClose={() => handleCloseTool(toolTitle)}
+                // You might want different initial sizes/positions per tool
+                initialWidth={toolTitle === 'Graphing Calculator' ? 500 : 350}
+                initialHeight={toolTitle === 'Graphing Calculator' ? 400 : 300}
+              >
+                <ToolComponent />
+              </ToolWindow>
             );
           })}
-        </nav>
       </div>
-    </div>
+
+      {/* Floating Nav Bar */}
+      <div
+        className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center"
+        onMouseEnter={() => setIsHoveringNav(true)}
+        onMouseLeave={() => {
+          setIsHoveringNav(false);
+          setHoveredItem(null);
+        }}
+      >
+        {/* Popover Content Area */}
+        <AnimatePresence>
+          {hoveredItem && demoData[hoveredItem] && (
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              variants={popoverVariants}
+              transition={{ duration: 0.2, ease: 'easeInOut' }}
+              className="w-[320px] bg-secondary/90 dark:bg-secondary/80 rounded-lg shadow-lg backdrop-blur-md overflow-hidden mb-2 border border-border/30"
+            >
+              <div className="p-4 space-y-2">
+                {demoData[hoveredItem].map((item, index) => (
+                  <React.Fragment key={index}>
+                    <div className="flex items-center justify-between text-sm text-foreground group">
+                      {/* Link or Button based on type */}
+                      {hoveredItem !== 'Tools' && item.href ? (
+                        <Link href={item.href} legacyBehavior passHref>
+                           <a className="flex items-center flex-grow hover:text-primary cursor-pointer">
+                              <item.icon className="h-4 w-4 mr-2 text-muted-foreground group-hover:text-primary" />
+                              <span>{item.title}</span>
+                           </a>
+                        </Link>
+                      ) : (
+                         // For Tools, the div itself handles interaction via the Switch
+                         <div className="flex items-center flex-grow">
+                           <item.icon className="h-4 w-4 mr-2 text-muted-foreground" />
+                           <span>{item.title}</span>
+                         </div>
+                      )}
+
+                      {/* Conditionally render Switch for Tools or date for others */}
+                      {hoveredItem === 'Tools' ? (
+                         <Switch
+                            checked={openTools[item.title] || false}
+                            onCheckedChange={(checked) => handleToggleChange(item.title, checked)}
+                            aria-label={`Enable ${item.title}`}
+                            size="sm" // Use smaller switch if desired
+                         />
+                      ) : (
+                        item.date && <span className="text-muted-foreground text-xs ml-2 flex-shrink-0">{item.date}</span>
+                      )}
+                    </div>
+                    {index < demoData[hoveredItem].length - 1 && <Separator className="bg-border/50 my-1" />}
+                  </React.Fragment>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Navigation Buttons */}
+        <div
+          className="bg-secondary/80 dark:bg-secondary/70 rounded-full shadow-lg backdrop-blur-sm p-1 relative border border-border/20"
+        >
+          <nav className="flex items-center space-x-1">
+            {navItems.map((item) => {
+              const isActive = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href) && item.href !== '/';
+              return (
+                <FloatingNavItem
+                  key={item.label} // Use label as key since href might be '#'
+                  {...item}
+                  isActive={isActive}
+                  onMouseEnter={() => setHoveredItem(item.label)}
+                />
+              );
+            })}
+          </nav>
+        </div>
+      </div>
+    </>
   );
 }
