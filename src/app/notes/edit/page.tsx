@@ -274,7 +274,6 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
                    onChange={handleContentChange}
                    onSelect={handleSelectionChange} // Detect text selection
                    onBlur={handleBlur} // Hide toolbar on blur
-                   onClick={() => {}} // remove here
                    className="text-base border-none focus-visible:ring-0 shadow-none p-0 resize-none bg-transparent min-h-[200px] w-full leading-relaxed focus:outline-none"
                  />
               </div>
@@ -348,4 +347,3 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
     </div>
   );
 }
-
