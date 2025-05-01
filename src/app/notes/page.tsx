@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import Link from "next/link"; // Import Link
 
 export default function NotesPage() {
   return (
@@ -15,9 +16,14 @@ export default function NotesPage() {
         <main className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 bg-background">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl md:text-3xl font-bold text-foreground">My Notes</h1>
-            <Button className="hover:scale-110 active:scale-95">
-              <PlusCircle className="mr-2 h-4 w-4" /> Create Note
-            </Button>
+            {/* Updated Button to be a Link */}
+            <Link href="/notes/edit" passHref legacyBehavior>
+              <a>
+                <Button className="hover:scale-110 active:scale-95">
+                  <PlusCircle className="mr-2 h-4 w-4" /> Create Note
+                </Button>
+              </a>
+            </Link>
           </div>
 
           <div className="relative mb-6">
