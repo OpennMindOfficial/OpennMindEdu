@@ -25,7 +25,7 @@ import {
   TextQuote,
 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"; // Import Popover components
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from '@/lib/utils';
 
 // Demo note data structure
@@ -46,8 +46,8 @@ const sampleNotes: Note[] = [
 const slashCommands = [
   { name: 'Heading 1', icon: Hash, level: 1 },
   { name: 'Heading 2', icon: Hash, level: 2 },
-  { name: 'Bulleted List', icon: () => <ul className="list-disc pl-1 text-xs"><li></li></ul>, }, // Custom icon for list
-  { name: 'Numbered List', icon: () => <ol className="list-decimal pl-1 text-xs"><li></li></ol>, }, // Custom icon for list
+  { name: 'Bulleted List', icon: () => <ul className="list-disc pl-1 text-xs"><li></li></ul>, },
+  { name: 'Numbered List', icon: () => <ol className="list-decimal pl-1 text-xs"><li></li></ol>, },
   { name: 'Image', icon: ImageIcon },
   { name: 'Video', icon: Video },
   { name: 'Code Block', icon: Code },
@@ -58,7 +58,6 @@ const slashCommands = [
 ];
 
 export default function EditNotePage() {
-  // State for current note being edited
   const [currentNoteId, setCurrentNoteId] = React.useState<string | null>('1');
   const [noteTitle, setNoteTitle] = React.useState("The Remarkable Story of Jeff Bezos and Amazon");
   const [noteContent, setNoteContent] = React.useState(`Jeff Bezos is a business magnate and the founder, CEO, and president of Amazon, the world's largest online retailer. Born on January 12, 1964, in Albuquerque, New Mexico, Bezos had a varied career before starting Amazon. He graduated from Princeton University with a degree in electrical engineering and computer science. Bezos worked on Wall Street for several years before leaving to found Amazon. In the early days of the company, Bezos ran Amazon out of his garage and focused on selling books online.
@@ -71,39 +70,47 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
 - Bezos is known for his focus on customer obsession and long-term thinking.
 - Bezos Family Foundation has donated millions of dollars to charitable causes through the`);
 
-  // State for slash command popover
   const [popoverOpen, setPopoverOpen] = React.useState(false);
   const contentRef = React.useRef<HTMLTextAreaElement>(null);
-
-  // State for formatting toolbar visibility
   const [isTextSelected, setIsTextSelected] = React.useState(false);
+  const lastTypedCharRef = React.useRef<string | null>(null); // Ref to track the last typed character
 
   const handleContentChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = event.target.value;
+    const cursorPos = event.target.selectionStart;
+    const charJustTyped = value.substring(cursorPos - 1, cursorPos);
+    const charBeforeSlash = value.substring(cursorPos - 2, cursorPos - 1);
+
     setNoteContent(value);
 
-    // Check if the last character typed is '/' (simplified check)
-    const cursorPos = event.target.selectionStart;
-    const textBeforeCursor = value.substring(0, cursorPos);
+    // Trigger popover ONLY if '/' was just typed and it's at the start, after space, or after newline
+    const shouldOpenPopover =
+        charJustTyped === '/' &&
+        (cursorPos === 1 || charBeforeSlash === ' ' || charBeforeSlash === '\n' || charBeforeSlash === '');
 
-    // Trigger popover if '/' is typed at the start, after space, or after newline
-    const triggerChar = textBeforeCursor.slice(-1);
-    const charBeforeTrigger = textBeforeCursor.slice(-2, -1);
+    setPopoverOpen(shouldOpenPopover);
 
-    // Only open the popover if '/' is the last character typed
-    setPopoverOpen(triggerChar === '/' && (textBeforeCursor.length === 1 || charBeforeTrigger === ' ' || charBeforeTrigger === '\n' || charBeforeTrigger === ''));
+    // Update last typed character (useful for other potential logic)
+    lastTypedCharRef.current = charJustTyped;
+
+    // Auto-adjust textarea height
+    if (contentRef.current) {
+      contentRef.current.style.height = 'auto'; // Reset height
+      contentRef.current.style.height = `${contentRef.current.scrollHeight}px`; // Set to scroll height
+    }
   };
+
 
   const handleSelectCommand = (commandName: string) => {
     if (contentRef.current) {
       const cursorPos = contentRef.current.selectionStart;
       const currentContent = noteContent;
-      // Find the last '/' before the cursor to replace it
+      // Find the last '/' just before the cursor to replace it
       const textBeforeCursor = currentContent.substring(0, cursorPos);
       const lastSlashIndex = textBeforeCursor.lastIndexOf('/');
 
-      if (lastSlashIndex !== -1) {
-        // Basic check: assume the last slash before cursor triggered it
+      // Only replace if the slash is immediately before the cursor
+      if (lastSlashIndex === cursorPos - 1) {
         const newContent =
           currentContent.substring(0, lastSlashIndex) + // Text before the slash
           `[${commandName}] ` +                         // Insert command placeholder
@@ -111,75 +118,94 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
 
         setNoteContent(newContent);
 
-        // Attempt to set cursor position after the inserted command
+        // Set cursor position after the inserted command
         setTimeout(() => {
           const newCursorPos = lastSlashIndex + `[${commandName}] `.length;
           contentRef.current?.focus();
           contentRef.current?.setSelectionRange(newCursorPos, newCursorPos);
+          // Re-adjust height after content change
+           if (contentRef.current) {
+             contentRef.current.style.height = 'auto';
+             contentRef.current.style.height = `${contentRef.current.scrollHeight}px`;
+           }
         }, 0);
-      } else {
-        // Fallback (shouldn't normally happen with current trigger logic)
-        setNoteContent(prev => prev + `[${commandName}] `);
-        contentRef.current?.focus();
       }
     }
-    setPopoverOpen(false);
+    setPopoverOpen(false); // Close popover after selection
   };
 
-  // Handle creating a new note
   const handleCreateNewNote = () => {
     setCurrentNoteId(null);
     setNoteTitle("");
     setNoteContent("");
-    setIsTextSelected(false); // Reset selection state
-    setPopoverOpen(false);   // Close popover
+    setIsTextSelected(false);
+    setPopoverOpen(false);
+    // Reset textarea height
+    if (contentRef.current) {
+        contentRef.current.style.height = 'auto';
+    }
   };
 
-  // Handle selecting an existing note
   const handleSelectNote = (noteId: string) => {
     const selected = sampleNotes.find(n => n.id === noteId);
     if (selected) {
       setCurrentNoteId(selected.id);
       setNoteTitle(selected.title);
-      // In a real app, load full content here
       setNoteContent(selected.contentPreview + "\n\n(Full content would load here...)");
-      setIsTextSelected(false); // Reset selection state
-      setPopoverOpen(false);   // Close popover
+      setIsTextSelected(false);
+      setPopoverOpen(false);
+      // Adjust height for new content
+       setTimeout(() => {
+         if (contentRef.current) {
+           contentRef.current.style.height = 'auto';
+           contentRef.current.style.height = `${contentRef.current.scrollHeight}px`;
+         }
+       }, 0);
     }
   };
 
-  // Handler for text selection change
   const handleSelectionChange = () => {
     if (contentRef.current) {
       const start = contentRef.current.selectionStart;
       const end = contentRef.current.selectionEnd;
-      setIsTextSelected(start !== end); // Text is selected if start and end differ
+      setIsTextSelected(start !== end);
+      if (start === end) {
+          setPopoverOpen(false); // Close popover if selection is cleared
+      }
     } else {
       setIsTextSelected(false);
     }
   };
 
-  // Hide toolbar on blur (with a slight delay to allow clicking toolbar buttons)
   const handleBlur = () => {
       setTimeout(() => {
-          // Only hide if the focus hasn't moved to a toolbar button (basic check)
           if (document.activeElement !== contentRef.current && !document.querySelector('.formatting-toolbar')?.contains(document.activeElement)) {
              setIsTextSelected(false);
           }
+          // Don't close popover on blur if it's intentionally open
+          // setPopoverOpen(false); // Remove this line to keep popover open until command selected or slash deleted
       }, 150);
   };
+
+  // Effect to adjust initial height
+  React.useEffect(() => {
+     if (contentRef.current) {
+       contentRef.current.style.height = 'auto';
+       contentRef.current.style.height = `${contentRef.current.scrollHeight}px`;
+     }
+  }, [currentNoteId]); // Adjust height when note changes
 
 
   const currentNoteData = currentNoteId ? sampleNotes.find(n => n.id === currentNoteId) : null;
   const breadcrumb = currentNoteId ? `# Personal / ${currentNoteData?.title.substring(0,20)}...` : "# Personal / New Note";
-  const author = "Nathalia Anderson"; // Static for now
+  const author = "Nathalia Anderson";
   const timestamp = currentNoteData?.lastEdited || `Today, ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-  const wikipediaLink = "https://en.wikipedia.org/wiki/Jeff_Bezos"; // Example link
+  const wikipediaLink = "https://en.wikipedia.org/wiki/Jeff_Bezos";
 
   return (
     <div className="flex h-screen bg-background text-foreground overflow-hidden">
       <Sidebar />
-      {/* Notes List Sidebar (Left) */}
+      {/* Notes List Sidebar */}
       <aside className="w-64 border-r bg-card flex flex-col shrink-0 h-full">
         <div className="p-3 border-b flex items-center justify-between h-16">
           <h2 className="font-semibold text-sm">All Notes</h2>
@@ -214,7 +240,8 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
       {/* Main Content Area (Editor) */}
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header />
-        <main className="flex-1 p-6 md:p-8 lg:p-12 space-y-6 bg-background relative"> {/* Added relative positioning, removed overflow-y-auto */}
+        {/* Make main scrollable, not the textarea */}
+        <main className="flex-1 p-6 md:p-8 lg:p-12 space-y-6 bg-background relative overflow-y-auto">
           {/* Header Section */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -231,20 +258,29 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
 
           <Separator />
 
-          {/* Title - Editable */}
+          {/* Title - Auto-growing */}
           <Textarea
             placeholder="Note Title"
             value={noteTitle}
-            onChange={(e) => setNoteTitle(e.target.value)}
-            className="text-3xl font-bold border-none focus-visible:ring-0 shadow-none p-0 resize-none bg-transparent h-auto leading-tight focus:outline-none"
+            onChange={(e) => {
+                setNoteTitle(e.target.value);
+                 // Auto-adjust height for title too
+                 e.target.style.height = 'auto';
+                 e.target.style.height = `${e.target.scrollHeight}px`;
+            }}
+            onInput={(e) => { // Ensure height adjusts on input
+                const target = e.target as HTMLTextAreaElement;
+                target.style.height = 'auto';
+                target.style.height = `${target.scrollHeight}px`;
+            }}
+            className="text-3xl font-bold border-none focus-visible:ring-0 shadow-none p-0 resize-none bg-transparent overflow-hidden h-auto leading-tight focus:outline-none"
             rows={1}
           />
 
-          {/* Floating Formatting Toolbar - Conditionally Rendered */}
-           {/* Position it sticky to the top of the editor area */}
+          {/* Floating Formatting Toolbar */}
            <div className={cn(
                "sticky top-[-1px] z-10 bg-background/80 backdrop-blur-sm py-2 -mx-2 px-2 mb-4 rounded-md transition-opacity duration-200",
-               isTextSelected ? "opacity-100" : "opacity-0 pointer-events-none" // Control visibility and interaction
+               isTextSelected ? "opacity-100" : "opacity-0 pointer-events-none"
            )}>
                <div className="flex items-center gap-1 p-1 rounded-md border bg-card w-min shadow-sm formatting-toolbar">
                    <Button variant="ghost" size="icon" className="h-8 w-8 hover:scale-110 active:scale-95"><Bold className="w-4 h-4" /></Button>
@@ -257,30 +293,29 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
                </div>
            </div>
 
-
-          {/* Main Content - Editable */}
-          {/* Wrap Textarea in PopoverTrigger for positioning */}
+          {/* Main Content - Auto-growing */}
           <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+            {/* PopoverTrigger should ideally wrap only the element that triggers it */}
+            {/* but wrapping the textarea allows positioning relative to it */}
             <PopoverTrigger asChild>
-              {/* Trigger needs to wrap the element it positions relative to */}
-              <div className='relative'> {/* Wrapper for positioning */}
+                {/* The Textarea itself will be the trigger area */}
                  <Textarea
                    ref={contentRef}
                    placeholder="Start writing your note... Type '/' for commands."
                    value={noteContent}
                    onChange={handleContentChange}
-                   onSelect={handleSelectionChange} // Detect text selection
-                   onBlur={handleBlur} // Hide toolbar on blur
-                   className="text-base border-none focus-visible:ring-0 shadow-none p-0 resize-none bg-transparent min-h-[200px] w-full leading-relaxed focus:outline-none"
+                   onSelect={handleSelectionChange}
+                   onBlur={handleBlur}
+                   className="text-base border-none focus-visible:ring-0 shadow-none p-0 resize-none bg-transparent w-full leading-relaxed focus:outline-none overflow-hidden min-h-[100px]" // Use overflow-hidden, min-height
+                   style={{height: 'auto'}} // Start with auto height
                  />
-              </div>
             </PopoverTrigger>
             <PopoverContent
                className="w-60 p-1"
-               // Position popover near the cursor/slash (requires more complex logic, this is basic)
-               // You might need a library or custom JS to get cursor coordinates
-               // sideOffset={5}
-               // align="start"
+               // Position near cursor requires more complex logic - basic positioning for now
+               sideOffset={5}
+               align="start"
+               onOpenAutoFocus={(e) => e.preventDefault()} // Prevent focus shift to popover
             >
               <div className="text-xs text-muted-foreground px-2 py-1">Blocks</div>
               <div className="flex flex-col space-y-0.5">
@@ -288,10 +323,9 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
                   <Button
                     key={cmd.name}
                     variant="ghost"
-                    className="w-full justify-start h-8 px-2 text-sm hover:scale-100 active:scale-100" // Disable bubble effect for popover items
+                    className="w-full justify-start h-8 px-2 text-sm hover:scale-100 active:scale-100"
                     onClick={() => handleSelectCommand(cmd.name)}
                   >
-                     {/* Ensure icon components are rendered correctly */}
                      {typeof cmd.icon === 'function' ? (
                        React.createElement(cmd.icon, { className: "w-4 h-4 mr-2 text-muted-foreground" })
                      ) : (
@@ -305,7 +339,7 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
           </Popover>
 
 
-          {/* Example: Render Highlighted Info Block if present in content (logic needed) */}
+          {/* Example Rendered Blocks (based on simple includes check - needs proper parsing in real app) */}
           {noteContent.includes("Under Bezos' leadership") && (
               <div className="bg-yellow-100/50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 p-4 rounded-r-lg my-4 flex items-start gap-3">
                 <Lightbulb className="w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-1 flex-shrink-0" />
@@ -315,7 +349,6 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
               </div>
            )}
 
-           {/* Example: Render Bullet Points if present (logic needed) */}
             {noteContent.includes("- Jeff Bezos was born") && (
               <ul className="list-disc space-y-2 pl-6 my-4">
                 <li className="text-base text-foreground/90 leading-relaxed">Jeff Bezos was born on January 12, 1964, in Albuquerque, New Mexico.</li>
@@ -324,9 +357,7 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
               </ul>
            )}
 
-
-          {/* Wikipedia Link */}
-          {currentNoteId === '1' && ( // Only show for the sample note
+          {currentNoteId === '1' && (
               <div className="mt-6">
                  <a
                    href={wikipediaLink}
