@@ -7,7 +7,7 @@ import { ArrowLeft } from "lucide-react";
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 
-// Import local images (assuming these are the same subjects for now)
+// Import local images
 import itImage from '../it.png';
 import englishLitImage from '../english_lit.png';
 import socialSciImage from '../social_sci.png';
@@ -52,19 +52,7 @@ const allSubjects = [
     imageUrl: hindiImage,
     bgColorClass: "bg-red-100 dark:bg-red-900/30",
   },
-   // Add more subjects as needed
-   {
-    title: "Placeholder Subject 1",
-    imageUrl: 'https://picsum.photos/seed/placeholder1/225/340', // Placeholder
-    bgColorClass: "bg-gray-100 dark:bg-gray-900/30",
-    dataAiHint: "study abstract"
-  },
-  {
-    title: "Placeholder Subject 2",
-    imageUrl: 'https://picsum.photos/seed/placeholder2/225/340', // Placeholder
-    bgColorClass: "bg-purple-100 dark:bg-purple-900/30",
-    dataAiHint: "books library"
-  },
+  // Removed placeholder subjects
 ];
 
 export default function AllSubjectsPage() {
@@ -90,16 +78,11 @@ export default function AllSubjectsPage() {
                 title={subject.title}
                 imageUrl={subject.imageUrl}
                 bgColorClass={subject.bgColorClass}
-                className="w-full h-[300px] md:h-[320px]" // Adjust size as needed for grid view
-                data-ai-hint={subject.dataAiHint}
+                className="w-full h-[300px] md:h-[320px]" // Keep size consistent
+                data-ai-hint={subject.title?.toLowerCase().split(" ")[0]} // Use first word of title as hint
               />
             ))}
-            {/* Example Placeholder */}
-            <Card className="p-4 bg-muted/50 dark:bg-card/80 rounded-xl border-0 flex items-center justify-center h-[300px] md:h-[320px]">
-                <CardContent className="text-center p-0">
-                    <p className="text-muted-foreground text-sm">More subjects coming soon...</p>
-                </CardContent>
-            </Card>
+            {/* Removed Placeholder card */}
           </div>
         </main>
       </div>
