@@ -52,6 +52,7 @@ function FloatingNavItem({ href, icon: Icon, label, isActive, onMouseEnter }: Fl
 }
 
 // Demo data for the popover content - updated keys and content
+// Ensuring the 'date' field for Tools section is 'Tool' as per screenshot
 const demoData: { [key: string]: { icon: React.ElementType, title: string; date: string; href: string }[] } = {
   Tools: [
     { icon: Calculator, title: 'Calculator', date: 'Tool', href: '#' },
@@ -117,6 +118,7 @@ export function FloatingNav() {
                         <item.icon className="h-4 w-4 mr-2 text-muted-foreground group-hover:text-primary" />
                         <span>{item.title}</span>
                       </div>
+                      {/* Displaying the date/label from demoData */}
                       <span className="text-muted-foreground text-xs">{item.date}</span>
                     </a>
                   </Link>
@@ -150,4 +152,3 @@ export function FloatingNav() {
     </div>
   );
 }
-
