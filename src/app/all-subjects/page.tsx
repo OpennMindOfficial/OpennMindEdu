@@ -71,7 +71,7 @@ export default function AllSubjectsPage() {
           </div>
 
           {/* Increased grid gap for more uniform spacing */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-[30px]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-[50px]">
             {allSubjects.map((subject, index) => (
               <SubjectCard
                 key={index}
