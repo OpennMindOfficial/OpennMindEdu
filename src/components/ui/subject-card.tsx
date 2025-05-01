@@ -1,51 +1,24 @@
 
-'use client'; // This component needs client-side JS for interaction
+'use client';
 
-import React, { useRef, useState } from 'react';
-import Image, { type StaticImageData } from 'next/image'; // Import StaticImageData
+import React from 'react';
+import Image, { type StaticImageData } from 'next/image';
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from '@/lib/utils';
 
-interface SubjectCardProps extends React.HTMLAttributes<HTMLDivElement> { // Extend HTML attributes
-  title: string; // Keep title prop for alt text, even if not displayed
-  imageUrl: string | StaticImageData; // Allow string or StaticImageData
-  bgColorClass?: string; // Background color class prop
+interface SubjectCardProps extends React.HTMLAttributes<HTMLDivElement> {
+  title: string;
+  imageUrl: string | StaticImageData;
+  bgColorClass?: string;
   className?: string;
-  // Add data-ai-hint prop
   'data-ai-hint'?: string;
 }
 
 export function SubjectCard({ title, imageUrl, bgColorClass, className, ...props }: SubjectCardProps) {
-  const imageRef = useRef<HTMLDivElement>(null); // Ref for the image container
-  const [rotate, setRotate] = useState({ x: 0, y: 0 });
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!imageRef.current) return;
-
-    const rect = imageRef.current.getBoundingClientRect();
-    const width = rect.width;
-    const height = rect.height;
-    // Get mouse position relative to the image element
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-
-    // Calculate rotation angles based on mouse position within the image
-    const maxRotate = 7; // Reduced max rotation slightly for subtlety
-    const rotateX = ((mouseY / height) * 2 - 1) * -maxRotate; // Invert Y rotation
-    const rotateY = ((mouseX / width) * 2 - 1) * maxRotate;
-
-    setRotate({ x: rotateX, y: rotateY });
-  };
-
-  const handleMouseLeave = () => {
-    setRotate({ x: 0, y: 0 }); // Reset rotation on mouse leave
-  };
-
   return (
     <div
       className={cn(
-        "overflow-visible transition-all duration-300 ease-out hover:shadow-xl",
-        "transform-style-preserve-3d", // Keep 3D context on parent
+        "overflow-hidden transition-all duration-300 ease-out hover:shadow-xl rounded-xl", // Apply rounding to the container
         className // Allows overriding width/height etc.
       )}
       {...props} // Spread the rest of the props including data-ai-hint
@@ -55,30 +28,26 @@ export function SubjectCard({ title, imageUrl, bgColorClass, className, ...props
         "border-0", // No border
         bgColorClass || "bg-card/60 dark:bg-muted/40", // Apply bgColorClass or default to the card itself
         "w-full h-full", // Ensure card fills the container
-        "transition-all duration-300 ease-out" // Add transition to the card itself if needed
+        "relative" // Ensure relative positioning for overlay
       )}>
-        <CardContent className="p-0 relative h-full" ref={imageRef}>
-            <div // Wrapper div for Image to apply transform and handlers
-                onMouseMove={handleMouseMove}
-                onMouseLeave={handleMouseLeave}
-                style={{
-                    transform: `perspective(1000px) rotateX(${rotate.x}deg) rotateY(${rotate.y}deg) scale(1.05)`, // Apply 3D rotation and slight scale
-                    transition: 'transform 0.3s cubic-bezier(0.23, 1, 0.32, 1)', // Smoother, more elastic transition
-                    willChange: 'transform', // Hint browser for optimization
-                }}
-                className="relative w-full h-full rounded-xl overflow-hidden" // Ensure wrapper takes full height and hides overflow
-            >
-                <Image
-                  src={imageUrl}
-                  alt={title} // Keep alt text for accessibility
-                  fill // Use fill to cover the container
-                  style={{ objectFit: 'cover' }} // Cover ensures image fills space, might crop
-                  className="block w-full h-full rounded-xl transition-transform duration-300" // Image itself fills the div, apply rounding
-                  priority={false} // Setting priority to false as these might be many images
-                />
-                {/* Optional: Add a subtle inner shadow or gradient for depth */}
-                 <div className="absolute inset-0 rounded-xl ring-1 ring-inset ring-black/10"></div>
-            </div>
+        <CardContent className="p-0 relative h-full">
+          {/* Image */}
+          <Image
+            src={imageUrl}
+            alt={title} // Keep alt text for accessibility
+            fill // Use fill to cover the container
+            style={{ objectFit: 'cover' }} // Cover ensures image fills space
+            className="block w-full h-full rounded-xl" // Image itself fills the div, apply rounding
+            priority={false}
+          />
+          {/* Title Overlay */}
+          <div className="absolute inset-0 flex items-start justify-center p-4 bg-gradient-to-b from-black/50 to-transparent rounded-t-xl pointer-events-none">
+            <h3 className="text-white text-xl md:text-2xl font-bold text-center mt-2" style={{ textShadow: '1px 1px 3px rgba(0,0,0,0.6)' }}>
+              {title}
+            </h3>
+          </div>
+          {/* Optional: Add a subtle inner shadow or gradient for depth - matches screenshot border */}
+           <div className="absolute inset-0 rounded-xl ring-1 ring-inset ring-white/20 dark:ring-black/20 pointer-events-none"></div>
         </CardContent>
       </Card>
     </div>

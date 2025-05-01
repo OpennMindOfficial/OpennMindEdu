@@ -7,7 +7,7 @@ import { Sidebar } from "@/components/layout/sidebar";
 import { SubjectCard } from "@/components/ui/subject-card";
 import { ExamCard } from "@/components/ui/exam-card";
 import { LearnWithCard } from "@/components/ui/learn-with-card";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card"; // Ensure Card is imported
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import {
@@ -172,6 +172,27 @@ export default function Home() {
               </div>
            </div>
 
+           {/* Mock Exams Section */}
+            <div className="space-y-4">
+               <div className="flex items-center space-x-2 cursor-pointer group">
+                  <PlusCircle className="w-5 h-5 text-primary" />
+                  <h2 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">Mock exams</h2>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
+               </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {examCards.map((card, index) => (
+                    <ExamCard
+                      key={index}
+                      title={card.title}
+                      imageUrl={card.imageUrl}
+                      bgColorClass={card.bgColorClass}
+                      isNew={card.isNew}
+                      dataAiHint={card.dataAiHint}
+                    />
+                  ))}
+                </div>
+            </div>
+
             {/* My Subjects Section */}
             <div className="space-y-4">
              <div className="flex justify-between items-center">
@@ -196,11 +217,11 @@ export default function Home() {
                    {subjects.map((subject, index) => (
                      <SubjectCard
                        key={index}
-                       title={subject.title} // Title still used for alt text
+                       title={subject.title} // Pass title for overlay
                        imageUrl={subject.imageUrl}
                        bgColorClass={subject.bgColorClass}
-                       className="w-[225px] h-[340px] flex-shrink-0" // Increased horizontal size
-                       data-ai-hint={subject.title?.toLowerCase().split(" ")[0]} // Use first word of title as hint
+                       className="w-[225px] h-[340px] flex-shrink-0" // Keep original size or adjust as needed
+                       data-ai-hint={subject.title?.toLowerCase().split(" ")[0]}
                      />
                    ))}
                  </div>
@@ -209,27 +230,6 @@ export default function Home() {
              </div>
            </div>
 
-
-           {/* Mock Exams Section */}
-            <div className="space-y-4">
-               <div className="flex items-center space-x-2 cursor-pointer group">
-                  <PlusCircle className="w-5 h-5 text-primary" />
-                  <h2 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">Mock exams</h2>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
-               </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {examCards.map((card, index) => (
-                    <ExamCard
-                      key={index}
-                      title={card.title}
-                      imageUrl={card.imageUrl}
-                      bgColorClass={card.bgColorClass}
-                      isNew={card.isNew}
-                      dataAiHint={card.dataAiHint}
-                    />
-                  ))}
-                </div>
-            </div>
 
            {/* Learn With Section */}
            <div className="space-y-4">

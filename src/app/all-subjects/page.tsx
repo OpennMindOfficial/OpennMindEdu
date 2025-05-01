@@ -71,23 +71,21 @@ export default function AllSubjectsPage() {
             <h1 className="text-2xl md:text-3xl font-bold text-foreground">All Subjects</h1>
           </div>
 
-          {/* Increased gap from gap-8 to gap-10 for more horizontal spacing */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-10">
+          {/* Adjusted grid gap to match homepage spacing */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {allSubjects.map((subject, index) => (
               <SubjectCard
                 key={index}
-                title={subject.title}
+                title={subject.title} // Pass title for overlay
                 imageUrl={subject.imageUrl}
                 bgColorClass={subject.bgColorClass}
-                className="w-full h-[300px] md:h-[320px]" // Keep size consistent
-                data-ai-hint={subject.title?.toLowerCase().split(" ")[0]} // Use first word of title as hint
+                className="w-full h-[340px]" // Maintain height, width determined by grid
+                data-ai-hint={subject.title?.toLowerCase().split(" ")[0]}
               />
             ))}
-            {/* Removed Placeholder card */}
           </div>
         </main>
       </div>
     </div>
   );
 }
-
