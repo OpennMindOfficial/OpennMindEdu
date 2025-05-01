@@ -71,8 +71,8 @@ export default function AllSubjectsPage() {
             <h1 className="text-2xl md:text-3xl font-bold text-foreground">All Subjects</h1>
           </div>
 
-          {/* Adjusted grid gap to match homepage spacing */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          {/* Adjusted grid columns for wider cards on larger screens */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {allSubjects.map((subject, index) => (
               <SubjectCard
                 key={index}
