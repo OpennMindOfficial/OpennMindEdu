@@ -9,20 +9,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"; // Import Avata
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator"; // Import Separator
 import {
-  LayoutDashboard, // Dashboard
-  Bell, // Notifications
-  FolderOpen, // Q4 Updates (example)
-  BarChart3, // Q4 Conversions (example)
-  Users, // Q4 Customers (example)
-  BarChartHorizontal, // Weekly Update (example)
-  UsersRound, // Non-staff site visit (example)
-  Users2, // Cohorts
-  Filter, // Funnels
-  CheckCircle2, // Conversions
-  BarChart2, // Reports
-  Clock, // Recent sessions
   Settings, // Account settings
-  ChevronDown,
   ChevronLeft, // For Collapse icon
   Home,
   MessageSquare,
@@ -33,7 +20,9 @@ import {
   BookOpen,
   FileStack,
   Bookmark,
-  GraduationCap // OpennMind logo icon
+  GraduationCap, // OpennMind logo icon
+  ChevronDown, // Added for dropdown indicator
+  Clock, // Import Clock icon
 } from 'lucide-react';
 import * as React from 'react';
 import { motion } from 'framer-motion'; // Import motion
@@ -130,27 +119,13 @@ function NavSection({ title, children }: NavSectionProps) {
 export function Sidebar() {
     const pathname = usePathname();
 
-    // Example data structure matching the image - adjusted for OpennMind context
-    const mainNavItems = [
-        { href: '/', icon: LayoutDashboard, label: 'Dashboard'},
-        { href: '/notifications', icon: Bell, label: 'Notifications', badgeCount: 8},
-    ];
-
-    // Favourites Section - can be customized
-    const favouritesItems = [
-        { href: '#', icon: FolderOpen, label: 'My Courses', isDropdown: true }, // Placeholder for dropdown
-        { href: '/courses/math-q4', icon: BarChart3, label: 'Math Q4 progress', secondaryText: 'Report', isSubItem: true },
-        { href: '/courses/science-q4', icon: Users, label: 'Science Q4 cohort', secondaryText: 'Cohort', isSubItem: true },
-        { href: '/courses/weekly-summary', icon: BarChartHorizontal, label: 'Weekly Summary', secondaryText: 'Report', isSubItem: true },
-    ];
-
-    // OpennMind specific items (Integrate or separate as needed)
+    // OpennMind specific items (Study Tools)
     const opennMindItems = [
         { href: '/chat', icon: MessageSquare, label: 'Chat With Jojo'},
         { href: '/predicted-papers', icon: FileText, label: 'Predicted Papers'},
         { href: '/predict-grade', icon: Lightbulb, label: 'Predict Grade' },
         { href: '/mock-exams', icon: PlusCircle, label: 'Mock Exams'},
-        { href: '/timed-exams', icon: Clock, label: 'Timed Exams'},
+        { href: '/timed-exams', icon: Clock, label: 'Timed Exams'}, // Added timed exams
         { href: '/questionbank', icon: HelpCircle, label: 'Questionbank'},
         { href: '/notes', icon: BookOpen, label: 'Notes'},
         { href: '/pdf-to-notes', icon: FileStack, label: 'PDF To Notes'},
@@ -179,31 +154,12 @@ export function Sidebar() {
         </div>
 
         <ScrollArea className="flex-1 py-4">
-            {/* Main Navigation */}
-            <nav className="grid items-start gap-0.5 px-3 mb-4">
-                {mainNavItems.map((item) => (
-                   <NavItem key={item.href} {...item} isActive={pathname === item.href} />
-                ))}
-            </nav>
-
-            <Separator className="mx-4 mb-4" />
-
-            {/* Favourites Section */}
-            <NavSection title="Favourites">
-                {favouritesItems.map((item) => (
-                   <NavItem key={item.href} {...item} isActive={pathname.startsWith(item.href) && item.href !== '#'} />
-                ))}
-            </NavSection>
-
-            <Separator className="mx-4 my-4" />
-
             {/* OpennMind Specific Section */}
              <NavSection title="Study Tools">
                   {opennMindItems.map((item) => (
                     <NavItem key={item.href} {...item} isActive={pathname === item.href} />
                   ))}
              </NavSection>
-
 
         </ScrollArea>
 
