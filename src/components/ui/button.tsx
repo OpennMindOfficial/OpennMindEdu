@@ -13,12 +13,12 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+          "border border-input bg-background hover:bg-muted hover:text-foreground", // Changed hover:bg-accent to hover:bg-muted and hover:text-accent-foreground to hover:text-foreground
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-muted hover:text-foreground", // Adjusted ghost hover for better visibility
         link: "text-primary underline-offset-4 hover:underline !scale-100 hover:!scale-100 active:!scale-100", // Link might not need scaling
-        // Adjusted primary variant to match screenshot purple
+        // Adjusted primary variant to match screenshot blue
         primary: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm",
         accent: "bg-accent text-accent-foreground hover:bg-accent/90", // Keep original accent if needed elsewhere
       },
