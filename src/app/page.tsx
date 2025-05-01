@@ -22,6 +22,11 @@ import {
   FileText,
   Layers,
   ChevronLeft, // Import ChevronLeft
+  Dices, // Icon for Random Exam
+  SlidersHorizontal, // Icon for Custom Exam
+  Timer, // Icon for Timed Exam
+  PenTool, // Icon for Sketchpad
+  GraduationCap, // Icon for Revision Plan
 } from "lucide-react";
 import React, { useState, useEffect, useRef } from 'react'; // Import useRef
 import Link from 'next/link'; // Import Link
@@ -36,10 +41,6 @@ import mathImage from './maths.png';
 import scienceImage from './science.png'; // Assuming this file exists
 import hindiImage from './hindi.png';
 
-// Import local images for exams
-import i1 from './i1.png';
-import i2 from './i2.png';
-import i3 from './i3.png';
 
 const subjects = [
   {
@@ -87,30 +88,34 @@ const subjects = [
 ];
 
 
-// Data for Exam Cards using local images
+// Data for Exam Cards using icons
 const examCards = [
   {
     title: "Random exam",
-    imageUrl: i1, // Use imported image i1
-    bgColorClass: "bg-gradient-to-br from-blue-100/50 to-white dark:from-blue-900/30 dark:to-background",
+    icon: Dices, // Use Dices icon
+    bgColorClass: "bg-gradient-to-br from-blue-200/50 to-white dark:from-blue-800/30 dark:to-background",
+    textColorClass: "text-blue-800 dark:text-blue-300", // Match icon color theme
     isNew: false,
-    dataAiHint: "abstract shapes",
+    dataAiHint: "random dice",
   },
   {
     title: "Custom exam",
-    imageUrl: i2, // Use imported image i2
-    bgColorClass: "bg-gradient-to-br from-green-100/50 to-white dark:from-green-900/30 dark:to-background",
+    icon: SlidersHorizontal, // Use SlidersHorizontal icon
+    bgColorClass: "bg-gradient-to-br from-green-200/50 to-white dark:from-green-800/30 dark:to-background",
+    textColorClass: "text-green-800 dark:text-green-300", // Match icon color theme
     isNew: true,
-    dataAiHint: "gears settings",
+    dataAiHint: "custom settings sliders",
   },
   {
     title: "Timed exam",
-    imageUrl: i3, // Use imported image i3
-    bgColorClass: "bg-gradient-to-br from-pink-100/50 to-white dark:from-pink-900/30 dark:to-background",
+    icon: Timer, // Use Timer icon
+    bgColorClass: "bg-gradient-to-br from-pink-200/50 to-white dark:from-pink-800/30 dark:to-background",
+    textColorClass: "text-pink-800 dark:text-pink-300", // Match icon color theme
     isNew: true,
-    dataAiHint: "clock time",
+    dataAiHint: "timed clock stopwatch",
   },
 ];
+
 
 // Data for Learn With Cards
 const learnWithCards = [
@@ -120,7 +125,10 @@ const learnWithCards = [
     { title: 'Mock exams', icon: ClipboardCheck, bgColorClass: 'bg-learn-green', textColorClass: 'text-learn-green-foreground' },
     { title: 'Notes', icon: FileText, bgColorClass: 'bg-learn-red', textColorClass: 'text-learn-red-foreground' },
     { title: 'Flashcards', icon: Layers, bgColorClass: 'bg-learn-indigo', textColorClass: 'text-learn-indigo-foreground' },
+    { title: 'Sketchpad', icon: PenTool, bgColorClass: 'bg-learn-orange', textColorClass: 'text-learn-orange-foreground' },
+    { title: 'Revision Plan', icon: GraduationCap, bgColorClass: 'bg-learn-teal', textColorClass: 'text-learn-teal-foreground' },
 ];
+
 
 // Motivational Study Quotes
 const studyQuotes = [
@@ -166,6 +174,10 @@ export default function Home() {
         window.addEventListener('resize', checkScrollArrows);
     }
 
+    // Initial check
+    checkScrollArrows();
+
+
     return () => {
         if (container) {
             container.removeEventListener('scroll', checkScrollArrows);
@@ -177,13 +189,16 @@ export default function Home() {
   const checkScrollArrows = () => {
       const container = scrollContainerRef.current;
       if (!container) return;
+      // Introduce a small tolerance (e.g., 1 pixel) for floating point inaccuracies
+      const tolerance = 1;
       const scrollLeft = container.scrollLeft;
       const scrollWidth = container.scrollWidth;
       const clientWidth = container.clientWidth;
 
-      setShowLeftArrow(scrollLeft > 0);
-      setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 1); // Use a small tolerance
+      setShowLeftArrow(scrollLeft > tolerance);
+      setShowRightArrow(scrollLeft < scrollWidth - clientWidth - tolerance);
   };
+
 
   const scroll = (direction: 'left' | 'right') => {
       const container = scrollContainerRef.current;
@@ -193,7 +208,11 @@ export default function Home() {
         left: direction === 'left' ? -scrollAmount : scrollAmount,
         behavior: 'smooth',
       });
+      // Re-check arrows shortly after starting scroll to update state quickly
+      setTimeout(checkScrollArrows, 150);
+      setTimeout(checkScrollArrows, 350); // Check again after smooth scroll likely finished
   };
+
 
 
   return (
@@ -209,7 +228,7 @@ export default function Home() {
            <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900/80 text-primary-foreground p-6 rounded-xl shadow-lg flex items-center justify-between relative overflow-hidden">
              <div className="z-10">
                <h2 className="text-xl md:text-2xl font-semibold mb-2">{randomQuote || "Loading quote..."}</h2> {/* Display quote or loading message */}
-               <Button variant="secondary" size="sm" className="bg-white/20 hover:bg-white/30 text-white px-4 py-1 text-xs h-auto rounded-full">
+               <Button variant="secondary" size="sm" className="bg-white/20 hover:bg-white/30 text-white px-4 py-1 text-xs h-auto rounded-full shadow-sm hover:shadow-md transition-all duration-300">
                  Keep pushing! &lt;3
                </Button>
              </div>
@@ -220,8 +239,30 @@ export default function Home() {
               </div>
            </div>
 
+            {/* Mock Exams Section - Moved Up */}
+            <div className="space-y-4">
+               <div className="flex items-center space-x-2 cursor-pointer group">
+                  <PlusCircle className="w-5 h-5 text-primary" />
+                  <h2 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">Mock exams</h2>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
+               </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {examCards.map((card, index) => (
+                    <ExamCard
+                      key={index}
+                      title={card.title}
+                      icon={card.icon} // Pass icon prop
+                      bgColorClass={card.bgColorClass}
+                      textColorClass={card.textColorClass} // Pass text color for icon
+                      isNew={card.isNew}
+                      dataAiHint={card.dataAiHint}
+                    />
+                  ))}
+                </div>
+            </div>
 
-           {/* My Subjects Section */}
+
+           {/* My Subjects Section - Moved Down */}
             <div className="space-y-4">
              <div className="flex justify-between items-center">
                <div className="flex items-center space-x-2 cursor-pointer group">
@@ -231,10 +272,18 @@ export default function Home() {
                </div>
                <div className="flex items-center space-x-4 text-sm">
                  <Link href="/all-subjects" passHref legacyBehavior>
-                   <a><Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground rounded-full">Change subjects</Button></a>
+                   <a>
+                     <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground rounded-full shadow-sm hover:shadow-md transition-all duration-300">
+                       Change subjects
+                     </Button>
+                   </a>
                  </Link>
                  <Link href="/all-subjects" passHref legacyBehavior>
-                   <a><Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground rounded-full">Browse all</Button></a>
+                    <a>
+                     <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground rounded-full shadow-sm hover:shadow-md transition-all duration-300">
+                       Browse all
+                     </Button>
+                   </a>
                  </Link>
                </div>
              </div>
@@ -244,6 +293,7 @@ export default function Home() {
                 <div
                    ref={scrollContainerRef}
                    className="flex w-full space-x-4 pb-4 overflow-x-auto scroll-smooth scrollbar-hide" // scrollbar-hide utility might need Tailwind config
+                   onScroll={checkScrollArrows} // Add onScroll handler here too
                 >
                    {subjects.map((subject, index) => (
                      <SubjectCard
@@ -263,6 +313,7 @@ export default function Home() {
                      size="icon"
                      className={cn(
                          "absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 z-10 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300",
+                         "hover:scale-110 active:scale-95", // Bubble effect
                          showLeftArrow ? "visible" : "invisible" // Control visibility via state
                      )}
                      onClick={() => scroll('left')}
@@ -277,6 +328,7 @@ export default function Home() {
                      size="icon"
                      className={cn(
                          "absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-10 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300",
+                          "hover:scale-110 active:scale-95", // Bubble effect
                          showRightArrow ? "visible" : "invisible" // Control visibility via state
                      )}
                      onClick={() => scroll('right')}
@@ -287,26 +339,6 @@ export default function Home() {
              </div>
            </div>
 
-           {/* Mock Exams Section */}
-            <div className="space-y-4">
-               <div className="flex items-center space-x-2 cursor-pointer group">
-                  <PlusCircle className="w-5 h-5 text-primary" />
-                  <h2 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">Mock exams</h2>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
-               </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {examCards.map((card, index) => (
-                    <ExamCard
-                      key={index}
-                      title={card.title}
-                      imageUrl={card.imageUrl}
-                      bgColorClass={card.bgColorClass}
-                      isNew={card.isNew}
-                      dataAiHint={card.dataAiHint}
-                    />
-                  ))}
-                </div>
-            </div>
 
 
            {/* Learn With Section */}
@@ -327,10 +359,10 @@ export default function Home() {
                       textColorClass={card.textColorClass}
                     />
                  ))}
-                 {/* Placeholder Card */}
+                 {/* Example Placeholder Card - Replace with actual content */}
                  <Card className="p-4 bg-muted/50 dark:bg-card/80 rounded-xl border-0 flex items-center justify-center h-full min-h-[144px] md:min-h-[144px]">
                     <CardContent className="text-center p-0">
-                      <p className="text-muted-foreground text-sm">Learning content coming soon...</p>
+                      <p className="text-muted-foreground text-sm">More learning tools coming soon...</p>
                     </CardContent>
                  </Card>
               </div>
@@ -342,3 +374,6 @@ export default function Home() {
     </div>
   );
 }
+
+
+    

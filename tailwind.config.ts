@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss"
 
 const config = {
@@ -53,7 +54,7 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // Custom colors for exam cards
+        // Custom colors for exam cards (can be removed if only icons are used)
         'exam-blue': {
           light: '#E0F2FE',
           dark: '#3B82F6',
@@ -91,6 +92,14 @@ const config = {
           DEFAULT: 'hsl(240, 40%, 35%)', // Darker indigo/blue-purple
           foreground: 'hsl(240, 40%, 95%)', // Lighter indigo text
         },
+        'learn-orange': { // Added for Sketchpad
+          DEFAULT: 'hsl(25, 60%, 30%)', // Darker orange
+          foreground: 'hsl(25, 60%, 95%)', // Lighter orange text
+        },
+        'learn-teal': { // Added for Revision Plan
+          DEFAULT: 'hsl(170, 45%, 25%)', // Darker teal
+          foreground: 'hsl(170, 45%, 95%)', // Lighter teal text
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -122,3 +131,6 @@ const config = {
 } satisfies Config
 
 export default config
+
+
+    
