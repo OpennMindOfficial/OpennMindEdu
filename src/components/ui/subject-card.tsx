@@ -1,5 +1,4 @@
 
-
 'use client'; // This component needs client-side JS for interaction
 
 import React, { useRef, useState } from 'react';
@@ -7,14 +6,16 @@ import Image, { type StaticImageData } from 'next/image'; // Import StaticImageD
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from '@/lib/utils';
 
-interface SubjectCardProps {
+interface SubjectCardProps extends React.HTMLAttributes<HTMLDivElement> { // Extend HTML attributes
   title: string; // Keep title prop for alt text, even if not displayed
   imageUrl: string | StaticImageData; // Allow string or StaticImageData
   bgColorClass?: string; // Background color class prop
   className?: string;
+  // Add data-ai-hint prop
+  'data-ai-hint'?: string;
 }
 
-export function SubjectCard({ title, imageUrl, bgColorClass, className }: SubjectCardProps) {
+export function SubjectCard({ title, imageUrl, bgColorClass, className, ...props }: SubjectCardProps) {
   const imageRef = useRef<HTMLDivElement>(null); // Ref for the image container
   const [rotate, setRotate] = useState({ x: 0, y: 0 });
 
@@ -47,6 +48,7 @@ export function SubjectCard({ title, imageUrl, bgColorClass, className }: Subjec
         "transform-style-preserve-3d", // Keep 3D context on parent
         className // Allows overriding width/height etc.
       )}
+      {...props} // Spread the rest of the props including data-ai-hint
     >
       <Card className={cn(
         "overflow-hidden rounded-xl",
@@ -60,8 +62,8 @@ export function SubjectCard({ title, imageUrl, bgColorClass, className }: Subjec
                 onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}
                 style={{
-                    transform: `perspective(1000px) rotateX(${rotate.x}deg) rotateY(${rotate.y}deg) scale(1.05)`, // Adjusted perspective, reduced scale slightly
-                    transition: 'transform 0.3s ease-out', // Smoother transition
+                    transform: `perspective(1000px) rotateX(${rotate.x}deg) rotateY(${rotate.y}deg) scale(1.05)`, // Apply 3D rotation and slight scale
+                    transition: 'transform 0.3s cubic-bezier(0.23, 1, 0.32, 1)', // Smoother, more elastic transition
                     willChange: 'transform', // Hint browser for optimization
                 }}
                 className="relative w-full h-full rounded-xl overflow-hidden" // Ensure wrapper takes full height and hides overflow

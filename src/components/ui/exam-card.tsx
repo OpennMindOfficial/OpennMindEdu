@@ -9,15 +9,17 @@ import { Play } from "lucide-react"; // Import Play icon
 import { cn } from '@/lib/utils';
 import { useState } from 'react'; // Import useState
 
-interface ExamCardProps {
+interface ExamCardProps extends React.HTMLAttributes<HTMLDivElement> { // Extend HTML attributes
   title: string;
   imageUrl: string | StaticImageData; // Accept string URL or imported image object
   bgColorClass: string; // Tailwind class for background gradient/color
   isNew?: boolean;
   className?: string;
+  // Add data-ai-hint prop
+  'data-ai-hint'?: string;
 }
 
-export function ExamCard({ title, imageUrl, bgColorClass, isNew, className }: ExamCardProps) {
+export function ExamCard({ title, imageUrl, bgColorClass, isNew, className, ...props }: ExamCardProps) {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -29,6 +31,7 @@ export function ExamCard({ title, imageUrl, bgColorClass, isNew, className }: Ex
       )}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      {...props} // Spread the rest of the props including data-ai-hint
     >
       <CardHeader className="p-4 pb-2 z-10 relative">
         <div className="flex justify-between items-center">
