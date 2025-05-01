@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -20,7 +21,6 @@ import {
   BookOpen,
   FileStack,
   Bookmark,
-  GraduationCap, // OpennMind logo icon (now unused)
   ChevronDown, // Added for dropdown indicator
   Clock, // Import Clock icon
 } from 'lucide-react';
@@ -128,7 +128,7 @@ export function Sidebar() {
 
     // OpennMind specific items (Study Tools)
     const opennMindItems = [
-        { href: '/chat', icon: MessageSquare, label: 'Chat With Jojo'},
+        { href: '/chat', icon: MessageSquare, label: 'Chat With AI'}, // Changed label here
         { href: '/predicted-papers', icon: FileText, label: 'Predicted Papers'},
         { href: '/predict-grade', icon: Lightbulb, label: 'Predict Grade' },
         { href: '/mock-exams', icon: PlusCircle, label: 'Mock Exams'},
@@ -148,7 +148,11 @@ export function Sidebar() {
              {/* CBSE Selector Button */}
              <Button
                  variant="outline" // Use outline variant for the base style
-                 className="w-full justify-between border-muted-foreground/30 hover:bg-muted/50 h-9 text-sm font-normal text-foreground px-3" // Match styling: padding, height, border
+                 className={cn(
+                     "w-full justify-between border-muted-foreground/30 h-9 text-sm font-normal text-foreground px-3",
+                     "hover:bg-muted/50", // Apply hover directly
+                     "hover:scale-100 active:scale-100" // Ensure no scaling
+                 )}
              >
                  <span className="font-medium">CBSE</span>
                  <div className="flex items-center gap-1.5">
