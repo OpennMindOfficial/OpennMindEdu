@@ -71,7 +71,8 @@ export default function AllSubjectsPage() {
             <h1 className="text-2xl md:text-3xl font-bold text-foreground">All Subjects</h1>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8"> {/* Increased gap from gap-6 to gap-8 */}
+          {/* Increased gap from gap-8 to gap-10 for more horizontal spacing */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-10">
             {allSubjects.map((subject, index) => (
               <SubjectCard
                 key={index}
