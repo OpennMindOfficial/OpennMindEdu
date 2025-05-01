@@ -4,6 +4,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
 import { FloatingNav } from "@/components/layout/floating-nav";
+import Script from "next/script"; // Import Script component
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -19,6 +20,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Desmos API Script */}
+        <Script
+            src="https://www.desmos.com/api/v1.10/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"
+            strategy="beforeInteractive" // Load before page is interactive
+        />
+      </head>
       <body
         className={cn(
           "min-h-screen bg-background font-sans antialiased", // Removed overflow-hidden from body
