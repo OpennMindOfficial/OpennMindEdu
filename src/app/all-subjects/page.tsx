@@ -52,7 +52,6 @@ const allSubjects = [
     imageUrl: hindiImage,
     bgColorClass: "bg-red-100 dark:bg-red-900/30",
   },
-  // Removed placeholder subjects
 ];
 
 export default function AllSubjectsPage() {
@@ -71,12 +70,12 @@ export default function AllSubjectsPage() {
             <h1 className="text-2xl md:text-3xl font-bold text-foreground">All Subjects</h1>
           </div>
 
-          {/* Adjusted grid columns for wider cards on larger screens */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {/* Increased grid gap for more uniform spacing */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {allSubjects.map((subject, index) => (
               <SubjectCard
                 key={index}
-                title={subject.title} // Pass title for overlay
+                title={subject.title} // Title might be needed for accessibility or future use
                 imageUrl={subject.imageUrl}
                 bgColorClass={subject.bgColorClass}
                 className="w-full h-[340px]" // Maintain height, width determined by grid
