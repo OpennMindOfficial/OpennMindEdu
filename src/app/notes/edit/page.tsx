@@ -90,11 +90,8 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
     const triggerChar = textBeforeCursor.slice(-1);
     const charBeforeTrigger = textBeforeCursor.slice(-2, -1);
 
-    if (triggerChar === '/' && (textBeforeCursor.length === 1 || charBeforeTrigger === ' ' || charBeforeTrigger === '\n' || charBeforeTrigger === '')) {
-       setPopoverOpen(true);
-    } else {
-       setPopoverOpen(false);
-    }
+    // Only open the popover if '/' is the last character typed
+    setPopoverOpen(triggerChar === '/' && (textBeforeCursor.length === 1 || charBeforeTrigger === ' ' || charBeforeTrigger === '\n' || charBeforeTrigger === ''));
   };
 
   const handleSelectCommand = (commandName: string) => {
@@ -217,7 +214,7 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
       {/* Main Content Area (Editor) */}
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header />
-        <main className="flex-1 overflow-y-auto p-6 md:p-8 lg:p-12 space-y-6 bg-background relative"> {/* Added relative positioning */}
+        <main className="flex-1 p-6 md:p-8 lg:p-12 space-y-6 bg-background relative"> {/* Added relative positioning, removed overflow-y-auto */}
           {/* Header Section */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
