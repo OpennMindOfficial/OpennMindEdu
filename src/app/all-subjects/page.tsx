@@ -1,9 +1,11 @@
+'use client';
 
 import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
 import { SubjectCard } from "@/components/ui/subject-card";
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 // Import local images
 import itImage from '../it.png';
@@ -60,7 +62,7 @@ export default function AllSubjectsPage() {
         <Header />
         <main className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 bg-background">
           <div className="flex items-center gap-4 mb-6">
-            <Link href="/" passHref>
+            <Link href="/" passHref legacyBehavior>
               <Button variant="ghost" size="icon" className="rounded-full">
                 <ArrowLeft className="w-5 h-5" />
               </Button>
@@ -69,7 +71,7 @@ export default function AllSubjectsPage() {
           </div>
 
           {/* Increased grid gap for more uniform spacing */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-[50px]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-[70px]">
             {allSubjects.map((subject, index) => (
               <SubjectCard
                 key={index}
@@ -86,3 +88,4 @@ export default function AllSubjectsPage() {
     </div>
   );
 }
+import { ArrowLeft } from "lucide-react"
