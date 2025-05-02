@@ -4,8 +4,8 @@
 import * as React from 'react';
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Input } from "@/components/ui/input"; // Keep Input if needed within editor
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"; // Keep Avatar if needed
 import {
   Hash,
   Bold,
@@ -39,28 +39,30 @@ import {
   List,
   Type,
   ChevronDown,
-  GripVertical, // For drag handle in sidebar header (optional)
-  Wand2, // Icon for AI actions trigger
-  ScrollText, // Summarize
-  ListChecks, // Action Points
-  ListOrdered, // Main Points
-  SpellCheck, // Fix Grammar
-  Sparkles, // Improve Writing
-  Scissors, // Make Shorter
-  Filter, // Simplify (using Filter as an alternative)
-  FileText, // Write Essay
+  GripVertical,
+  Wand2,
+  ScrollText,
+  ListChecks,
+  ListOrdered,
+  SpellCheck,
+  Sparkles,
+  Scissors,
+  Filter,
+  FileText,
 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
-import { Popover, PopoverContent, PopoverAnchor, PopoverTrigger } from "@/components/ui/popover"; // Adjusted import
+import { Popover, PopoverContent, PopoverAnchor, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from '@/lib/utils';
+import { Sidebar } from '@/components/layout/sidebar'; // Import standard Sidebar
+import { Header } from '@/components/layout/header'; // Import standard Header
 
-// Demo note data structure (expanded slightly)
+// Demo note data structure (expanded slightly) - Consider moving this to a data source or state management
 interface Note {
   id: string;
   title: string;
-  contentPreview: string;
+  contentPreview: string; // Keep preview for potential future use, though full content is loaded
   lastEdited: string;
-  createdAt?: string; // Add createdAt
+  createdAt?: string;
   url?: string;
   type?: string;
 }
@@ -71,9 +73,9 @@ const sampleNotes: Note[] = [
     title: 'The Remarkable Story...',
     contentPreview: 'Jeff Bezos is a business...',
     lastEdited: 'Today, 15:28',
-    createdAt: '01/15/2024 11:31:04 AM', // Example data
-    url: 'https://opennmind.com/notes/remarkable-story', // Example data
-    type: 'Document', // Example data
+    createdAt: '01/15/2024 11:31:04 AM',
+    url: 'https://opennmind.com/notes/remarkable-story',
+    type: 'Document',
   },
   { id: '2', title: 'Another Note', contentPreview: 'This is the preview...', lastEdited: 'Yesterday, 10:00' },
   { id: '3', title: 'Ideas for Project X', contentPreview: 'Need to research...', lastEdited: 'July 28, 09:15' },
@@ -107,25 +109,26 @@ const aiActions = [
 ];
 
 export default function EditNotePage() {
-  const [currentNoteId, setCurrentNoteId] = React.useState<string | null>('1');
-  const [noteTitle, setNoteTitle] = React.useState("Untitled"); // Default to Untitled
-  const [noteContent, setNoteContent] = React.useState(""); // Start empty for new notes
+  // State for current note ID - needs to be managed differently now, perhaps via URL param or context
+  const [currentNoteId, setCurrentNoteId] = React.useState<string | null>('1'); // Example: load note 1 by default
+  const [noteTitle, setNoteTitle] = React.useState("Untitled");
+  const [noteContent, setNoteContent] = React.useState("");
 
   const [slashPopoverOpen, setSlashPopoverOpen] = React.useState(false);
-  const [aiPopoverOpen, setAiPopoverOpen] = React.useState(false); // State for AI popover
+  const [aiPopoverOpen, setAiPopoverOpen] = React.useState(false);
   const contentRef = React.useRef<HTMLTextAreaElement>(null);
   const [isTextSelected, setIsTextSelected] = React.useState(false);
   const slashTriggeredRef = React.useRef(false);
   const selectionRef = React.useRef<{ start: number, end: number } | null>(null);
-  const popoverAnchorRef = React.useRef<HTMLDivElement>(null); // Ref for explicit anchor positioning
-  const formattingToolbarRef = React.useRef<HTMLDivElement>(null); // Ref for toolbar positioning
+  const popoverAnchorRef = React.useRef<HTMLDivElement>(null);
+  const formattingToolbarRef = React.useRef<HTMLDivElement>(null);
 
-  // Load note data when currentNoteId changes
+  // TODO: Replace useEffect with logic to get note ID from URL params or global state
   React.useEffect(() => {
+    // This part needs to adapt based on how the note ID is passed to the page
     const selected = sampleNotes.find(n => n.id === currentNoteId);
     if (selected) {
       setNoteTitle(selected.title || "Untitled");
-      // Simulate loading full content - replace preview with actual content
       const fullContent = selected.id === '1'
        ? `Jeff Bezos is a business magnate and the founder, CEO, and president of Amazon, the world's largest online retailer. Born on January 12, 1964, in Albuquerque, New Mexico, Bezos had a varied career before starting Amazon. He graduated from Princeton University with a degree in electrical engineering and computer science. Bezos worked on Wall Street for several years before leaving to found Amazon. In the early days of the company, Bezos ran Amazon out of his garage and focused on selling books online.
 
@@ -138,15 +141,12 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
 - Bezos Family Foundation has donated millions of dollars to charitable causes through the`
        : selected.contentPreview + "\n\n(Full content would load here...)";
       setNoteContent(fullContent);
-      // Adjust height after content loads
-       setTimeout(() => adjustTextareaHeight(contentRef.current), 0);
+      setTimeout(() => adjustTextareaHeight(contentRef.current), 0);
     } else {
-      // Handle case where note ID is null (new note)
-      setNoteTitle("Untitled");
+      setNoteTitle("Untitled"); // Or "New Note"
       setNoteContent("");
       setTimeout(() => adjustTextareaHeight(contentRef.current), 0);
     }
-    // Reset interaction states
     setIsTextSelected(false);
     setSlashPopoverOpen(false);
     slashTriggeredRef.current = false;
@@ -162,30 +162,27 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
     const charBeforeSlash = value.substring(cursorPos - 2, cursorPos - 1);
 
     setNoteContent(value);
-    adjustTextareaHeight(textarea); // Adjust height on every change
+    adjustTextareaHeight(textarea);
 
     const shouldOpenPopover =
         charJustTyped === '/' &&
-        (cursorPos === 1 || [' ', '\n', ''].includes(charBeforeSlash) || charBeforeSlash.match(/\W/) ); // Open after space, newline, start, or non-word char
+        (cursorPos === 1 || [' ', '\n', ''].includes(charBeforeSlash) || charBeforeSlash.match(/\W/) );
 
     if (shouldOpenPopover) {
         slashTriggeredRef.current = true;
-        selectionRef.current = { start: cursorPos - 1, end: cursorPos }; // Store slash position
-        calculateAndSetPopoverPosition(textarea, cursorPos - 1); // Calculate position based on slash
+        selectionRef.current = { start: cursorPos - 1, end: cursorPos };
+        calculateAndSetPopoverPosition(textarea, cursorPos - 1);
         setSlashPopoverOpen(true);
-        setIsTextSelected(false); // Close formatting toolbar if slash is typed
+        setIsTextSelected(false);
     } else if (slashPopoverOpen && slashTriggeredRef.current) {
-        // Check if the slash command trigger is still valid
         const textAroundCursor = value.substring(selectionRef.current?.start ?? 0, cursorPos);
-        if (!textAroundCursor.startsWith('/')) { // Close if slash is deleted or changed
+        if (!textAroundCursor.startsWith('/')) {
             setSlashPopoverOpen(false);
             slashTriggeredRef.current = false;
         } else {
-            // Keep it open and update position if needed (e.g., due to scrolling)
             calculateAndSetPopoverPosition(textarea, selectionRef.current?.start ?? 0);
         }
     } else if (charJustTyped !== '/') {
-        // Close popover if user types something else or moves cursor away without selecting a command
         const currentSelection = textarea.selectionStart === textarea.selectionEnd ? { start: textarea.selectionStart, end: textarea.selectionEnd } : null;
         if (slashPopoverOpen && (!selectionRef.current || (currentSelection && currentSelection.start <= selectionRef.current.start))) {
              setSlashPopoverOpen(false);
@@ -194,27 +191,20 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
     }
   };
 
-  // Use ResizeObserver to adjust height dynamically
   React.useEffect(() => {
     const textarea = contentRef.current;
     if (!textarea) return;
-
     const resizeObserver = new ResizeObserver(() => {
       adjustTextareaHeight(textarea);
     });
-
     resizeObserver.observe(textarea);
-
-    // Initial adjust
     adjustTextareaHeight(textarea);
-
     return () => resizeObserver.disconnect();
-  }, [noteContent]); // Re-observe if content changes significantly causing reflow
+  }, [noteContent]);
 
   const adjustTextareaHeight = (textarea: HTMLTextAreaElement | null) => {
     if (textarea) {
-      textarea.style.height = 'auto'; // Reset height
-      // Use scrollHeight for content height, ensure min-height via CSS
+      textarea.style.height = 'auto';
       textarea.style.height = `${textarea.scrollHeight}px`;
     }
   };
@@ -224,18 +214,14 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
       const textarea = contentRef.current;
       const { start: slashIndex } = selectionRef.current;
       const currentContent = noteContent;
-      const textAfterSlash = currentContent.substring(slashIndex + 1).split(/(\s|\n)/)[0]; // Get command text after slash
-
-      // Replace the slash and the command text (if any)
+      const textAfterSlash = currentContent.substring(slashIndex + 1).split(/(\s|\n)/)[0];
       const replaceEndIndex = slashIndex + 1 + textAfterSlash.length;
       const newContent =
         currentContent.substring(0, slashIndex) +
-        `[${commandName}] ` + // Simulate inserting the block
+        `[${commandName}] ` +
         currentContent.substring(replaceEndIndex);
 
       setNoteContent(newContent);
-
-      // Set cursor after the inserted command placeholder
       setTimeout(() => {
         const newCursorPos = slashIndex + `[${commandName}] `.length;
         textarea.focus();
@@ -249,12 +235,9 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
   };
 
    const handleAiAction = (actionFunc: () => void) => {
-        actionFunc(); // Execute the placeholder function
-        setAiPopoverOpen(false); // Close the AI popover
-        // In a real app, you'd likely pass the selected text or entire note content
-        // to the AI function here.
+        actionFunc();
+        setAiPopoverOpen(false);
    };
-
 
   const handleInsertImage = () => {
      console.log("Insert Image");
@@ -268,7 +251,6 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
      setIsTextSelected(false);
    };
 
-   // Helper to insert placeholder text at selection/cursor
    const insertPlaceholder = (text: string) => {
        if (!contentRef.current) return;
        const textarea = contentRef.current;
@@ -277,30 +259,17 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
        const currentContent = noteContent;
        const newContent = currentContent.substring(0, start) + text + currentContent.substring(end);
        setNoteContent(newContent);
-
-       // Move cursor after inserted text
        setTimeout(() => {
          const newCursorPos = start + text.length;
          textarea.focus();
          textarea.setSelectionRange(newCursorPos, newCursorPos);
          adjustTextareaHeight(textarea);
-         selectionRef.current = { start: newCursorPos, end: newCursorPos }; // Update selection ref to cursor pos
-         setIsTextSelected(false); // Hide formatting toolbar
+         selectionRef.current = { start: newCursorPos, end: newCursorPos };
+         setIsTextSelected(false);
        }, 0);
    }
 
-  const handleCreateNewNote = () => {
-    const newId = `new-${Date.now()}`;
-    // sampleNotes.unshift({ id: newId, title: 'Untitled', contentPreview: '', lastEdited: 'Now' });
-    setCurrentNoteId(null);
-  };
-
-  const handleSelectNote = (noteId: string) => {
-    setCurrentNoteId(noteId);
-  };
-
-   const handleSelectionChange = () => {
-       // Use requestAnimationFrame to ensure selection state is updated
+  const handleSelectionChange = () => {
        requestAnimationFrame(() => {
            if (contentRef.current && document.activeElement === contentRef.current) {
                const textarea = contentRef.current;
@@ -309,36 +278,31 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
                const hasSelection = start !== end;
 
                if (hasSelection) {
-                   // Only show formatting toolbar if slash popover is NOT open
                    if (!slashPopoverOpen) {
                        selectionRef.current = { start, end };
-                       calculateAndSetToolbarPosition(textarea, start); // Calculate based on selection start
+                       calculateAndSetToolbarPosition(textarea, start);
                        setIsTextSelected(true);
                    } else {
-                       // If slash popover is open, prioritize it and hide formatting
                        setIsTextSelected(false);
                    }
                } else {
-                    // No selection, hide toolbar
                     setIsTextSelected(false);
-                    // Clear selectionRef only if slash popover isn't active
                     if (!slashPopoverOpen || !slashTriggeredRef.current) {
                         selectionRef.current = null;
                     }
                }
            } else {
-                // If textarea loses focus, check if focus moved to the toolbar or popovers
                 const activeEl = document.activeElement;
                 const isFocusInsideToolbar = formattingToolbarRef.current?.contains(activeEl);
                 const isFocusInsideSlashPopover = document.querySelector('[data-radix-popover-content][data-popover-type="slash"]')?.contains(activeEl);
                  const isFocusInsideAiPopover = document.querySelector('[data-radix-popover-content][data-popover-type="ai"]')?.contains(activeEl);
 
-
                 if (!isFocusInsideToolbar) setIsTextSelected(false);
-                if (!isFocusInsideSlashPopover && slashPopoverOpen) setSlashPopoverOpen(false);
+                if (!isFocusInsideSlashPopover && slashPopoverOpen) {
+                    setSlashPopoverOpen(false);
+                    slashTriggeredRef.current = false;
+                 }
                  if (!isFocusInsideAiPopover && aiPopoverOpen) setAiPopoverOpen(false);
-
-                // Don't clear selection ref if a popover is the reason for blur
                 if (!slashPopoverOpen && !aiPopoverOpen && !isFocusInsideToolbar) {
                      selectionRef.current = null;
                  }
@@ -346,65 +310,47 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
        });
    };
 
-   // Calculate and set Popover position based on cursor/slash
    const calculateAndSetPopoverPosition = (textarea: HTMLTextAreaElement, position: number) => {
-        // --- Advanced Position Calculation ---
-        // Create a temporary hidden div to measure text position
         const measureDiv = document.createElement('div');
         measureDiv.style.position = 'absolute';
         measureDiv.style.visibility = 'hidden';
-        measureDiv.style.whiteSpace = 'pre-wrap'; // Match textarea wrapping
-        measureDiv.style.wordWrap = 'break-word'; // Match textarea wrapping
+        measureDiv.style.whiteSpace = 'pre-wrap';
+        measureDiv.style.wordWrap = 'break-word';
         measureDiv.style.overflowWrap = 'break-word';
         measureDiv.style.padding = window.getComputedStyle(textarea).padding;
         measureDiv.style.border = window.getComputedStyle(textarea).border;
         measureDiv.style.font = window.getComputedStyle(textarea).font;
-        measureDiv.style.width = `${textarea.clientWidth}px`; // Match width
+        measureDiv.style.width = `${textarea.clientWidth}px`;
         measureDiv.style.boxSizing = 'border-box';
 
         const textBefore = textarea.value.substring(0, position);
         const textAfter = textarea.value.substring(position);
-
         measureDiv.textContent = textBefore;
-
-        // Span to mark the exact cursor position
         const cursorSpan = document.createElement('span');
-        cursorSpan.textContent = '|'; // Or use a zero-width space if needed
+        cursorSpan.textContent = '|';
         measureDiv.appendChild(cursorSpan);
-        measureDiv.appendChild(document.createTextNode(textAfter)); // Add remaining text for accurate height
-
-
+        measureDiv.appendChild(document.createTextNode(textAfter));
         document.body.appendChild(measureDiv);
 
-        // Calculate position relative to textarea
         const cursorRect = cursorSpan.getBoundingClientRect();
         const textareaRect = textarea.getBoundingClientRect();
 
         const top = cursorRect.top - textareaRect.top + textarea.scrollTop;
-        // Use clientLeft for border width offset if needed
-        const left = cursorRect.left - textareaRect.left + textarea.scrollLeft + 5; // Slight offset to the right
+        const left = cursorRect.left - textareaRect.left + textarea.scrollLeft + 5;
 
         document.body.removeChild(measureDiv);
-        // --- End Advanced Calculation ---
-
 
         if (popoverAnchorRef.current) {
-            popoverAnchorRef.current.style.position = 'absolute'; // Crucial for positioning
-            // Position the anchor near the calculated cursor position
-            // The popover will then position itself relative to this anchor
+            popoverAnchorRef.current.style.position = 'absolute';
             popoverAnchorRef.current.style.top = `${top}px`;
             popoverAnchorRef.current.style.left = `${left}px`;
-            popoverAnchorRef.current.style.width = '1px'; // Give it minimal size
+            popoverAnchorRef.current.style.width = '1px';
             popoverAnchorRef.current.style.height = '1px';
         }
    };
 
-
-    // Calculate and set Toolbar position based on selection start
    const calculateAndSetToolbarPosition = (textarea: HTMLTextAreaElement, position: number) => {
-       // Re-use the advanced calculation logic, but position toolbar above
         const measureDiv = document.createElement('div');
-        // ... (same setup as calculateAndSetPopoverPosition) ...
         measureDiv.style.position = 'absolute';
         measureDiv.style.visibility = 'hidden';
         measureDiv.style.whiteSpace = 'pre-wrap';
@@ -418,34 +364,29 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
 
         const textBefore = textarea.value.substring(0, position);
         const selectionSpan = document.createElement('span');
-        selectionSpan.textContent = '|'; // Placeholder for start of selection
+        selectionSpan.textContent = '|';
         measureDiv.textContent = textBefore;
         measureDiv.appendChild(selectionSpan);
         measureDiv.appendChild(document.createTextNode(textarea.value.substring(position)));
-
         document.body.appendChild(measureDiv);
 
         const spanRect = selectionSpan.getBoundingClientRect();
         const textareaRect = textarea.getBoundingClientRect();
-
-        const top = spanRect.top - textareaRect.top + textarea.scrollTop - 45; // Position slightly above the line
-        const left = spanRect.left - textareaRect.left + textarea.scrollLeft + textarea.clientWidth / 2; // Center horizontally
+        const top = spanRect.top - textareaRect.top + textarea.scrollTop - 45;
+        const left = spanRect.left - textareaRect.left + textarea.scrollLeft + textarea.clientWidth / 2;
 
         document.body.removeChild(measureDiv);
 
         if (formattingToolbarRef.current) {
-            formattingToolbarRef.current.style.position = 'absolute'; // Needs to be absolute
-            formattingToolbarRef.current.style.top = `${Math.max(textarea.offsetTop, top)}px`; // Don't go above textarea top
+            formattingToolbarRef.current.style.position = 'absolute';
+            formattingToolbarRef.current.style.top = `${Math.max(textarea.offsetTop, top)}px`;
             formattingToolbarRef.current.style.left = `${left}px`;
-            // Add transform to center it precisely if needed
             formattingToolbarRef.current.style.transform = 'translateX(-50%)';
-            formattingToolbarRef.current.style.zIndex = '50'; // Ensure it's above content
+            formattingToolbarRef.current.style.zIndex = '50';
         }
    };
 
-
   const handleBlur = (event: React.FocusEvent<HTMLTextAreaElement>) => {
-      // Use setTimeout to allow clicks within popovers/toolbars before hiding them
       setTimeout(() => {
           const activeEl = document.activeElement;
           const isFocusInsideToolbar = formattingToolbarRef.current?.contains(activeEl);
@@ -462,12 +403,10 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
            if (!isFocusInsideAiPopover && aiPopoverOpen) {
                setAiPopoverOpen(false);
            }
-           // If focus didn't move to toolbar or popovers, clear selectionRef
           if (!isFocusInsideToolbar && !isFocusInsideSlashPopover && !isFocusInsideAiPopover) {
                selectionRef.current = null;
            }
-
-      }, 150); // Delay allows button clicks in popovers/toolbar
+      }, 150);
   };
 
    React.useEffect(() => {
@@ -484,7 +423,7 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
             } else if (isTextSelected) {
                 setIsTextSelected(false);
                 selectionRef.current = null;
-                if (contentRef.current) contentRef.current.blur(); // Optionally blur textarea
+                if (contentRef.current) contentRef.current.blur();
                 event.preventDefault();
             }
        }
@@ -493,127 +432,29 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
      return () => document.removeEventListener('keydown', handleKeyDown);
    }, [slashPopoverOpen, aiPopoverOpen, isTextSelected]);
 
-
-  // Effect to adjust initial height
   React.useEffect(() => {
     adjustTextareaHeight(contentRef.current);
   }, []);
 
   const currentNoteData = currentNoteId ? sampleNotes.find(n => n.id === currentNoteId) : null;
-  const wikipediaLink = "https://en.wikipedia.org/wiki/Jeff_Bezos";
+  const wikipediaLink = "https://en.wikipedia.org/wiki/Jeff_Bezos"; // Example link
 
   return (
-    <div className="flex h-screen bg-muted/40 dark:bg-background text-foreground overflow-hidden font-sans">
-
-      {/* Left Sidebar (Collections, Apps, etc.) */}
-      <aside className="w-64 bg-background dark:bg-zinc-900/50 border-r border-border flex flex-col shrink-0 h-full">
-        {/* Sidebar Header */}
-        <div className="h-14 px-3 border-b border-border flex items-center justify-between shrink-0">
-           <div className="flex items-center gap-2">
-            <Avatar className="h-6 w-6">
-                <AvatarImage src="https://github.com/shadcn.png" alt="Acme Inc" />
-                <AvatarFallback>AC</AvatarFallback>
-            </Avatar>
-            <span className="font-semibold text-sm">Acme</span>
-           </div>
-            <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground">
-              <GripVertical className="w-4 h-4" />
-            </Button>
-        </div>
-
-        {/* Sidebar Content */}
-        <div className="flex-1 overflow-y-auto p-2 space-y-4">
-            {/* Main Navigation */}
-            <nav className="space-y-0.5">
-                <Button variant="ghost" className="w-full justify-start h-8 px-2 text-sm font-normal"> <Inbox className="w-4 h-4 mr-2"/> Inbox</Button>
-                <Button variant="secondary" className="w-full justify-start h-8 px-2 text-sm font-normal"> <Folder className="w-4 h-4 mr-2"/> Collections</Button>
-                <Button variant="ghost" className="w-full justify-start h-8 px-2 text-sm font-normal"> <Grid3X3 className="w-4 h-4 mr-2"/> Integrations</Button>
-                <Button variant="ghost" className="w-full justify-start h-8 px-2 text-sm font-normal"> <Settings className="w-4 h-4 mr-2"/> Settings</Button>
-            </nav>
-
-            {/* Apps Section */}
-             <div>
-                <div className="px-2 mb-1 flex items-center justify-between">
-                  <h3 className="text-xs font-semibold uppercase text-muted-foreground tracking-wider">Apps</h3>
-                   <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground">
-                     <Plus className="w-4 h-4" />
-                   </Button>
-                </div>
-                 <nav className="space-y-0.5">
-                    <Button variant="ghost" className="w-full justify-start h-8 px-2 text-sm font-normal"> <BarChart className="w-4 h-4 mr-2"/> Marketing</Button>
-                    <Button variant="ghost" className="w-full justify-start h-8 px-2 text-sm font-normal"> <Home className="w-4 h-4 mr-2"/> My First App</Button>
-                    <Button variant="ghost" className="w-full justify-start h-8 px-2 text-sm font-normal"> <Type className="w-4 h-4 mr-2"/> Sales</Button>
-                    <Button variant="ghost" className="w-full justify-start h-8 px-2 text-sm font-normal"> <Bot className="w-4 h-4 mr-2"/> Slack Bot</Button>
-                 </nav>
-             </div>
-
-              {/* Notes List */}
-              <div>
-                  <div className="px-2 mb-1 mt-4 flex items-center justify-between">
-                    <h3 className="text-xs font-semibold uppercase text-muted-foreground tracking-wider">My Notes</h3>
-                     <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground" onClick={handleCreateNewNote}>
-                       <Plus className="w-4 h-4" />
-                       <span className="sr-only">Create New Note</span>
-                     </Button>
-                  </div>
-                   <div className="space-y-1 max-h-48 overflow-y-auto pr-1">
-                     {sampleNotes.map((note) => (
-                       <div
-                         key={note.id}
-                         onClick={() => handleSelectNote(note.id)}
-                         className={cn(
-                           "p-2 rounded-md cursor-pointer hover:bg-muted dark:hover:bg-muted/50 group",
-                           currentNoteId === note.id && "bg-muted dark:bg-muted/50"
-                         )}
-                       >
-                         <h4 className="text-sm font-medium truncate group-hover:text-foreground">{note.title || "Untitled Note"}</h4>
-                         <p className="text-xs text-muted-foreground truncate mt-0.5">{note.contentPreview || "No content yet..."}</p>
-                         <p className="text-[10px] text-muted-foreground/70 mt-1">{note.lastEdited}</p>
-                       </div>
-                     ))}
-                     {sampleNotes.length === 0 && (
-                        <div className="p-4 text-center text-muted-foreground text-sm">
-                          No notes yet. Click '+' to create one.
-                        </div>
-                     )}
-                   </div>
-              </div>
-        </div>
-      </aside>
-
-      {/* Main Content Area */}
-      <div className="flex flex-col flex-1 bg-background dark:bg-zinc-900 overflow-hidden">
-        {/* Top Bar (Tabs, Search, User) */}
-        <header className="h-14 px-4 border-b border-border flex items-center justify-between shrink-0 bg-background dark:bg-zinc-900">
-            <div className="flex items-center gap-2">
-                <Button variant="ghost" size="icon" className="h-8 w-8"><Grid3X3 className="w-4 h-4"/></Button>
-                <Button variant="secondary" size="sm" className="h-8 px-3 rounded-md"> <Hash className="w-4 h-4 mr-2"/> Tab</Button>
-                <Button variant="ghost" size="sm" className="h-8 px-3 rounded-md"> <Hash className="w-4 h-4 mr-2"/> Tab</Button>
-                <Button variant="ghost" size="icon" className="h-8 w-8"><Plus className="w-4 h-4"/></Button>
-            </div>
-            <div className="flex items-center gap-3">
-                <div className="relative w-64">
-                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input type="search" placeholder="Search..." className="pl-9 h-8 bg-muted dark:bg-zinc-800 rounded-md text-sm"/>
-                </div>
-                <Button variant="default" size="sm" className="h-8">Save</Button>
-                <Button variant="ghost" size="icon" className="h-8 w-8"><Folder className="w-4 h-4"/></Button>
-                 <Button variant="ghost" size="icon" className="h-8 w-8"><MoreHorizontal className="w-4 h-4"/></Button>
-                 <Avatar className="h-7 w-7">
-                    <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-                    <AvatarFallback>CN</AvatarFallback>
-                 </Avatar>
-            </div>
-        </header>
-
-        {/* Editor Area */}
-        <main className="flex-1 overflow-y-auto p-6 md:p-8 lg:p-10 relative bg-white dark:bg-zinc-900/70">
+    // Use standard layout
+    <div className="flex h-screen bg-background text-foreground overflow-hidden">
+      <Sidebar />
+      <div className="flex flex-col flex-1 overflow-hidden">
+        <Header />
+        {/* Main Content Area - Adjusted for standard layout */}
+        <main className="flex-1 overflow-y-auto p-6 md:p-8 lg:p-10 relative bg-background">
            <div className="max-w-3xl mx-auto">
-              <Button variant="ghost" className="text-muted-foreground hover:text-foreground mb-4 px-0 h-auto">
-                 <ArrowLeft className="w-4 h-4 mr-1.5" />
-                 Back to collection
-              </Button>
+               {/* Back Button */}
+               <Button variant="ghost" className="text-muted-foreground hover:text-foreground mb-4 px-0 h-auto">
+                  <ArrowLeft className="w-4 h-4 mr-1.5" />
+                  Back to notes {/* Or dynamic based on context */}
+               </Button>
 
+              {/* Title Textarea */}
               <Textarea
                 placeholder="Untitled"
                 value={noteTitle}
@@ -624,7 +465,7 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
                 onInput={(e) => adjustTextareaHeight(e.target as HTMLTextAreaElement)}
                 className="text-3xl md:text-4xl font-bold border-none focus-visible:ring-0 shadow-none p-0 resize-none bg-transparent overflow-hidden h-auto leading-tight focus:outline-none mb-6 w-full block"
                 rows={1}
-                style={{ height: 'auto' }} // Start with auto height
+                style={{ height: 'auto' }}
               />
 
               {/* Metadata and AI Trigger */}
@@ -652,7 +493,7 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
                             side="left"
                             align="start"
                             sideOffset={10}
-                            data-popover-type="ai" // Add identifier
+                            data-popover-type="ai"
                         >
                             <div className="flex flex-col space-y-0.5">
                                 {aiActions.map((action) => (
@@ -661,7 +502,7 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
                                         variant="ghost"
                                         className="w-full justify-start h-8 px-2 text-sm font-normal hover:bg-muted dark:hover:bg-muted/50"
                                         onClick={() => handleAiAction(action.action)}
-                                        onMouseDown={(e) => e.preventDefault()} // Prevent blur on click
+                                        onMouseDown={(e) => e.preventDefault()}
                                     >
                                         <action.icon className="w-4 h-4 mr-2 text-muted-foreground" />
                                         <span>{action.name}</span>
@@ -680,13 +521,11 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
                     style={{
                          opacity: isTextSelected ? 1 : 0,
                          pointerEvents: isTextSelected ? 'auto' : 'none',
-                         // Position is calculated by JS
                     }}
                     className={cn(
                          "absolute z-50 bg-background/80 dark:bg-zinc-800/80 backdrop-blur-sm py-1 px-1 rounded-md border border-border/30 shadow-lg transition-opacity duration-200",
                     )}>
                     <div className="flex items-center gap-0.5 p-0 rounded-md w-min">
-                       {/* Standard Formatting Buttons */}
                        <Button variant="ghost" size="icon" className="h-7 w-7 hover:scale-105 active:scale-95"><Bold className="w-4 h-4" /></Button>
                        <Button variant="ghost" size="icon" className="h-7 w-7 hover:scale-105 active:scale-95"><Italic className="w-4 h-4" /></Button>
                        <Button variant="ghost" size="icon" className="h-7 w-7 hover:scale-105 active:scale-95"><Underline className="w-4 h-4" /></Button>
@@ -695,7 +534,6 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
                        <Button variant="ghost" size="icon" className="h-7 w-7 hover:scale-105 active:scale-95"><Highlighter className="w-4 h-4" /></Button>
                        <Button variant="ghost" size="icon" className="h-7 w-7 hover:scale-105 active:scale-95"><LinkIcon className="w-4 h-4" /></Button>
                        <Separator orientation="vertical" className="h-5 mx-1" />
-                       {/* Insert Media Buttons */}
                        <Button variant="ghost" size="icon" className="h-7 w-7 hover:scale-105 active:scale-95" onClick={handleInsertImage} title="Insert Image">
                          <ImageIcon className="w-4 h-4" />
                          <span className="sr-only">Insert Image</span>
@@ -709,11 +547,9 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
 
                {/* Main Content Textarea with Slash Command Popover */}
                 <div className="relative w-full">
-                 {/* PopoverAnchor needs to be inside the relative container */}
                  <div ref={popoverAnchorRef} className="absolute w-0 h-0"/>
                  <Popover open={slashPopoverOpen} onOpenChange={setSlashPopoverOpen}>
                     <PopoverAnchor asChild>
-                        {/* The anchor is now positioned by JS */}
                         <div/>
                     </PopoverAnchor>
                     <Textarea
@@ -724,34 +560,32 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
                       onSelect={handleSelectionChange}
                       onBlur={handleBlur}
                       onClick={(e) => {
-                         // Prevent closing slash popover if click is on the trigger area
                          if (slashPopoverOpen && slashTriggeredRef.current && e.target === contentRef.current) {
                              const cursorPos = contentRef.current?.selectionStart ?? 0;
                              if(selectionRef.current && cursorPos > selectionRef.current.start && contentRef.current?.value.substring(selectionRef.current.start, cursorPos).startsWith('/')){
-                                // Clicked within the slash command, keep it open
+                                // Clicked within command, keep open
                              } else {
                                 setSlashPopoverOpen(false);
                                 slashTriggeredRef.current = false;
                              }
                          }
                       }}
-                       className="text-base border-none focus-visible:ring-0 shadow-none p-0 resize-none bg-transparent w-full leading-relaxed focus:outline-none min-h-[300px] block" // Use block, remove overflow-hidden for auto-height
-                       style={{ height: 'auto' }} // Let height grow with content
+                       className="text-base border-none focus-visible:ring-0 shadow-none p-0 resize-none bg-transparent w-full leading-relaxed focus:outline-none min-h-[300px] block"
+                       style={{ height: 'auto' }}
                     />
                    <PopoverContent
                         className="w-60 p-1 bg-background dark:bg-zinc-800 border border-border shadow-lg rounded-lg"
                         side="bottom"
                         align="start"
                         sideOffset={10}
-                        onOpenAutoFocus={(e) => e.preventDefault()} // Prevent stealing focus
+                        onOpenAutoFocus={(e) => e.preventDefault()}
                         onInteractOutside={(e) => {
-                            // Close only if interaction is outside textarea & popover itself
                              if (e.target !== contentRef.current) {
                                 setSlashPopoverOpen(false);
                                 slashTriggeredRef.current = false;
                             }
                         }}
-                         data-popover-type="slash" // Add identifier
+                         data-popover-type="slash"
                          style={{ zIndex: 60 }}
                    >
                      <div className="text-xs text-muted-foreground px-2 py-1">Blocks</div>
@@ -762,7 +596,7 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
                            variant="ghost"
                            className="w-full justify-start h-8 px-2 text-sm font-normal hover:bg-muted dark:hover:bg-muted/50"
                            onClick={() => handleSelectSlashCommand(cmd.name)}
-                            onMouseDown={(e) => e.preventDefault()} // Prevents blur before click registers
+                            onMouseDown={(e) => e.preventDefault()}
                          >
                             {typeof cmd.icon === 'function' ? (
                               React.createElement(cmd.icon, { className: "w-4 h-4 mr-2 text-muted-foreground" })
@@ -800,5 +634,3 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
     </div>
   );
 }
-
-    
