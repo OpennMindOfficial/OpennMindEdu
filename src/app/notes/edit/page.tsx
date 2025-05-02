@@ -40,9 +40,18 @@ import {
   Type,
   ChevronDown,
   GripVertical, // For drag handle in sidebar header (optional)
+  Wand2, // Icon for AI actions trigger
+  ScrollText, // Summarize
+  ListChecks, // Action Points
+  ListOrdered, // Main Points
+  SpellCheck, // Fix Grammar
+  Sparkles, // Improve Writing
+  Scissors, // Make Shorter
+  Filter, // Simplify (using Filter as an alternative)
+  FileText, // Write Essay
 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
-import { Popover, PopoverContent, PopoverAnchor } from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverAnchor, PopoverTrigger } from "@/components/ui/popover"; // Adjusted import
 import { cn } from '@/lib/utils';
 
 // Demo note data structure (expanded slightly)
@@ -85,12 +94,25 @@ const slashCommands = [
   { name: 'Color Card', icon: Palette },
 ];
 
+// Define AI action options
+const aiActions = [
+    { name: 'Summarize', icon: ScrollText, action: () => console.log('AI Action: Summarize') },
+    { name: 'Action Points', icon: ListChecks, action: () => console.log('AI Action: Action Points') },
+    { name: 'Main Points', icon: ListOrdered, action: () => console.log('AI Action: Main Points') },
+    { name: 'Fix Grammar', icon: SpellCheck, action: () => console.log('AI Action: Fix Grammar') },
+    { name: 'Improve Writing', icon: Sparkles, action: () => console.log('AI Action: Improve Writing') },
+    { name: 'Make Shorter', icon: Scissors, action: () => console.log('AI Action: Make Shorter') },
+    { name: 'Simplify', icon: Filter, action: () => console.log('AI Action: Simplify') },
+    { name: 'Write Essay', icon: FileText, action: () => console.log('AI Action: Write Essay') },
+];
+
 export default function EditNotePage() {
   const [currentNoteId, setCurrentNoteId] = React.useState<string | null>('1');
   const [noteTitle, setNoteTitle] = React.useState("Untitled"); // Default to Untitled
   const [noteContent, setNoteContent] = React.useState(""); // Start empty for new notes
 
-  const [popoverOpen, setPopoverOpen] = React.useState(false);
+  const [slashPopoverOpen, setSlashPopoverOpen] = React.useState(false);
+  const [aiPopoverOpen, setAiPopoverOpen] = React.useState(false); // State for AI popover
   const contentRef = React.useRef<HTMLTextAreaElement>(null);
   const [isTextSelected, setIsTextSelected] = React.useState(false);
   const slashTriggeredRef = React.useRef(false);
@@ -126,7 +148,7 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
     }
     // Reset interaction states
     setIsTextSelected(false);
-    setPopoverOpen(false);
+    setSlashPopoverOpen(false);
     slashTriggeredRef.current = false;
     selectionRef.current = null;
   }, [currentNoteId]);
@@ -140,6 +162,7 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
     const charBeforeSlash = value.substring(cursorPos - 2, cursorPos - 1);
 
     setNoteContent(value);
+    adjustTextareaHeight(textarea); // Adjust height on every change
 
     const shouldOpenPopover =
         charJustTyped === '/' &&
@@ -149,59 +172,92 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
         slashTriggeredRef.current = true;
         selectionRef.current = { start: cursorPos - 1, end: cursorPos }; // Store slash position
         calculateAndSetPopoverPosition(textarea, cursorPos - 1); // Calculate position based on slash
-        setPopoverOpen(true);
-        setIsTextSelected(false);
-    } else if (popoverOpen && slashTriggeredRef.current) {
+        setSlashPopoverOpen(true);
+        setIsTextSelected(false); // Close formatting toolbar if slash is typed
+    } else if (slashPopoverOpen && slashTriggeredRef.current) {
+        // Check if the slash command trigger is still valid
         const textAroundCursor = value.substring(selectionRef.current?.start ?? 0, cursorPos);
-        if (!textAroundCursor.endsWith('/')) { // Close if slash is deleted or moved away from
-            setPopoverOpen(false);
+        if (!textAroundCursor.startsWith('/')) { // Close if slash is deleted or changed
+            setSlashPopoverOpen(false);
             slashTriggeredRef.current = false;
         } else {
-             // Keep it open if still at the slash, update position if needed
-             calculateAndSetPopoverPosition(textarea, selectionRef.current?.start ?? 0);
+            // Keep it open and update position if needed (e.g., due to scrolling)
+            calculateAndSetPopoverPosition(textarea, selectionRef.current?.start ?? 0);
+        }
+    } else if (charJustTyped !== '/') {
+        // Close popover if user types something else or moves cursor away without selecting a command
+        const currentSelection = textarea.selectionStart === textarea.selectionEnd ? { start: textarea.selectionStart, end: textarea.selectionEnd } : null;
+        if (slashPopoverOpen && (!selectionRef.current || (currentSelection && currentSelection.start <= selectionRef.current.start))) {
+             setSlashPopoverOpen(false);
+             slashTriggeredRef.current = false;
         }
     }
-
-    adjustTextareaHeight(textarea);
   };
+
+  // Use ResizeObserver to adjust height dynamically
+  React.useEffect(() => {
+    const textarea = contentRef.current;
+    if (!textarea) return;
+
+    const resizeObserver = new ResizeObserver(() => {
+      adjustTextareaHeight(textarea);
+    });
+
+    resizeObserver.observe(textarea);
+
+    // Initial adjust
+    adjustTextareaHeight(textarea);
+
+    return () => resizeObserver.disconnect();
+  }, [noteContent]); // Re-observe if content changes significantly causing reflow
 
   const adjustTextareaHeight = (textarea: HTMLTextAreaElement | null) => {
     if (textarea) {
-      textarea.style.height = 'auto';
-      textarea.style.height = `${Math.max(textarea.scrollHeight, 200)}px`; // Ensure min height
+      textarea.style.height = 'auto'; // Reset height
+      // Use scrollHeight for content height, ensure min-height via CSS
+      textarea.style.height = `${textarea.scrollHeight}px`;
     }
   };
 
-  const handleSelectCommand = (commandName: string) => {
+  const handleSelectSlashCommand = (commandName: string) => {
     if (contentRef.current && selectionRef.current && slashTriggeredRef.current) {
       const textarea = contentRef.current;
       const { start: slashIndex } = selectionRef.current;
       const currentContent = noteContent;
+      const textAfterSlash = currentContent.substring(slashIndex + 1).split(/(\s|\n)/)[0]; // Get command text after slash
 
-      if (currentContent.substring(slashIndex, slashIndex + 1) === '/') {
-        const newContent =
-          currentContent.substring(0, slashIndex) +
-          `[${commandName}] ` +
-          currentContent.substring(slashIndex + 1);
+      // Replace the slash and the command text (if any)
+      const replaceEndIndex = slashIndex + 1 + textAfterSlash.length;
+      const newContent =
+        currentContent.substring(0, slashIndex) +
+        `[${commandName}] ` + // Simulate inserting the block
+        currentContent.substring(replaceEndIndex);
 
-        setNoteContent(newContent);
+      setNoteContent(newContent);
 
-        setTimeout(() => {
-          const newCursorPos = slashIndex + `[${commandName}] `.length;
-          textarea.focus();
-          textarea.setSelectionRange(newCursorPos, newCursorPos);
-          adjustTextareaHeight(textarea);
-        }, 0);
-      }
+      // Set cursor after the inserted command placeholder
+      setTimeout(() => {
+        const newCursorPos = slashIndex + `[${commandName}] `.length;
+        textarea.focus();
+        textarea.setSelectionRange(newCursorPos, newCursorPos);
+        adjustTextareaHeight(textarea);
+      }, 0);
     }
-    setPopoverOpen(false);
+    setSlashPopoverOpen(false);
     slashTriggeredRef.current = false;
     selectionRef.current = null;
   };
 
+   const handleAiAction = (actionFunc: () => void) => {
+        actionFunc(); // Execute the placeholder function
+        setAiPopoverOpen(false); // Close the AI popover
+        // In a real app, you'd likely pass the selected text or entire note content
+        // to the AI function here.
+   };
+
+
   const handleInsertImage = () => {
      console.log("Insert Image");
-     // Placeholder: Insert markdown or placeholder text
      insertPlaceholder("[Image: Add URL or upload]");
      setIsTextSelected(false);
    };
@@ -222,144 +278,220 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
        const newContent = currentContent.substring(0, start) + text + currentContent.substring(end);
        setNoteContent(newContent);
 
+       // Move cursor after inserted text
        setTimeout(() => {
          const newCursorPos = start + text.length;
          textarea.focus();
          textarea.setSelectionRange(newCursorPos, newCursorPos);
          adjustTextareaHeight(textarea);
-         selectionRef.current = null; // Clear selection after action
+         selectionRef.current = { start: newCursorPos, end: newCursorPos }; // Update selection ref to cursor pos
+         setIsTextSelected(false); // Hide formatting toolbar
        }, 0);
    }
 
   const handleCreateNewNote = () => {
-    // Generate a temporary new ID or handle state differently
     const newId = `new-${Date.now()}`;
-    // Add a placeholder to sampleNotes or manage state separately
-    // sampleNotes.push({ id: newId, title: 'Untitled', contentPreview: '', lastEdited: 'Now' });
-    setCurrentNoteId(null); // Or set to newId if managing state directly
-    // State reset happens in useEffect based on currentNoteId
+    // sampleNotes.unshift({ id: newId, title: 'Untitled', contentPreview: '', lastEdited: 'Now' });
+    setCurrentNoteId(null);
   };
 
   const handleSelectNote = (noteId: string) => {
     setCurrentNoteId(noteId);
-    // Data loading and state reset happens in useEffect
   };
 
    const handleSelectionChange = () => {
+       // Use requestAnimationFrame to ensure selection state is updated
        requestAnimationFrame(() => {
            if (contentRef.current && document.activeElement === contentRef.current) {
-               const start = contentRef.current.selectionStart;
-               const end = contentRef.current.selectionEnd;
+               const textarea = contentRef.current;
+               const start = textarea.selectionStart;
+               const end = textarea.selectionEnd;
                const hasSelection = start !== end;
 
                if (hasSelection) {
-                    selectionRef.current = { start, end };
-                    calculateAndSetToolbarPosition(contentRef.current, start);
-                    setIsTextSelected(true);
-                    // Close slash popover if selection happens while it's open
-                    if (popoverOpen && slashTriggeredRef.current) {
-                        setPopoverOpen(false);
-                        slashTriggeredRef.current = false;
-                    }
-               } else {
-                   setIsTextSelected(false);
-                   // Clear selectionRef only if slash popover isn't the active reason
-                   if (!popoverOpen || !slashTriggeredRef.current) {
-                       selectionRef.current = null;
+                   // Only show formatting toolbar if slash popover is NOT open
+                   if (!slashPopoverOpen) {
+                       selectionRef.current = { start, end };
+                       calculateAndSetToolbarPosition(textarea, start); // Calculate based on selection start
+                       setIsTextSelected(true);
+                   } else {
+                       // If slash popover is open, prioritize it and hide formatting
+                       setIsTextSelected(false);
                    }
+               } else {
+                    // No selection, hide toolbar
+                    setIsTextSelected(false);
+                    // Clear selectionRef only if slash popover isn't active
+                    if (!slashPopoverOpen || !slashTriggeredRef.current) {
+                        selectionRef.current = null;
+                    }
                }
            } else {
-                // If textarea loses focus, hide the toolbar unless focus moved TO the toolbar
+                // If textarea loses focus, check if focus moved to the toolbar or popovers
                 const activeEl = document.activeElement;
-                if (!formattingToolbarRef.current?.contains(activeEl)) {
-                    setIsTextSelected(false);
-                    // Don't clear selection ref if popover is open
-                    if (!popoverOpen) {
-                         selectionRef.current = null;
-                     }
-                }
+                const isFocusInsideToolbar = formattingToolbarRef.current?.contains(activeEl);
+                const isFocusInsideSlashPopover = document.querySelector('[data-radix-popover-content][data-popover-type="slash"]')?.contains(activeEl);
+                 const isFocusInsideAiPopover = document.querySelector('[data-radix-popover-content][data-popover-type="ai"]')?.contains(activeEl);
+
+
+                if (!isFocusInsideToolbar) setIsTextSelected(false);
+                if (!isFocusInsideSlashPopover && slashPopoverOpen) setSlashPopoverOpen(false);
+                 if (!isFocusInsideAiPopover && aiPopoverOpen) setAiPopoverOpen(false);
+
+                // Don't clear selection ref if a popover is the reason for blur
+                if (!slashPopoverOpen && !aiPopoverOpen && !isFocusInsideToolbar) {
+                     selectionRef.current = null;
+                 }
            }
        });
    };
 
    // Calculate and set Popover position based on cursor/slash
    const calculateAndSetPopoverPosition = (textarea: HTMLTextAreaElement, position: number) => {
-     const textBeforeCursor = textarea.value.substring(0, position);
-     const lines = textBeforeCursor.split('\n');
-     const currentLine = lines[lines.length - 1];
-     const lineIndex = lines.length - 1;
+        // --- Advanced Position Calculation ---
+        // Create a temporary hidden div to measure text position
+        const measureDiv = document.createElement('div');
+        measureDiv.style.position = 'absolute';
+        measureDiv.style.visibility = 'hidden';
+        measureDiv.style.whiteSpace = 'pre-wrap'; // Match textarea wrapping
+        measureDiv.style.wordWrap = 'break-word'; // Match textarea wrapping
+        measureDiv.style.overflowWrap = 'break-word';
+        measureDiv.style.padding = window.getComputedStyle(textarea).padding;
+        measureDiv.style.border = window.getComputedStyle(textarea).border;
+        measureDiv.style.font = window.getComputedStyle(textarea).font;
+        measureDiv.style.width = `${textarea.clientWidth}px`; // Match width
+        measureDiv.style.boxSizing = 'border-box';
 
-     // Estimate position - THIS IS COMPLEX AND OFTEN REQUIRES A DEDICATED LIBRARY
-     // Basic approximation:
-     const lineHeight = parseFloat(window.getComputedStyle(textarea).lineHeight) || 24;
-     const charWidth = 8; // Very rough estimate
-     const top = textarea.offsetTop + lineIndex * lineHeight;
-     const left = textarea.offsetLeft + currentLine.length * charWidth + textarea.scrollLeft;
+        const textBefore = textarea.value.substring(0, position);
+        const textAfter = textarea.value.substring(position);
 
-     if (popoverAnchorRef.current) {
-       popoverAnchorRef.current.style.top = `${top}px`;
-       popoverAnchorRef.current.style.left = `${left}px`;
-     }
+        measureDiv.textContent = textBefore;
+
+        // Span to mark the exact cursor position
+        const cursorSpan = document.createElement('span');
+        cursorSpan.textContent = '|'; // Or use a zero-width space if needed
+        measureDiv.appendChild(cursorSpan);
+        measureDiv.appendChild(document.createTextNode(textAfter)); // Add remaining text for accurate height
+
+
+        document.body.appendChild(measureDiv);
+
+        // Calculate position relative to textarea
+        const cursorRect = cursorSpan.getBoundingClientRect();
+        const textareaRect = textarea.getBoundingClientRect();
+
+        const top = cursorRect.top - textareaRect.top + textarea.scrollTop;
+        // Use clientLeft for border width offset if needed
+        const left = cursorRect.left - textareaRect.left + textarea.scrollLeft + 5; // Slight offset to the right
+
+        document.body.removeChild(measureDiv);
+        // --- End Advanced Calculation ---
+
+
+        if (popoverAnchorRef.current) {
+            popoverAnchorRef.current.style.position = 'absolute'; // Crucial for positioning
+            // Position the anchor near the calculated cursor position
+            // The popover will then position itself relative to this anchor
+            popoverAnchorRef.current.style.top = `${top}px`;
+            popoverAnchorRef.current.style.left = `${left}px`;
+            popoverAnchorRef.current.style.width = '1px'; // Give it minimal size
+            popoverAnchorRef.current.style.height = '1px';
+        }
    };
 
-   // Calculate and set Toolbar position based on selection start
-   const calculateAndSetToolbarPosition = (textarea: HTMLTextAreaElement, position: number) => {
-        const textBeforeSelection = textarea.value.substring(0, position);
-        const lines = textBeforeSelection.split('\n');
-        const lineIndex = lines.length - 1;
 
-        const lineHeight = parseFloat(window.getComputedStyle(textarea).lineHeight) || 24;
-        const top = textarea.offsetTop + lineIndex * lineHeight - 40; // Position above the line
-        const left = textarea.offsetLeft + textarea.scrollLeft + 20; // Indent slightly
+    // Calculate and set Toolbar position based on selection start
+   const calculateAndSetToolbarPosition = (textarea: HTMLTextAreaElement, position: number) => {
+       // Re-use the advanced calculation logic, but position toolbar above
+        const measureDiv = document.createElement('div');
+        // ... (same setup as calculateAndSetPopoverPosition) ...
+        measureDiv.style.position = 'absolute';
+        measureDiv.style.visibility = 'hidden';
+        measureDiv.style.whiteSpace = 'pre-wrap';
+        measureDiv.style.wordWrap = 'break-word';
+        measureDiv.style.overflowWrap = 'break-word';
+        measureDiv.style.padding = window.getComputedStyle(textarea).padding;
+        measureDiv.style.border = window.getComputedStyle(textarea).border;
+        measureDiv.style.font = window.getComputedStyle(textarea).font;
+        measureDiv.style.width = `${textarea.clientWidth}px`;
+        measureDiv.style.boxSizing = 'border-box';
+
+        const textBefore = textarea.value.substring(0, position);
+        const selectionSpan = document.createElement('span');
+        selectionSpan.textContent = '|'; // Placeholder for start of selection
+        measureDiv.textContent = textBefore;
+        measureDiv.appendChild(selectionSpan);
+        measureDiv.appendChild(document.createTextNode(textarea.value.substring(position)));
+
+        document.body.appendChild(measureDiv);
+
+        const spanRect = selectionSpan.getBoundingClientRect();
+        const textareaRect = textarea.getBoundingClientRect();
+
+        const top = spanRect.top - textareaRect.top + textarea.scrollTop - 45; // Position slightly above the line
+        const left = spanRect.left - textareaRect.left + textarea.scrollLeft + textarea.clientWidth / 2; // Center horizontally
+
+        document.body.removeChild(measureDiv);
 
         if (formattingToolbarRef.current) {
-            formattingToolbarRef.current.style.position = 'absolute';
-            formattingToolbarRef.current.style.top = `${top}px`;
+            formattingToolbarRef.current.style.position = 'absolute'; // Needs to be absolute
+            formattingToolbarRef.current.style.top = `${Math.max(textarea.offsetTop, top)}px`; // Don't go above textarea top
             formattingToolbarRef.current.style.left = `${left}px`;
+            // Add transform to center it precisely if needed
+            formattingToolbarRef.current.style.transform = 'translateX(-50%)';
+            formattingToolbarRef.current.style.zIndex = '50'; // Ensure it's above content
         }
    };
 
 
   const handleBlur = (event: React.FocusEvent<HTMLTextAreaElement>) => {
-      const relatedTarget = event.relatedTarget as Node | null;
-      const popoverContent = document.querySelector('[data-radix-popover-content]');
-      // const formattingToolbar = document.querySelector('.formatting-toolbar');
-      const formattingToolbar = formattingToolbarRef.current; // Use ref
-
-       // Delay hiding popover/toolbar to allow clicks inside them
+      // Use setTimeout to allow clicks within popovers/toolbars before hiding them
       setTimeout(() => {
           const activeEl = document.activeElement;
-          if (popoverOpen && !popoverContent?.contains(activeEl)) {
-                setPopoverOpen(false);
+          const isFocusInsideToolbar = formattingToolbarRef.current?.contains(activeEl);
+           const isFocusInsideSlashPopover = document.querySelector('[data-radix-popover-content][data-popover-type="slash"]')?.contains(activeEl);
+           const isFocusInsideAiPopover = document.querySelector('[data-radix-popover-content][data-popover-type="ai"]')?.contains(activeEl);
+
+          if (!isFocusInsideToolbar) {
+              setIsTextSelected(false);
+          }
+          if (!isFocusInsideSlashPopover && slashPopoverOpen) {
+                setSlashPopoverOpen(false);
                 slashTriggeredRef.current = false;
           }
-          if (isTextSelected && !formattingToolbar?.contains(activeEl)) {
-               setIsTextSelected(false);
+           if (!isFocusInsideAiPopover && aiPopoverOpen) {
+               setAiPopoverOpen(false);
+           }
+           // If focus didn't move to toolbar or popovers, clear selectionRef
+          if (!isFocusInsideToolbar && !isFocusInsideSlashPopover && !isFocusInsideAiPopover) {
                selectionRef.current = null;
-          }
-      }, 150);
+           }
+
+      }, 150); // Delay allows button clicks in popovers/toolbar
   };
 
    React.useEffect(() => {
      const handleKeyDown = (event: KeyboardEvent) => {
        if (event.key === 'Escape') {
-            if (popoverOpen) {
-             setPopoverOpen(false);
+            if (slashPopoverOpen) {
+             setSlashPopoverOpen(false);
              slashTriggeredRef.current = false;
              selectionRef.current = null;
-             event.preventDefault(); // Prevent other escape actions
-            }
-            if (isTextSelected) {
+             event.preventDefault();
+            } else if (aiPopoverOpen) {
+              setAiPopoverOpen(false);
+              event.preventDefault();
+            } else if (isTextSelected) {
                 setIsTextSelected(false);
                 selectionRef.current = null;
-                if (contentRef.current) contentRef.current.blur();
+                if (contentRef.current) contentRef.current.blur(); // Optionally blur textarea
                 event.preventDefault();
             }
        }
      };
      document.addEventListener('keydown', handleKeyDown);
      return () => document.removeEventListener('keydown', handleKeyDown);
-   }, [popoverOpen, isTextSelected]);
+   }, [slashPopoverOpen, aiPopoverOpen, isTextSelected]);
 
 
   // Effect to adjust initial height
@@ -368,12 +500,8 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
   }, []);
 
   const currentNoteData = currentNoteId ? sampleNotes.find(n => n.id === currentNoteId) : null;
-  // const breadcrumb = currentNoteId ? `# Personal / ${currentNoteData?.title.substring(0, 20)}...` : "# Personal / New Note";
-  // const author = "Nathalia Anderson";
-  // const timestamp = currentNoteData?.lastEdited || `Today, ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-  const wikipediaLink = "https://en.wikipedia.org/wiki/Jeff_Bezos"; // Keep for demo link
+  const wikipediaLink = "https://en.wikipedia.org/wiki/Jeff_Bezos";
 
-  // --- New Layout Structure ---
   return (
     <div className="flex h-screen bg-muted/40 dark:bg-background text-foreground overflow-hidden font-sans">
 
@@ -389,7 +517,7 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
             <span className="font-semibold text-sm">Acme</span>
            </div>
             <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground">
-              <GripVertical className="w-4 h-4" /> {/* Or ChevronUpDownIcon */}
+              <GripVertical className="w-4 h-4" />
             </Button>
         </div>
 
@@ -419,7 +547,7 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
                  </nav>
              </div>
 
-              {/* Notes List (similar to previous implementation) */}
+              {/* Notes List */}
               <div>
                   <div className="px-2 mb-1 mt-4 flex items-center justify-between">
                     <h3 className="text-xs font-semibold uppercase text-muted-foreground tracking-wider">My Notes</h3>
@@ -428,7 +556,7 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
                        <span className="sr-only">Create New Note</span>
                      </Button>
                   </div>
-                   <div className="space-y-1 max-h-48 overflow-y-auto pr-1"> {/* Limit height and scroll */}
+                   <div className="space-y-1 max-h-48 overflow-y-auto pr-1">
                      {sampleNotes.map((note) => (
                        <div
                          key={note.id}
@@ -450,8 +578,6 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
                      )}
                    </div>
               </div>
-
-
         </div>
       </aside>
 
@@ -482,14 +608,12 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
 
         {/* Editor Area */}
         <main className="flex-1 overflow-y-auto p-6 md:p-8 lg:p-10 relative bg-white dark:bg-zinc-900/70">
-           <div className="max-w-3xl mx-auto"> {/* Center content */}
-              {/* Back Button */}
+           <div className="max-w-3xl mx-auto">
               <Button variant="ghost" className="text-muted-foreground hover:text-foreground mb-4 px-0 h-auto">
                  <ArrowLeft className="w-4 h-4 mr-1.5" />
                  Back to collection
               </Button>
 
-              {/* Title Input */}
               <Textarea
                 placeholder="Untitled"
                 value={noteTitle}
@@ -500,83 +624,98 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
                 onInput={(e) => adjustTextareaHeight(e.target as HTMLTextAreaElement)}
                 className="text-3xl md:text-4xl font-bold border-none focus-visible:ring-0 shadow-none p-0 resize-none bg-transparent overflow-hidden h-auto leading-tight focus:outline-none mb-6 w-full block"
                 rows={1}
-                style={{ height: 'auto' }}
+                style={{ height: 'auto' }} // Start with auto height
               />
 
-              {/* Metadata Section */}
-              <div className="space-y-2 mb-8 text-sm text-foreground">
-                <div className="flex items-center">
-                  <Calendar className="w-4 h-4 mr-3 text-muted-foreground"/>
-                  <span className="w-20 text-muted-foreground">Created</span>
-                  <span>{currentNoteData?.createdAt || '-'}</span>
-                </div>
-                 <div className="flex items-center">
-                  <Clock className="w-4 h-4 mr-3 text-muted-foreground"/>
-                  <span className="w-20 text-muted-foreground">Updated</span>
-                  <span>{currentNoteData?.lastEdited || '-'}</span>
+              {/* Metadata and AI Trigger */}
+              <div className="flex justify-between items-start mb-8">
+                 <div className="space-y-2 text-sm text-foreground">
+                    {/* Metadata items */}
+                    <div className="flex items-center"><Calendar className="w-4 h-4 mr-3 text-muted-foreground"/><span className="w-20 text-muted-foreground">Created</span><span>{currentNoteData?.createdAt || '-'}</span></div>
+                    <div className="flex items-center"><Clock className="w-4 h-4 mr-3 text-muted-foreground"/><span className="w-20 text-muted-foreground">Updated</span><span>{currentNoteData?.lastEdited || '-'}</span></div>
+                    <div className="flex items-center"><LinkIcon className="w-4 h-4 mr-3 text-muted-foreground"/><span className="w-20 text-muted-foreground">URL</span>{currentNoteData?.url ? <a href={currentNoteData.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline truncate dark:text-blue-400">{currentNoteData.url}</a> : <span>-</span>}</div>
+                    <div className="flex items-center"><List className="w-4 h-4 mr-3 text-muted-foreground"/><span className="w-20 text-muted-foreground">Name</span><span>{noteTitle || 'Untitled'}</span></div>
+                    <div className="flex items-center"><Type className="w-4 h-4 mr-3 text-muted-foreground"/><span className="w-20 text-muted-foreground">Type</span><span>{currentNoteData?.type || 'Note'}</span></div>
+                    <Button variant="ghost" className="text-muted-foreground hover:text-foreground px-0 h-auto -ml-1"><Plus className="w-4 h-4 mr-1.5"/> Add property</Button>
                  </div>
-                 <div className="flex items-center">
-                  <LinkIcon className="w-4 h-4 mr-3 text-muted-foreground"/>
-                  <span className="w-20 text-muted-foreground">URL</span>
-                  {currentNoteData?.url ? (
-                    <a href={currentNoteData.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline truncate dark:text-blue-400">
-                       {currentNoteData.url}
-                     </a>
-                  ) : (
-                     <span>-</span>
-                  )}
-                 </div>
-                 <div className="flex items-center">
-                  <List className="w-4 h-4 mr-3 text-muted-foreground"/>
-                  <span className="w-20 text-muted-foreground">Name</span>
-                  <span>{noteTitle || 'Untitled'}</span>
-                 </div>
-                 <div className="flex items-center">
-                  <Type className="w-4 h-4 mr-3 text-muted-foreground"/>
-                  <span className="w-20 text-muted-foreground">Type</span>
-                  <span>{currentNoteData?.type || 'Note'}</span>
-                 </div>
-                 <Button variant="ghost" className="text-muted-foreground hover:text-foreground px-0 h-auto -ml-1">
-                   <Plus className="w-4 h-4 mr-1.5"/> Add property
-                 </Button>
+
+                  {/* AI Action Popover Trigger */}
+                   <Popover open={aiPopoverOpen} onOpenChange={setAiPopoverOpen}>
+                        <PopoverTrigger asChild>
+                             <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary rounded-full hover:bg-primary/10">
+                                 <Wand2 className="w-5 h-5" />
+                                 <span className="sr-only">AI Actions</span>
+                             </Button>
+                        </PopoverTrigger>
+                        <PopoverContent
+                            className="w-56 p-1 bg-background dark:bg-zinc-800 border border-border shadow-lg rounded-lg"
+                            side="left"
+                            align="start"
+                            sideOffset={10}
+                            data-popover-type="ai" // Add identifier
+                        >
+                            <div className="flex flex-col space-y-0.5">
+                                {aiActions.map((action) => (
+                                    <Button
+                                        key={action.name}
+                                        variant="ghost"
+                                        className="w-full justify-start h-8 px-2 text-sm font-normal hover:bg-muted dark:hover:bg-muted/50"
+                                        onClick={() => handleAiAction(action.action)}
+                                        onMouseDown={(e) => e.preventDefault()} // Prevent blur on click
+                                    >
+                                        <action.icon className="w-4 h-4 mr-2 text-muted-foreground" />
+                                        <span>{action.name}</span>
+                                    </Button>
+                                ))}
+                            </div>
+                        </PopoverContent>
+                    </Popover>
               </div>
 
               <Separator className="mb-8" />
 
-
               {/* Floating Formatting Toolbar */}
-              <div
-                ref={formattingToolbarRef}
-                style={{ opacity: isTextSelected ? 1 : 0, pointerEvents: isTextSelected ? 'auto' : 'none' }}
-                className={cn(
-                  "absolute z-50 bg-background/80 dark:bg-zinc-800/80 backdrop-blur-sm py-1 px-1 rounded-md border border-border/30 shadow-lg transition-opacity duration-200",
-                  // Position is calculated in JS
-               )}>
-                  <div className="flex items-center gap-0.5 p-0 rounded-md w-min">
-                     <Button variant="ghost" size="icon" className="h-7 w-7 hover:scale-105 active:scale-95"><Bold className="w-4 h-4" /></Button>
-                     <Button variant="ghost" size="icon" className="h-7 w-7 hover:scale-105 active:scale-95"><Italic className="w-4 h-4" /></Button>
-                     <Button variant="ghost" size="icon" className="h-7 w-7 hover:scale-105 active:scale-95"><Underline className="w-4 h-4" /></Button>
-                     <Button variant="ghost" size="icon" className="h-7 w-7 hover:scale-105 active:scale-95"><Strikethrough className="w-4 h-4" /></Button>
-                     <Separator orientation="vertical" className="h-5 mx-1" />
-                     <Button variant="ghost" size="icon" className="h-7 w-7 hover:scale-105 active:scale-95"><Highlighter className="w-4 h-4" /></Button>
-                     <Button variant="ghost" size="icon" className="h-7 w-7 hover:scale-105 active:scale-95"><LinkIcon className="w-4 h-4" /></Button>
-                     <Separator orientation="vertical" className="h-5 mx-1" />
-                     <Button variant="ghost" size="icon" className="h-7 w-7 hover:scale-105 active:scale-95" onClick={handleInsertImage} title="Insert Image">
-                       <ImageIcon className="w-4 h-4" />
-                       <span className="sr-only">Insert Image</span>
-                     </Button>
-                     <Button variant="ghost" size="icon" className="h-7 w-7 hover:scale-105 active:scale-95" onClick={handleInsertVideo} title="Insert Video">
-                       <Video className="w-4 h-4" />
-                       <span className="sr-only">Insert Video</span>
-                     </Button>
-                  </div>
-               </div>
+               <div
+                    ref={formattingToolbarRef}
+                    style={{
+                         opacity: isTextSelected ? 1 : 0,
+                         pointerEvents: isTextSelected ? 'auto' : 'none',
+                         // Position is calculated by JS
+                    }}
+                    className={cn(
+                         "absolute z-50 bg-background/80 dark:bg-zinc-800/80 backdrop-blur-sm py-1 px-1 rounded-md border border-border/30 shadow-lg transition-opacity duration-200",
+                    )}>
+                    <div className="flex items-center gap-0.5 p-0 rounded-md w-min">
+                       {/* Standard Formatting Buttons */}
+                       <Button variant="ghost" size="icon" className="h-7 w-7 hover:scale-105 active:scale-95"><Bold className="w-4 h-4" /></Button>
+                       <Button variant="ghost" size="icon" className="h-7 w-7 hover:scale-105 active:scale-95"><Italic className="w-4 h-4" /></Button>
+                       <Button variant="ghost" size="icon" className="h-7 w-7 hover:scale-105 active:scale-95"><Underline className="w-4 h-4" /></Button>
+                       <Button variant="ghost" size="icon" className="h-7 w-7 hover:scale-105 active:scale-95"><Strikethrough className="w-4 h-4" /></Button>
+                       <Separator orientation="vertical" className="h-5 mx-1" />
+                       <Button variant="ghost" size="icon" className="h-7 w-7 hover:scale-105 active:scale-95"><Highlighter className="w-4 h-4" /></Button>
+                       <Button variant="ghost" size="icon" className="h-7 w-7 hover:scale-105 active:scale-95"><LinkIcon className="w-4 h-4" /></Button>
+                       <Separator orientation="vertical" className="h-5 mx-1" />
+                       {/* Insert Media Buttons */}
+                       <Button variant="ghost" size="icon" className="h-7 w-7 hover:scale-105 active:scale-95" onClick={handleInsertImage} title="Insert Image">
+                         <ImageIcon className="w-4 h-4" />
+                         <span className="sr-only">Insert Image</span>
+                       </Button>
+                       <Button variant="ghost" size="icon" className="h-7 w-7 hover:scale-105 active:scale-95" onClick={handleInsertVideo} title="Insert Video">
+                         <Video className="w-4 h-4" />
+                         <span className="sr-only">Insert Video</span>
+                       </Button>
+                    </div>
+                 </div>
 
-              {/* Main Content Textarea with Popover */}
-               <div className="relative w-full">
-                 <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
-                    {/* Explicit PopoverAnchor, positioned by JS */}
-                    <PopoverAnchor ref={popoverAnchorRef} className="absolute w-0 h-0"/>
+               {/* Main Content Textarea with Slash Command Popover */}
+                <div className="relative w-full">
+                 {/* PopoverAnchor needs to be inside the relative container */}
+                 <div ref={popoverAnchorRef} className="absolute w-0 h-0"/>
+                 <Popover open={slashPopoverOpen} onOpenChange={setSlashPopoverOpen}>
+                    <PopoverAnchor asChild>
+                        {/* The anchor is now positioned by JS */}
+                        <div/>
+                    </PopoverAnchor>
                     <Textarea
                       ref={contentRef}
                       placeholder="Start writing your note... Type '/' for commands."
@@ -584,31 +723,36 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
                       onChange={handleContentChange}
                       onSelect={handleSelectionChange}
                       onBlur={handleBlur}
-                      onClick={() => {
-                          if (popoverOpen && slashTriggeredRef.current) {
-                              setPopoverOpen(false);
-                              slashTriggeredRef.current = false;
-                              selectionRef.current = null;
-                          }
+                      onClick={(e) => {
+                         // Prevent closing slash popover if click is on the trigger area
+                         if (slashPopoverOpen && slashTriggeredRef.current && e.target === contentRef.current) {
+                             const cursorPos = contentRef.current?.selectionStart ?? 0;
+                             if(selectionRef.current && cursorPos > selectionRef.current.start && contentRef.current?.value.substring(selectionRef.current.start, cursorPos).startsWith('/')){
+                                // Clicked within the slash command, keep it open
+                             } else {
+                                setSlashPopoverOpen(false);
+                                slashTriggeredRef.current = false;
+                             }
+                         }
                       }}
-                      className="text-base border-none focus-visible:ring-0 shadow-none p-0 resize-none bg-transparent w-full leading-relaxed focus:outline-none overflow-hidden min-h-[300px]" // Adjusted min-height
-                      style={{ height: 'auto' }}
+                       className="text-base border-none focus-visible:ring-0 shadow-none p-0 resize-none bg-transparent w-full leading-relaxed focus:outline-none min-h-[300px] block" // Use block, remove overflow-hidden for auto-height
+                       style={{ height: 'auto' }} // Let height grow with content
                     />
                    <PopoverContent
-                      className="w-60 p-1 bg-background dark:bg-zinc-800 border border-border shadow-lg rounded-lg"
-                      side="bottom"
-                      align="start"
-                      sideOffset={10}
-                      onOpenAutoFocus={(e) => e.preventDefault()}
-                      onInteractOutside={(e) => {
-                          if (e.target !== contentRef.current) {
-                              setPopoverOpen(false);
-                              slashTriggeredRef.current = false;
-                              // Maybe keep selectionRef if focus moves to toolbar?
-                          }
-                      }}
-                      // Ensure popover is above content
-                      style={{ zIndex: 60 }}
+                        className="w-60 p-1 bg-background dark:bg-zinc-800 border border-border shadow-lg rounded-lg"
+                        side="bottom"
+                        align="start"
+                        sideOffset={10}
+                        onOpenAutoFocus={(e) => e.preventDefault()} // Prevent stealing focus
+                        onInteractOutside={(e) => {
+                            // Close only if interaction is outside textarea & popover itself
+                             if (e.target !== contentRef.current) {
+                                setSlashPopoverOpen(false);
+                                slashTriggeredRef.current = false;
+                            }
+                        }}
+                         data-popover-type="slash" // Add identifier
+                         style={{ zIndex: 60 }}
                    >
                      <div className="text-xs text-muted-foreground px-2 py-1">Blocks</div>
                      <div className="flex flex-col space-y-0.5">
@@ -617,8 +761,8 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
                            key={cmd.name}
                            variant="ghost"
                            className="w-full justify-start h-8 px-2 text-sm font-normal hover:bg-muted dark:hover:bg-muted/50"
-                           onClick={() => handleSelectCommand(cmd.name)}
-                           onMouseDown={(e) => e.preventDefault()}
+                           onClick={() => handleSelectSlashCommand(cmd.name)}
+                            onMouseDown={(e) => e.preventDefault()} // Prevents blur before click registers
                          >
                             {typeof cmd.icon === 'function' ? (
                               React.createElement(cmd.icon, { className: "w-4 h-4 mr-2 text-muted-foreground" })
@@ -642,19 +786,11 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
                     </p>
                   </div>
                )}
-              {/* Add more rendered block examples if needed */}
 
-              {/* Wikipedia Link (if applicable) */}
               {currentNoteId === '1' && (
                   <div className="mt-8">
-                     <a
-                       href={wikipediaLink}
-                       target="_blank"
-                       rel="noopener noreferrer"
-                       className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline underline-offset-2"
-                     >
-                       <ExternalLink className="w-4 h-4" />
-                       Check Wikipedia source
+                     <a href={wikipediaLink} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline underline-offset-2">
+                       <ExternalLink className="w-4 h-4" /> Check Wikipedia source
                      </a>
                   </div>
                )}
@@ -664,3 +800,5 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
     </div>
   );
 }
+
+    
