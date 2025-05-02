@@ -1,6 +1,7 @@
 
 import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function SavedPage() {
   return (
@@ -10,8 +11,18 @@ export default function SavedPage() {
         <Header />
         <main className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 bg-background">
           <h1 className="text-3xl font-bold text-foreground">Saved</h1>
-          <p className="text-muted-foreground">Saved items content will go here.</p>
-          {/* Placeholder content */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Access Your Saved Items</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>
+                Find all your saved notes, questions, and resources in one
+                convenient location. Stay organized and never lose track of
+                important information.
+              </p>
+            </CardContent>
+          </Card>
         </main>
       </div>
     </div>

@@ -2,8 +2,6 @@
 import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
 import { SubjectCard } from "@/components/ui/subject-card";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft } from "lucide-react";
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 
@@ -63,9 +61,9 @@ export default function AllSubjectsPage() {
         <main className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 bg-background">
           <div className="flex items-center gap-4 mb-6">
             <Link href="/" passHref>
-                <Button variant="ghost" size="icon" className="rounded-full">
-                    <ArrowLeft className="w-5 h-5" />
-                </Button>
+              <Button variant="ghost" size="icon" className="rounded-full">
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
             </Link>
             <h1 className="text-2xl md:text-3xl font-bold text-foreground">All Subjects</h1>
           </div>
