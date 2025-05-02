@@ -3,7 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
-import { FloatingNav } from "@/components/layout/floating-nav";
+// Removed FloatingNav import
 import Script from "next/script"; // Import Script component
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -39,11 +39,8 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {/* Added relative positioning and overflow-hidden container for RND bounds */}
-          <div className="relative min-h-screen w-full overflow-hidden">
-             {children}
-             <FloatingNav />
-          </div>
+          {/* Removed relative positioning container and FloatingNav */}
+           {children}
         </ThemeProvider>
       </body>
     </html>
