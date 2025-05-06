@@ -22,64 +22,64 @@ interface ChatMessage {
 }
 
 //genkit related code
-const RespondInputSchema = z.object({
-  userMessage: z.string().describe('The user\'s message to respond to.'),
-  photoDataUri: z.string().optional().describe(
-    "A photo related to the user's message, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
-  ),
-});
+// const RespondInputSchema = z.object({
+//   userMessage: z.string().describe('The user\'s message to respond to.'),
+//   photoDataUri: z.string().optional().describe(
+//     "A photo related to the user's message, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
+//   ),
+// });
 
-const RespondOutputSchema = z.object({
-  response: z.string().describe('The AI assistant\'s response to the user message.'),
-});
+// const RespondOutputSchema = z.object({
+//   response: z.string().describe('The AI assistant\'s response to the user message.'),
+// });
 
-let prompt: any;
-let flow: any;
+// let prompt: any;
+// let flow: any;
 
-async function initializeGenkit() {
-  try {
-  prompt = (await import('@/ai/genkit')).ai.definePrompt({
-    name: 'opennMindAiChat',
-    input: { schema: RespondInputSchema },
-    output: { schema: RespondOutputSchema },
-    prompt: `You are a helpful AI assistant for high school and college students. You can answer questions about a wide variety of subjects.
+// async function initializeGenkit() {
+//   try {
+//   prompt = (await import('@/ai/genkit')).ai.definePrompt({
+//     name: 'opennMindAiChat',
+//     input: { schema: RespondInputSchema },
+//     output: { schema: RespondOutputSchema },
+//     prompt: `You are a helpful AI assistant for high school and college students. You can answer questions about a wide variety of subjects.
 
-    Use the following information to respond to the user. Respond in a detailed manner.
-    Message: {{{userMessage}}}
-    {{#if photoDataUri}}
-    Photo: {{media url=photoDataUri}}
-    {{/if}}
+//     Use the following information to respond to the user. Respond in a detailed manner.
+//     Message: {{{userMessage}}}
+//     {{#if photoDataUri}}
+//     Photo: {{media url=photoDataUri}}
+//     {{/if}}
 
-    `,
-  });
+//     `,
+//   });
 
-  flow = (await import('@/ai/genkit')).ai.defineFlow(
-    {
-      name: 'opennMindAiChatFlow',
-      inputSchema: RespondInputSchema,
-      outputSchema: RespondOutputSchema,
-    },
-    async input => {
-      const { output } = await prompt(input);
-      return output!;
-    }
-  );
-  } catch (error) {
-    console.error("Genkit Initialization Error", error);
-    return;
-  }
-}
+//   flow = (await import('@/ai/genkit')).ai.defineFlow(
+//     {
+//       name: 'opennMindAiChatFlow',
+//       inputSchema: RespondInputSchema,
+//       outputSchema: RespondOutputSchema,
+//     },
+//     async input => {
+//       const { output } = await prompt(input);
+//       return output!;
+//     }
+//   );
+//   } catch (error) {
+//     console.error("Genkit Initialization Error", error);
+//     return;
+//   }
+// }
 
 
-export async function callChatApi(input: {userMessage: string, photoDataUri?: string | null}): Promise<{response: string}> {
-  if (!prompt || !flow) {
-    await initializeGenkit();
-  }
-  if (!prompt || !flow) {
-    return {response: "Initialization failed. Please try again later."};
-  }
-  return flow(input);
-}
+// export async function callChatApi(input: {userMessage: string, photoDataUri?: string | null}): Promise<{response: string}> {
+//   if (!prompt || !flow) {
+//     await initializeGenkit();
+//   }
+//   if (!prompt || !flow) {
+//     return {response: "Initialization failed. Please try again later."};
+//   }
+//   return flow(input);
+// }
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -112,32 +112,42 @@ export default function ChatPage() {
     setPhoto(null); // Clear the photo immediately
     setIsLoading(true);
 
-    try {
-      const aiResponse = await callChatApi({ userMessage: input, photoDataUri: currentPhoto || undefined });
+    // try {
+    //   const aiResponse = await callChatApi({ userMessage: input, photoDataUri: currentPhoto || undefined });
 
-      const aiMessage: ChatMessage = {
-        id: Date.now().toString(),
-        sender: 'ai',
-        text: aiResponse.response,
-      };
+    //   const aiMessage: ChatMessage = {
+    //     id: Date.now().toString(),
+    //     sender: 'ai',
+    //     text: aiResponse.response,
+    //   };
 
-      setMessages(prevMessages => [...prevMessages, aiMessage]);
-    } catch (error) {
-      console.error("Error calling chat API:", error);
-       toast({
-              variant: 'destructive',
-              title: 'API Error',
-              description: 'Sorry, I encountered an error processing your request. Please try again later.',
-            });
+    //   setMessages(prevMessages => [...prevMessages, aiMessage]);
+    // } catch (error) {
+    //   console.error("Error calling chat API:", error);
+    //    toast({
+    //           variant: 'destructive',
+    //           title: 'API Error',
+    //           description: 'Sorry, I encountered an error processing your request. Please try again later.',
+    //         });
 
-      setMessages(prevMessages => [...prevMessages, {
-        id: Date.now().toString(),
-        sender: 'ai',
-        text: "Sorry, I encountered an error processing your request.",
-      }]);
-    } finally {
-      setIsLoading(false);
-    }
+    //   setMessages(prevMessages => [...prevMessages, {
+    //     id: Date.now().toString(),
+    //     sender: 'ai',
+    //     text: "Sorry, I encountered an error processing your request.",
+    //   }]);
+    // } finally {
+    //   setIsLoading(false);
+    // }
+      // Mock AI Response
+      setTimeout(() => {
+        const aiMessage: ChatMessage = {
+          id: Date.now().toString(),
+          sender: 'ai',
+          text: "This is a demo response from the AI.  Since I can't access external resources or APIs, I'm just showing this message.  You uploaded: " + (currentPhoto ? "an image" : "no image") + ". " + (input ? "You also typed: " + input : "You didn't type anything either!"),
+        };
+        setMessages(prevMessages => [...prevMessages, aiMessage]);
+        setIsLoading(false);
+      }, 1500);
   };
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -228,3 +238,4 @@ export default function ChatPage() {
     </div>
   );
 }
+

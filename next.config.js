@@ -3,7 +3,9 @@ const nextConfig = {
     webpack: (config, { isServer }) => {
         if (!isServer) {
             config.resolve.fallback = {
-                fs: false
+                fs: false,
+                tls: false,
+                net: false
             };
         }
 
