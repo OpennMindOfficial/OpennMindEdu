@@ -58,7 +58,7 @@ export function Header() {
         {/* Bug Report Button */}
         <Link href="/bug-report" passHref legacyBehavior>
            <a>
-             <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground hover:bg-destructive/10 hover:text-destructive hover:scale-110 active:scale-95">
+             <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 hover:scale-110 active:scale-95"> {/* Apply destructive color on hover */}
                  <Bug className="h-5 w-5" />
                  <span className="sr-only">Report a Bug</span>
              </Button>

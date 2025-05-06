@@ -29,7 +29,7 @@ export default function BugReportPage() {
           <Card className="bg-muted/50 dark:bg-card/80 border-0 rounded-xl">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <Bug className="w-5 h-5 text-destructive" />
+                <Bug className="w-5 h-5 text-destructive" /> {/* Set bug icon color to destructive */}
                 <span>Describe the Issue</span>
               </CardTitle>
             </CardHeader>
