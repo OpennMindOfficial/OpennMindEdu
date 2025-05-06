@@ -9,43 +9,16 @@ export function ThemeToggle() {
   const { setTheme, theme } = useTheme();
 
   return (
-    <label className="bb8-toggle" style={{ fontSize: '14px' }}>
-      <input
-        className="bb8-toggle__checkbox"
-        type="checkbox"
-        checked={theme === "dark"}
-        onChange={(e) => setTheme(e.target.checked ? "dark" : "light")}
-      />
-      <div className="bb8-toggle__container">
-        <div className="bb8-toggle__scenery">
-          <div className="bb8-toggle__star"></div>
-          <div className="bb8-toggle__star"></div>
-          <div className="bb8-toggle__star"></div>
-          <div className="bb8-toggle__star"></div>
-          <div className="bb8-toggle__star"></div>
-          <div className="bb8-toggle__star"></div>
-          <div className="bb8-toggle__star"></div>
-          <div className="tatto-1"></div>
-          <div className="tatto-2"></div>
-          <div className="gomrassen"></div>
-          <div className="hermes"></div>
-          <div className="chenini"></div>
-          <div className="bb8-toggle__cloud"></div>
-          <div className="bb8-toggle__cloud"></div>
-          <div className="bb8-toggle__cloud"></div>
-        </div>
-        <div className="bb8">
-          <div className="bb8__head-container">
-            <div className="bb8__antenna"></div>
-            <div className="bb8__antenna"></div>
-            <div className="bb8__head"></div>
-          </div>
-          <div className="bb8__body"></div>
-        </div>
-        <div className="artificial__hidden">
-          <div className="bb8__shadow"></div>
-        </div>
-      </div>
+    <label className="inline-flex items-center space-x-2">
+      <span className="text-sm font-medium">
+        {theme === "dark" ? "Light" : "Dark"}
+      </span>
+      <button
+        className="h-9 px-3 font-semibold rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80"
+        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      >
+        Toggle Theme
+      </button>
     </label>
   );
 }
