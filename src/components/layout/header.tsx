@@ -1,7 +1,8 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Bell, CircleHelp, Settings, Zap, ShieldQuestion, GraduationCap } from "lucide-react";
+import { Search, Bell, CircleHelp, Settings, Zap, ShieldQuestion, GraduationCap, Bug } from "lucide-react"; // Import Bug icon
 import { ThemeToggle } from "@/components/theme-toggle";
+import Link from "next/link"; // Import Link
 
 export function Header() {
   return (
@@ -33,26 +34,36 @@ export function Header() {
 
       {/* Right Side Icons & Buttons */}
       <div className="flex items-center gap-2"> {/* Reduced gap */}
-        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
+        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground hover:scale-110 active:scale-95">
           <Bell className="h-5 w-5" />
           <span className="sr-only">Notifications</span>
         </Button>
-        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
+        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground hover:scale-110 active:scale-95">
           <CircleHelp className="h-5 w-5" />
           <span className="sr-only">Help</span>
         </Button>
 
         {/* Upgrade Button - Matched styling */}
-        <Button variant="primary" size="sm" className="px-4 font-semibold"> {/* Adjusted padding via size="sm" */}
+        <Button variant="primary" size="sm" className="px-4 font-semibold hover:scale-105 active:scale-95"> {/* Adjusted padding via size="sm" */}
             Upgrade
         </Button>
 
         <ThemeToggle />
 
-        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
+        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground hover:scale-110 active:scale-95">
             <Settings className="h-5 w-5" />
             <span className="sr-only">Settings</span>
         </Button>
+
+        {/* Bug Report Button */}
+        <Link href="/bug-report" passHref legacyBehavior>
+           <a>
+             <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground hover:bg-destructive/10 hover:text-destructive hover:scale-110 active:scale-95">
+                 <Bug className="h-5 w-5" />
+                 <span className="sr-only">Report a Bug</span>
+             </Button>
+           </a>
+        </Link>
       </div>
     </header>
   );
