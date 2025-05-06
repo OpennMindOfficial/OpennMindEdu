@@ -5,7 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50", // Removed scaling transitions
+  "inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50", // Changed rounded-md to rounded-lg
   {
     variants: {
       variant: {
@@ -23,9 +23,9 @@ const buttonVariants = cva(
       },
       size: {
         default: "h-10 px-4 py-2", // Reverted to standard padding
-        sm: "h-9 rounded-md px-3", // Use rounded-md for most sidebar buttons
-        lg: "h-11 rounded-md px-8",
-        icon: "h-10 w-10", // Icons can remain rounded-full or adjust as needed
+        sm: "h-9 rounded-lg px-3", // Use rounded-lg for most sidebar buttons
+        lg: "h-11 rounded-lg px-8",
+        icon: "h-10 w-10 rounded-lg", // Icons also use rounded-lg
       },
     },
     defaultVariants: {

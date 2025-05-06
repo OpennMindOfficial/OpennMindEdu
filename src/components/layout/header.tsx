@@ -1,8 +1,9 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Bell, CircleHelp, Settings, Zap, ShieldQuestion, GraduationCap, Bug } from "lucide-react"; // Import Bug icon
+import { Search, Bell, CircleHelp, Settings, Zap, ShieldQuestion, GraduationCap, Bug } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
-import Link from "next/link"; // Import Link
+import Link from "next/link";
+import { SparkleButton } from '@/components/common/sparkle-button'; // Import the new SparkleButton
 
 export function Header() {
   return (
@@ -27,30 +28,30 @@ export function Header() {
           <Input
             type="search"
             placeholder="Search for anything..."
-            className="pl-10 w-full bg-background md:bg-muted dark:bg-input rounded-full" // Rounded search bar
+            className="pl-10 w-full bg-background md:bg-muted dark:bg-input rounded-lg" // Changed to rounded-lg
           />
         </div>
       </div>
 
       {/* Right Side Icons & Buttons */}
       <div className="flex items-center gap-2"> {/* Reduced gap */}
-        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground hover:scale-110 active:scale-95">
+        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground hover:scale-105 active:scale-95">
           <Bell className="h-5 w-5" />
           <span className="sr-only">Notifications</span>
         </Button>
-        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground hover:scale-110 active:scale-95">
+        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground hover:scale-105 active:scale-95">
           <CircleHelp className="h-5 w-5" />
           <span className="sr-only">Help</span>
         </Button>
 
-        {/* Upgrade Button - Matched styling */}
-        <Button variant="primary" size="sm" className="px-4 font-semibold hover:scale-105 active:scale-95"> {/* Adjusted padding via size="sm" */}
+        {/* Upgrade Button - Replaced with SparkleButton */}
+        <SparkleButton className="px-4"> {/* Use px-4 for padding */}
             Upgrade
-        </Button>
+        </SparkleButton>
 
         <ThemeToggle />
 
-        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground hover:scale-110 active:scale-95">
+        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground hover:scale-105 active:scale-95">
             <Settings className="h-5 w-5" />
             <span className="sr-only">Settings</span>
         </Button>
@@ -58,7 +59,7 @@ export function Header() {
         {/* Bug Report Button */}
         <Link href="/bug-report" passHref legacyBehavior>
            <a>
-             <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 hover:scale-110 active:scale-95"> {/* Apply destructive color on hover */}
+             <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 hover:scale-105 active:scale-95"> {/* Apply destructive color on hover */}
                  <Bug className="h-5 w-5" />
                  <span className="sr-only">Report a Bug</span>
              </Button>
