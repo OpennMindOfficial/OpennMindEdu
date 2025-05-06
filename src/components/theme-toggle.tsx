@@ -9,7 +9,7 @@ export function ThemeToggle() {
   const { setTheme, theme } = useTheme();
 
   return (
-    <label className="bb8-toggle">
+    <label className="bb8-toggle" style={{ fontSize: '14px' }}>
       <input
         className="bb8-toggle__checkbox"
         type="checkbox"
@@ -49,3 +49,4 @@ export function ThemeToggle() {
     </label>
   );
 }
+
