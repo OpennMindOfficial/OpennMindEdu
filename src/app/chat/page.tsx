@@ -9,10 +9,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, Paperclip, ImagePlus, Loader2 } from "lucide-react";
+import { Send, ImagePlus, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import {genkit} from "@/ai/genkit";
 import { z } from 'zod';
+import { useToast } from "@/components/ui/use-toast"
 
 interface ChatMessage {
   id: string;
@@ -33,34 +33,51 @@ const RespondOutputSchema = z.object({
   response: z.string().describe('The AI assistant\'s response to the user message.'),
 });
 
-const prompt = genkit.definePrompt({
-  name: 'tangledAiChat',
-  input: { schema: RespondInputSchema },
-  output: { schema: RespondOutputSchema },
-  prompt: `You are a helpful AI assistant for high school and college students. You can answer questions about a wide variety of subjects.
+let prompt: any;
+let flow: any;
 
-  Use the following information to respond to the user. Respond in a detailed manner.
-  Message: {{{userMessage}}}
-  {{#if photoDataUri}}
-  Photo: {{media url=photoDataUri}}
-  {{/if}}
+async function initializeGenkit() {
+  try {
+  prompt = (await import('@/ai/genkit')).ai.definePrompt({
+    name: 'opennMindAiChat',
+    input: { schema: RespondInputSchema },
+    output: { schema: RespondOutputSchema },
+    prompt: `You are a helpful AI assistant for high school and college students. You can answer questions about a wide variety of subjects.
 
-  `,
-});
+    Use the following information to respond to the user. Respond in a detailed manner.
+    Message: {{{userMessage}}}
+    {{#if photoDataUri}}
+    Photo: {{media url=photoDataUri}}
+    {{/if}}
 
-const flow = genkit.defineFlow(
-  {
-    name: 'tangledAiChatFlow',
-    inputSchema: RespondInputSchema,
-    outputSchema: RespondOutputSchema,
-  },
-  async input => {
-    const { output } = await prompt(input);
-    return output!;
+    `,
+  });
+
+  flow = (await import('@/ai/genkit')).ai.defineFlow(
+    {
+      name: 'opennMindAiChatFlow',
+      inputSchema: RespondInputSchema,
+      outputSchema: RespondOutputSchema,
+    },
+    async input => {
+      const { output } = await prompt(input);
+      return output!;
+    }
+  );
+  } catch (error) {
+    console.error("Genkit Initialization Error", error);
+    return;
   }
-);
+}
+
 
 export async function callChatApi(input: {userMessage: string, photoDataUri?: string | null}): Promise<{response: string}> {
+  if (!prompt || !flow) {
+    await initializeGenkit();
+  }
+  if (!prompt || !flow) {
+    return {response: "Initialization failed. Please try again later."};
+  }
   return flow(input);
 }
 
@@ -70,6 +87,7 @@ export default function ChatPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [photo, setPhoto] = useState<string | null>(null); // Data URI of the image
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast()
 
   useEffect(() => {
     // Scroll to bottom when new messages are added
@@ -106,7 +124,12 @@ export default function ChatPage() {
       setMessages(prevMessages => [...prevMessages, aiMessage]);
     } catch (error) {
       console.error("Error calling chat API:", error);
-      // Handle error (e.g., display an error message to the user)
+       toast({
+              variant: 'destructive',
+              title: 'API Error',
+              description: 'Sorry, I encountered an error processing your request. Please try again later.',
+            });
+
       setMessages(prevMessages => [...prevMessages, {
         id: Date.now().toString(),
         sender: 'ai',
@@ -177,10 +200,8 @@ export default function ChatPage() {
                     onChange={handleImageUpload}
                     className="hidden"
                   />
-                  <Button variant="ghost" size="icon" asChild>
-                    <div className="flex items-center">
-                      <ImagePlus className="h-5 w-5" />
-                    </div>
+                  <Button variant="ghost" size="icon">
+                    <ImagePlus className="h-5 w-5" />
                   </Button>
                 </label>
                 <Textarea
