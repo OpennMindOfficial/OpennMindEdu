@@ -6,12 +6,20 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"; // Import Avatar
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator"; // Import Separator
+import { Separator } from "@/components/ui/separator";
 import {
-  Settings, // Account settings
-  ChevronLeft, // For Collapse icon
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"; // Import Dialog components
+import { Textarea } from "@/components/ui/textarea"; // Import Textarea
+import {
+  Settings,
   Home,
   MessageSquare,
   FileText,
@@ -21,18 +29,19 @@ import {
   BookOpen,
   FileStack,
   Bookmark,
-  ChevronDown, // Added for dropdown indicator
-  Clock, // Import Clock icon
-  GraduationCap, // Added for CBSE logo
-  CalendarCheck, // Icon for Study Plan
-  TrendingUp, // Icon for Performance Tracking
-  Gamepad2, // Icon for Fun Shun
-  Layers, // Icon for Extra Courses
-  BookOpenCheck, // Icon for NCERT Explanations
-  Target, // Icon for Exam Mode
+  ChevronDown,
+  Clock,
+  GraduationCap,
+  CalendarCheck,
+  TrendingUp,
+  Gamepad2,
+  Layers,
+  BookOpenCheck,
+  Target,
+  Send, // Import Send icon
 } from 'lucide-react';
 import * as React from 'react';
-import { motion } from 'framer-motion'; // Import motion
+import { motion } from 'framer-motion';
 
 interface NavItemProps {
   href: string;
@@ -42,10 +51,9 @@ interface NavItemProps {
   secondaryText?: string;
   isSubItem?: boolean;
   isActive?: boolean;
-  isDropdown?: boolean; // Flag for dropdown items like Q4 updates
+  isDropdown?: boolean;
 }
 
-// Updated NavItem for active state styling and hover animation
 function NavItem({
   href,
   icon: Icon,
@@ -62,19 +70,18 @@ function NavItem({
     <Link href={href} legacyBehavior passHref>
       <motion.a
         className={cn(
-          'relative flex items-center justify-between text-sm font-medium transition-colors h-9 px-3 rounded-md group', // Added group class, removed background classes
-          isSubItem ? 'pl-9' : '', // Indent sub-items
+          'relative flex items-center justify-between text-sm font-medium transition-colors h-9 px-3 rounded-md group',
+          isSubItem ? 'pl-9' : '',
           isActive
-            ? 'text-foreground' // Active text color
-            : 'text-muted-foreground hover:text-foreground', // Inactive text color and hover
+            ? 'text-foreground'
+            : 'text-muted-foreground hover:text-foreground',
         )}
         onHoverStart={() => setIsHovered(true)}
         onHoverEnd={() => setIsHovered(false)}
       >
-        {/* Animated Background Highlight */}
         {(isHovered || isActive) && (
             <motion.span
-                layoutId="sidebarHighlight" // Unique ID for layout animation
+                layoutId="sidebarHighlight"
                 className="absolute inset-0 z-0 rounded-md bg-muted dark:bg-muted/50"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -82,10 +89,7 @@ function NavItem({
                 transition={{ duration: 0.15 }}
             />
         )}
-
-        {/* Content (Icon, Label, Badge) - Ensure it's above the highlight */}
-        <div className="relative z-10 flex items-center overflow-hidden flex-grow"> {/* Use flex-grow */}
-             {/* Animated Icon */}
+        <div className="relative z-10 flex items-center overflow-hidden flex-grow">
              <motion.div
                 whileHover={{ scale: 1.1, rotate: -5 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 15 }}
@@ -93,14 +97,14 @@ function NavItem({
              >
                 <Icon className={cn("h-4 w-4", isActive ? "text-foreground" : "")} />
              </motion.div>
-            <span className="truncate">{label}</span> {/* Truncate long labels */}
+            <span className="truncate">{label}</span>
             {isDropdown && <ChevronDown className="h-4 w-4 ml-1 text-muted-foreground" />}
         </div>
-        <div className="relative z-10 flex items-center ml-2 flex-shrink-0"> {/* Container for badge/secondary text */}
+        <div className="relative z-10 flex items-center ml-2 flex-shrink-0">
             {badgeCount && (
                 <Badge
-                 variant="count" // Use count variant
-                 className="ml-auto flex h-5 w-5 shrink-0 items-center justify-center rounded-full p-0 text-xs font-semibold" // Simplified classes
+                 variant="count"
+                 className="ml-auto flex h-5 w-5 shrink-0 items-center justify-center rounded-full p-0 text-xs font-semibold"
                  >
                  {badgeCount}
                 </Badge>
@@ -132,8 +136,16 @@ function NavSection({ title, children }: NavSectionProps) {
 
 export function Sidebar() {
     const pathname = usePathname();
+    const [suggestion, setSuggestion] = React.useState("");
+    const [isPopupOpen, setIsPopupOpen] = React.useState(false);
 
-    // Reordered items based on priority
+    const handleSuggestionSubmit = () => {
+      console.log("Board change suggestion submitted:", suggestion);
+      setSuggestion("");
+      setIsPopupOpen(false); // Close popup after submission
+      // Add logic to send the suggestion
+    };
+
     const opennMindItems = [
         { href: '/chat', icon: MessageSquare, label: 'Chat With AI'},
         { href: '/mock-exams', icon: PlusCircle, label: 'Mock Exams'},
@@ -153,43 +165,90 @@ export function Sidebar() {
         { href: '/exam-mode', icon: Target, label: 'Exam Mode'},
     ];
 
-
   return (
-    <aside className="hidden md:flex flex-col w-64 border-r bg-card shrink-0 h-screen"> {/* Adjusted width */}
-        {/* Top Section - CBSE Selector */}
-        <div className="flex items-center justify-between h-16 px-3 border-b"> {/* Reduced padding to px-3 */}
-             {/* CBSE Selector Button */}
-             <Button
-                 variant="outline" // Use outline variant for the base style
-                 className={cn(
-                     "w-full justify-between border-muted-foreground/30 h-9 text-sm font-normal text-foreground px-3",
-                     "hover:bg-muted/50", // Apply hover directly
-                     "hover:scale-100 active:scale-100" // Ensure no scaling
-                 )}
-             >
-                 <div className="flex items-center gap-2">
-                    <GraduationCap className="w-4 h-4 text-primary" /> {/* Logo Icon */}
-                    <span className="font-medium">CBSE</span>
-                 </div>
-                 <div className="flex items-center gap-1.5">
-                     <Badge variant="free" className="px-1.5 py-0.5 text-[10px] leading-tight">FREE</Badge> {/* Custom 'free' variant */}
-                     <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                 </div>
-             </Button>
-             {/* Removed original collapse button */}
+    <aside className="hidden md:flex flex-col w-64 border-r bg-card shrink-0 h-screen">
+        <div className="flex items-center justify-between h-16 px-3 border-b">
+            <Dialog open={isPopupOpen} onOpenChange={setIsPopupOpen}>
+              <DialogTrigger asChild>
+                 <Button
+                     variant="outline"
+                     className={cn(
+                         "w-full justify-between border-muted-foreground/30 h-9 text-sm font-normal text-foreground px-3",
+                         "hover:bg-muted/50",
+                         "hover:scale-100 active:scale-100"
+                     )}
+                 >
+                     <div className="flex items-center gap-2">
+                        <GraduationCap className="w-4 h-4 text-primary" />
+                        <span className="font-medium">CBSE</span>
+                     </div>
+                     <div className="flex items-center gap-1.5">
+                         <Badge variant="free" className="px-1.5 py-0.5 text-[10px] leading-tight">FREE</Badge>
+                         <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                     </div>
+                 </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    <Lightbulb className="w-5 h-5 text-yellow-500" />
+                    Changing Board - Under Development
+                  </DialogTitle>
+                  <DialogDescription>
+                    The ability to change your educational board is coming soon!
+                    This will allow you to access content tailored to different curricula.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                   <p className="text-sm text-muted-foreground">
+                     We appreciate your patience as we work on this feature.
+                   </p>
+                  <div>
+                    <h4 className="font-semibold mb-2 text-foreground">Suggest a Board or Feature</h4>
+                    <p className="text-xs text-muted-foreground mb-2">
+                      What board are you interested in? Or any specific features related to board selection?
+                    </p>
+                    <Textarea
+                      placeholder="E.g., ICSE Board, State Boards, specific exam patterns..."
+                      value={suggestion}
+                      onChange={(e) => setSuggestion(e.target.value)}
+                      className="mb-3 min-h-[100px] bg-background dark:bg-input"
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      setIsPopupOpen(false);
+                      setSuggestion(""); // Clear suggestion if cancelled
+                    }}
+                    className="hover:scale-105 active:scale-95"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    onClick={handleSuggestionSubmit}
+                    disabled={!suggestion.trim()}
+                    className="hover:scale-105 active:scale-95"
+                  >
+                    <Send className="w-4 h-4 mr-2" />
+                    Submit Suggestion
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
         </div>
 
         <ScrollArea className="flex-1 py-4">
-            {/* OpennMind Specific Section */}
              <NavSection title="Study Tools">
                   {opennMindItems.map((item) => (
                     <NavItem key={item.href} {...item} isActive={pathname === item.href} />
                   ))}
              </NavSection>
-
         </ScrollArea>
 
-        {/* Bottom Section */}
         <div className="mt-auto p-3 border-t">
             <NavItem href="/settings" icon={Settings} label="Account settings" isActive={pathname === '/settings'} />
         </div>
