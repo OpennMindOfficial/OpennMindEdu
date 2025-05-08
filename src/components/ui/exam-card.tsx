@@ -1,35 +1,31 @@
-'use client'; // Keep 'use client' if other interactions remain, otherwise can remove
+'use client';
 
 import type React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { type LucideProps } from "lucide-react";
+import Image, { type StaticImageData } from 'next/image'; // Import next/image
 import { cn } from '@/lib/utils';
-// Removed useState as hover state is no longer needed
-// Removed Button and Play icon as they are no longer used
 
 interface ExamCardProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
-  icon: React.ElementType<LucideProps>;
+  imageUrl: string | StaticImageData; // Changed from icon to imageUrl
   bgColorClass: string;
-  textColorClass?: string;
+  textColorClass?: string; // Keep for potential future use, but not used for image
   isNew?: boolean;
   className?: string;
   'data-ai-hint'?: string;
 }
 
-export function ExamCard({ title, icon: Icon, bgColorClass, textColorClass, isNew, className, ...props }: ExamCardProps) {
-  // Removed useState for isHovered
+export function ExamCard({ title, imageUrl, bgColorClass, textColorClass, isNew, className, ...props }: ExamCardProps) {
 
   return (
     <Card
       className={cn(
-        "overflow-hidden rounded-xl border-0 shadow-md transition-shadow relative h-[140px] md:h-[160px]", // Decreased height significantly
+        "overflow-hidden rounded-xl border-0 shadow-md transition-shadow relative h-[140px] md:h-[160px]", // Maintain decreased height
         "flex flex-col justify-between",
         bgColorClass,
         className
       )}
-      // Removed onMouseEnter and onMouseLeave handlers
       {...props}
     >
       <CardHeader className="p-4 pb-2 z-10 relative flex-shrink-0">
@@ -39,18 +35,21 @@ export function ExamCard({ title, icon: Icon, bgColorClass, textColorClass, isNe
         </div>
       </CardHeader>
       <CardContent className="p-4 pt-0 flex-grow flex items-end justify-end relative overflow-hidden">
-        {/* Icon positioned at bottom right - removed hover scaling */}
-        <Icon
-          className={cn(
-            "absolute right-[-10px] bottom-[-10px] w-16 h-16 opacity-30 z-0 transition-transform duration-300 ease-in-out", // Slightly smaller icon size
-            // Removed hover scale class: isHovered ? "scale-110" : "",
-            textColorClass || "text-foreground/70"
-          )}
-          strokeWidth={1.5}
-        />
+        {/* Image positioned at bottom right */}
+        <div className={cn(
+            "absolute right-[-15px] bottom-[-15px] w-20 h-20 opacity-80 z-0 transition-transform duration-300 ease-in-out", // Adjusted size and position slightly
+             // Removed hover scale effect
+           )}>
+             <Image
+               src={imageUrl}
+               alt={title} // Use title for alt text
+               width={80} // Provide width
+               height={80} // Provide height
+               className="object-contain" // Use contain to show the full illustration
+               style={{ filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.1))' }} // Optional subtle shadow
+             />
+           </div>
 
-        {/* Removed Hover Overlay & Button */}
-        {/* The entire div for overlay and button is removed */}
       </CardContent>
     </Card>
   );
