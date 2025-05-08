@@ -55,7 +55,7 @@ export function ToolWindow({
       }}
       minWidth={minWidth}
       minHeight={minHeight}
-      bounds="parent" // Constrain dragging within the viewport or a specific parent
+      bounds="window" // Explicitly set bounds to the window viewport
       className={cn(
         "bg-card shadow-2xl rounded-lg overflow-hidden border border-border flex flex-col pointer-events-auto", // Ensure flex-col here
         className
