@@ -258,3 +258,4 @@ export const FloatingNav = ({ className }: { className?: string }) => {
     </>
   );
 };
+
