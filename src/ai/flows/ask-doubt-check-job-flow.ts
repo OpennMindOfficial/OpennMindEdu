@@ -3,16 +3,9 @@
  */
 'use strict';
 
-import { ai } from '@/ai/genkit'; // Removed the extraneous period
-import { z } from 'genkit';
-import { flow } from 'genkit/experimental/experimental';
-import { defineFlow } from 'genkit/experimental/flow';
-import {
-  defineTool,
-  generate,
-  promptRef,
-} from '@genkit-ai/core';
-import { ToolArgumentSchema } from '@genkit-ai/core/lib/tool';
+import { ai } from '@/ai/genkit';
+import { z } from 'zod'; // Corrected import: Use zod directly
+import { defineFlow, defineTool } from '@genkit-ai/core'; // Corrected import: Use @genkit-ai/core
 
 
 // Define the input schema using Zod
@@ -57,7 +50,7 @@ const getDoubtStatusTool = defineTool(
 );
 
 
-// Define the Genkit flow using the experimental API
+// Define the Genkit flow using the corrected import
 const checkDoubtFlow = defineFlow(
   {
     name: 'checkDoubtFlow',
@@ -98,6 +91,8 @@ const checkDoubtFlow = defineFlow(
 
     console.log(`[checkDoubtFlow] Final response message: ${responseMessage}`);
     // Return only the necessary fields defined in the output schema
+    // Note: The response message here includes more than just the optional tutor response.
+    // Adjusting to return the *status* and the crafted *responseMessage* based on the status.
     return { status: doubtStatusResult.status, response: responseMessage };
   }
 );

@@ -10,6 +10,7 @@ const nextConfig = {
                 tls: false,
                 net: false,
                 http2: false, // Add http2 fallback
+                dns: false, // Add dns fallback
             };
         }
 
