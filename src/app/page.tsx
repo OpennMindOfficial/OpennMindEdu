@@ -280,8 +280,6 @@ export default function Home() {
                         - {randomQuote.author}
                     </p>
                 )}
-               {/* Keep pushing button/tag */}
-               <p className="mt-2 inline-block bg-white/20 text-white/90 text-xs px-2 py-0.5 rounded-md">Keep pushing! &lt;3</p>
              </div>
            </motion.div>
 
