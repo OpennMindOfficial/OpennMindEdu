@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -6,15 +7,16 @@ import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input"; // Keep input if needed elsewhere, not primary here
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Send, ImagePlus, Loader2, Bot, User, X, Brain } from "lucide-react"; // Added Brain icon
+import { Send, ImagePlus, Loader2, Bot, User, X, Brain, FileQuestion } from "lucide-react"; // Added Brain icon, FileQuestion
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
 import { askDoubt, type AskDoubtInput, type AskDoubtOutput } from '@/ai/flows/ask-doubt-flow'; // Import the Genkit flow
+import { checkDoubt, type CheckDoubtInput, type CheckDoubtOutput } from '@/ai/flows/ask-doubt-check-job-flow'; // Corrected import path
 import Image from 'next/image'; // Import next/image
 
 // Define message structure
@@ -23,6 +25,7 @@ interface ChatMessage {
   sender: 'user' | 'ai';
   text: string;
   image?: string;
+  isStatusCheck?: boolean; // Flag to differentiate status check messages
 }
 
 // Example subjects (replace with actual data source if available)
@@ -44,10 +47,12 @@ export default function AskDoubtPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isCheckingStatus, setIsCheckingStatus] = useState(false);
   const [photo, setPhoto] = useState<string | null>(null); // Data URI of the image
   const [selectedSubject, setSelectedSubject] = useState<string>('');
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null); // Ref for file input
+  const [doubtIdToCheck, setDoubtIdToCheck] = useState(''); // State for doubt ID input
   const { toast } = useToast();
 
   useEffect(() => {
@@ -63,7 +68,7 @@ export default function AskDoubtPage() {
        {
          id: 'initial-ai-message',
          sender: 'ai',
-         text: 'Hello! Select a subject and ask me anything. You can also upload an image related to your doubt.',
+         text: 'Hello! Select a subject and ask me anything. You can also upload an image related to your doubt or check the status of a previous doubt using its ID.',
        }
      ]);
    }, []);
@@ -86,8 +91,11 @@ export default function AskDoubtPage() {
       return;
     }
 
+    // Generate a temporary unique ID for the user message
+    const tempDoubtId = `temp_${Date.now()}`;
+
     const userMessage: ChatMessage = {
-      id: Date.now().toString() + '-user',
+      id: tempDoubtId, // Use temporary ID for user message
       sender: 'user',
       text: input,
       image: photo || undefined,
@@ -103,6 +111,15 @@ export default function AskDoubtPage() {
     }
     setIsLoading(true);
 
+     // Add placeholder AI thinking message
+     const thinkingMessage: ChatMessage = {
+       id: Date.now().toString() + '-thinking',
+       sender: 'ai',
+       text: 'Thinking...',
+     };
+     setMessages(prevMessages => [...prevMessages, thinkingMessage]);
+
+
     try {
         // Prepare input for the Genkit flow
         const flowInput: AskDoubtInput = {
@@ -114,32 +131,96 @@ export default function AskDoubtPage() {
         // Call the Genkit flow
         const aiResponse: AskDoubtOutput = await askDoubt(flowInput);
 
-        const aiMessage: ChatMessage = {
-          id: Date.now().toString() + '-ai',
-          sender: 'ai',
-          text: aiResponse.explanation,
-          // image: aiResponse.diagramUrl // Handle potential diagram later
-        };
+        // Update the thinking message with the actual AI response
+        setMessages(prevMessages => prevMessages.map(msg =>
+            msg.id === thinkingMessage.id
+            ? { ...msg, id: `ai_${Date.now()}`, text: aiResponse.explanation || "Sorry, I couldn't process that." }
+            : msg
+        ));
 
-       setMessages(prevMessages => [...prevMessages, aiMessage]);
+       // Simulating getting a real doubt ID from the backend after submission
+       const assignedDoubtId = `doubt_${Math.floor(Math.random() * 1000)}`; // Replace with actual ID generation/retrieval
+
+       // Add a message indicating the doubt ID
+       const idMessage: ChatMessage = {
+         id: Date.now().toString() + '-id',
+         sender: 'ai',
+         text: `Your doubt has been submitted. Your Doubt ID is: ${assignedDoubtId}. You can use this ID to check the status later.`,
+       };
+       setMessages(prevMessages => [...prevMessages, idMessage]);
+
 
     } catch (error) {
         console.error("Error getting AI response:", error);
+        // Update the thinking message with an error message
+         setMessages(prevMessages => prevMessages.map(msg =>
+             msg.id === thinkingMessage.id
+             ? { ...msg, id: Date.now().toString() + '-error', text: "Apologies, I couldn't process that request right now. Please check the console for details." }
+             : msg
+         ));
         toast({
             variant: 'destructive',
             title: 'AI Error',
             description: 'Sorry, I encountered an error processing your doubt. Please try again.',
         });
-        // Optionally add an error message to the chat
-        setMessages(prevMessages => [...prevMessages, {
-            id: Date.now().toString() + '-error',
-            sender: 'ai',
-            text: "Apologies, I couldn't process that request right now. Please check the console for details."
-        }]);
     } finally {
         setIsLoading(false);
     }
   };
+
+  const handleCheckStatus = async () => {
+    if (!doubtIdToCheck.trim()) {
+      toast({
+        variant: 'destructive',
+        title: 'Doubt ID Required',
+        description: 'Please enter the Doubt ID you want to check.',
+      });
+      return;
+    }
+
+    const userStatusCheckMessage: ChatMessage = {
+        id: Date.now().toString() + '-user-check',
+        sender: 'user',
+        text: `Check status for Doubt ID: ${doubtIdToCheck}`,
+        isStatusCheck: true, // Mark as status check
+    };
+    setMessages(prevMessages => [...prevMessages, userStatusCheckMessage]);
+
+    setIsCheckingStatus(true); // Use a separate loading state for status check
+    const currentDoubtId = doubtIdToCheck;
+    setDoubtIdToCheck(''); // Clear the input field
+
+
+    try {
+        const input: CheckDoubtInput = { doubtId: currentDoubtId };
+        const result: CheckDoubtOutput = await checkDoubt(input);
+
+        const aiStatusMessage: ChatMessage = {
+            id: Date.now().toString() + '-ai-status',
+            sender: 'ai',
+            text: result.response || 'Could not retrieve status.',
+            isStatusCheck: true, // Mark as status check response
+        };
+        setMessages(prevMessages => [...prevMessages, aiStatusMessage]);
+
+    } catch (error) {
+        console.error("Error checking doubt status:", error);
+        toast({
+            variant: 'destructive',
+            title: 'Status Check Error',
+            description: 'Sorry, failed to check the status. Please try again.',
+        });
+        setMessages(prevMessages => [...prevMessages, {
+            id: Date.now().toString() + '-error-status',
+            sender: 'ai',
+            text: `Failed to check status for ID: ${currentDoubtId}.`,
+            isStatusCheck: true,
+        }]);
+    } finally {
+        setIsCheckingStatus(false);
+    }
+};
+
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -187,13 +268,54 @@ export default function AskDoubtPage() {
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header />
         <main className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 bg-transparent relative"> {/* Made main bg transparent and relative */}
+           {/* Background Illustration */}
+           <div className="absolute inset-0 z-[-1] overflow-hidden opacity-20 dark:opacity-10 pointer-events-none">
+              {/* Large faint brain illustration or abstract pattern */}
+              <Brain className="absolute -right-20 -bottom-20 w-96 h-96 text-primary/30 transform rotate-12" strokeWidth={0.5}/>
+              {/* Smaller abstract shapes */}
+              <svg viewBox="0 0 200 200" className="absolute top-10 left-10 w-60 h-60 text-accent/20">
+                <path d="M100 20C144.183 20 180 55.8172 180 100C180 144.183 144.183 180 100 180C55.8172 180 20 144.183 20 100C20 55.8172 55.8172 20 100 20Z" stroke="currentColor" strokeOpacity="0.1" strokeWidth="4" strokeDasharray="8 8"/>
+                <circle cx="100" cy="100" r="30" stroke="currentColor" strokeOpacity="0.3" strokeWidth="1"/>
+              </svg>
+              <svg viewBox="0 0 100 100" className="absolute bottom-5 right-5 w-40 h-40 text-secondary/30 transform -rotate-45">
+                <rect x="10" y="10" width="80" height="80" rx="15" stroke="currentColor" strokeOpacity="0.2" strokeWidth="2" fill="none" />
+                <line x1="30" y1="30" x2="70" y2="70" stroke="currentColor" strokeOpacity="0.2" strokeWidth="1"/>
+                <line x1="70" y1="30" x2="30" y2="70" stroke="currentColor" strokeOpacity="0.2" strokeWidth="1"/>
+              </svg>
+           </div>
           <div className="flex items-center gap-3">
              <Brain className="w-7 h-7 text-primary" />
              <h1 className="text-2xl md:text-3xl font-bold text-foreground">Ask Your Doubt</h1>
           </div>
 
+           {/* Doubt Status Check Section */}
+           <Card className="bg-card/80 dark:bg-card/70 border border-border/20 backdrop-blur-lg rounded-xl shadow-lg p-4 mb-6">
+             <div className="flex items-center gap-3 mb-2">
+                <FileQuestion className="w-5 h-5 text-accent" />
+               <h3 className="text-base font-semibold text-foreground">Check Doubt Status</h3>
+             </div>
+             <div className="flex items-center space-x-2">
+               <Input
+                 type="text"
+                 placeholder="Enter Doubt ID"
+                 value={doubtIdToCheck}
+                 onChange={(e) => setDoubtIdToCheck(e.target.value)}
+                 className="flex-1 rounded-lg border-input bg-background/80 dark:bg-input/80 text-sm shadow-inner h-9"
+                 disabled={isCheckingStatus}
+               />
+               <Button
+                 onClick={handleCheckStatus}
+                 disabled={isCheckingStatus || !doubtIdToCheck.trim()}
+                 className="hover:scale-110 active:scale-95 h-9"
+                 size="sm"
+               >
+                 {isCheckingStatus ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Check'}
+               </Button>
+             </div>
+           </Card>
+
           {/* Main Chat Card */}
-          <Card className="bg-card/80 dark:bg-card/70 border border-border/20 backdrop-blur-lg rounded-xl flex flex-col h-[calc(100vh-180px)] shadow-xl overflow-hidden"> {/* Adjusted height and added shadow */}
+          <Card className="bg-card/80 dark:bg-card/70 border border-border/20 backdrop-blur-lg rounded-xl flex flex-col h-[calc(100vh-320px)] shadow-xl overflow-hidden"> {/* Adjusted height to account for status check card */}
             {/* Header with Subject Selector */}
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 border-b border-border/20 px-4 py-3 bg-card/90 dark:bg-card/80 sticky top-0 z-10">
               <CardTitle className="text-base md:text-lg text-foreground font-semibold">AI Tutor Session</CardTitle>
@@ -252,8 +374,9 @@ export default function AskDoubtPage() {
                          )}
                       </div>
                     ))}
-                    {isLoading && (
-                      <div className="flex items-start gap-3 justify-start">
+                     {/* Loading indicator moved inside scroll area */}
+                    {isLoading && messages[messages.length - 1]?.text === 'Thinking...' && (
+                        <div className="flex items-start gap-3 justify-start">
                          <Avatar className="w-8 h-8 border border-border/30 shadow-sm">
                            <AvatarImage src="/placeholder-ai.jpg" alt="AI" data-ai-hint="robot ai brain"/>
                            <AvatarFallback className="bg-primary/20 text-primary"><Bot size={16}/></AvatarFallback>
@@ -284,7 +407,7 @@ export default function AskDoubtPage() {
                     onClick={triggerImageUpload}
                     className="hover:scale-110 active:scale-95 text-muted-foreground hover:text-primary"
                     aria-label="Upload Image"
-                    disabled={isLoading || !!photo} // Disable if photo already selected or loading
+                    disabled={isLoading || !!photo || isCheckingStatus} // Disable if photo already selected, loading or checking status
                  >
                     <ImagePlus className="h-5 w-5" />
                  </Button>
@@ -294,20 +417,20 @@ export default function AskDoubtPage() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey && !isLoading) { // Prevent send while loading
+                    if (e.key === 'Enter' && !e.shiftKey && !isLoading && !isCheckingStatus) { // Prevent send while loading or checking status
                       e.preventDefault();
                       handleSend();
                     }
                   }}
                   className="flex-1 rounded-lg border-input bg-background/80 dark:bg-input/80 min-h-[40px] max-h-[120px] resize-none text-sm shadow-inner" // Added shadow-inner
                   rows={1} // Start with 1 row
-                  disabled={isLoading}
+                  disabled={isLoading || isCheckingStatus} // Disable during both loading states
                 />
                 {/* Send Button */}
                 <Button
                   size="icon" // Changed to icon button
                   onClick={handleSend}
-                  disabled={isLoading || (!input.trim() && !photo) || !selectedSubject}
+                  disabled={isLoading || isCheckingStatus || (!input.trim() && !photo) || !selectedSubject}
                   className="hover:scale-110 active:scale-95 w-9 h-9 rounded-lg" // Made it square-ish
                   aria-label="Send message"
                 >
@@ -334,7 +457,7 @@ export default function AskDoubtPage() {
                             }}
                             className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-0.5 h-5 w-5 hover:bg-destructive/90 hover:scale-110"
                             aria-label="Remove image"
-                            disabled={isLoading} // Disable remove while loading
+                            disabled={isLoading || isCheckingStatus} // Disable remove while loading or checking status
                        >
                            <X className="w-3 h-3" />
                        </Button>
@@ -343,10 +466,11 @@ export default function AskDoubtPage() {
             </CardContent> {/* Closing CardContent */}
           </Card> {/* Closing Card */}
 
-           {/* Decorative element removed to fix build error */}
-
         </main> {/* Closing main */}
       </div> {/* Closing content wrapper div */}
-    </div> {/* Closing main wrapper div */}
+    </div> // Closing main wrapper div
   ); // Closing return
 } // Closing function
+
+
+
