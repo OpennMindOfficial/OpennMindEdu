@@ -116,31 +116,7 @@
 ::-webkit-scrollbar-thumb:hover {
     background: hsl(var(--muted-foreground));
 }
-
-/* BB8 Toggle Styles - Adapted from Uiverse.io by Galahhad */
-/* REMASTERED */
-/* RTX-ON */
-/* completely redone toggle and droid */
-
-/* .bb8-toggle {
-  --toggle-size: 16px;
-   finally I removed the scale now everything depends on the font-size 
-   --margin-top-for-head: 1.75em; 
-   it's just in case 👆 
-  --toggle-width: 10.625em;
-  --toggle-height: 5.625em;
-  --toggle-offset: calc((var(--toggle-height) - var(--bb8-diameter)) / 2);
-  --toggle-bg: linear-gradient(#2c4770, #070e2b 35%, #628cac 50% 70%, #a6c5d4)
-    no-repeat;
-  --bb8-diameter: 4.375em;
-  --radius: 99em;
-  --transition: 0.4s;
-  --accent: hsl(var(--primary)); /* Use accent color from globals.css */
-  /* --bb8-bg: hsl(var(--background)); /* Use background color from globals.css */
-  /* --bb8-shadow: #3a271c; /* Shadow color */
-/* } */
-
-/* .dark .bb8-toggle {
+/* dark .bb8-toggle {
   --toggle-bg: linear-gradient(#444, #111 35%, #555 50% 70%, #888) no-repeat; /* Dark mode toggle background */
   /* --bb8-bg: hsl(var(--background)); /* Dark Mode Background */
   /* --bb8-shadow: #111; /* Dark mode shadow color */
