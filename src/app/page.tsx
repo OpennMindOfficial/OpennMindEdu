@@ -33,7 +33,7 @@ import React, { useState, useEffect, useRef } from 'react'; // Import useRef
 import Link from 'next/link'; // Import Link
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion'; // Import motion
-// import quotesData from './quotes.json'; // Import the quotes JSON file // <-- Temporarily commented out
+import quotesData from './quotes.json'; // Import the quotes JSON file
 
 // Import local images for subjects
 import itImage from './it.png';
@@ -49,10 +49,10 @@ import i1 from './i1.png'; // Random exam
 import i2 from './i2.png'; // Custom exam
 import i3 from './i3.png'; // Timed exam
 
-// interface Quote { // <-- Temporarily commented out
-//     quote: string;
-//     author: string;
-// }
+interface Quote {
+    quote: string;
+    author: string;
+}
 
 // Data for Subject Cards
 const subjects = [
@@ -169,17 +169,17 @@ const itemVariants = {
 
 export default function Home() {
   const userName = "Rudransh"; // Mock user name
-  // const [randomQuote, setRandomQuote] = useState<Quote | null>(null); // <-- Temporarily commented out
+  const [randomQuote, setRandomQuote] = useState<Quote | null>(null);
   const [greeting, setGreeting] = useState('');
   const scrollContainerRef = useRef<HTMLDivElement>(null); // Ref for scroll container
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
 
   useEffect(() => {
-    // // Select a random quote from the imported JSON data // <-- Temporarily commented out
-    // const allQuotes = quotesData.quotes;
-    // const randomIndex = Math.floor(Math.random() * allQuotes.length);
-    // setRandomQuote(allQuotes[randomIndex]); // Set the entire quote object
+    // Select a random quote from the imported JSON data
+    const allQuotes = quotesData.quotes;
+    const randomIndex = Math.floor(Math.random() * allQuotes.length);
+    setRandomQuote(allQuotes[randomIndex]); // Set the entire quote object
 
     // Determine greeting based on local time
     const hour = new Date().getHours();
@@ -241,7 +241,6 @@ export default function Home() {
 
 
   return (
-    // Wrap the entire content in a single parent div for correct JSX structure
     <div className="flex h-screen bg-background text-foreground overflow-hidden">
       <Sidebar /> {/* Use updated Sidebar */}
       <div className="flex flex-col flex-1 overflow-hidden">
@@ -263,6 +262,29 @@ export default function Home() {
              {greeting}, {userName}
            </motion.h1>
 
+            {/* Top Promotional Banner (Quote) with animation */}
+           <motion.div
+             className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900/80 text-primary-foreground p-6 rounded-xl shadow-lg flex flex-col items-start justify-between relative overflow-hidden min-h-[120px]"
+             variants={itemVariants}
+             initial="hidden"
+             animate="show"
+             transition={{ delay: 0.1 }} // Keep a small delay
+           >
+             <div className="space-y-1">
+                 <h2 className="text-xl md:text-2xl font-semibold mb-2">
+                 {randomQuote ? `"${randomQuote.quote}"` : "Loading quote..."}
+               </h2>
+                {randomQuote && (
+                    <p className="text-sm md:text-base opacity-80">
+                        - {randomQuote.author}
+                    </p>
+                )}
+               {/* Optional: Add a static message if needed */}
+               {/* <p className="text-sm md:text-base mt-2">Keep pushing! &lt;3</p> */}
+             </div>
+           </motion.div>
+
+
            {/* My Subjects Section with animation */}
            <motion.div
              className="space-y-4"
@@ -279,7 +301,9 @@ export default function Home() {
                  </div>
                  <div className="flex items-center space-x-4 text-sm">
                      <Button variant="ghost" className="text-muted-foreground hover:text-foreground hover:scale-105 active:scale-95">Change subjects</Button>
-                     <Button variant="ghost" className="text-muted-foreground hover:text-foreground hover:scale-105 active:scale-95">Browse all</Button>
+                     <Link href="/all-subjects" passHref legacyBehavior>
+                       <a><Button variant="ghost" className="text-muted-foreground hover:text-foreground hover:scale-105 active:scale-95">Browse all</Button></a>
+                    </Link>
                  </div>
              </div>
 
@@ -291,10 +315,10 @@ export default function Home() {
                      <motion.div
                         key={index}
                         variants={itemVariants}
-                        className="w-[240px] h-[340px] flex-shrink-0" // Adjusted size
+                        className="w-[240px] h-[340px] flex-shrink-0 group" // Added group here as well
                      >
                        <SubjectCard
-                         title={subject.title}
+                         title={subject.title} // Keep title for accessibility/data
                          imageUrl={subject.imageUrl}
                          bgColorClass={subject.bgColorClass}
                          data-ai-hint={subject.dataAiHint || subject.title.split(' ')[0].toLowerCase()}
@@ -340,63 +364,6 @@ export default function Home() {
              </div>
            </motion.div>
 
-           {/* Mock Exams Section with animation */}
-            <motion.div
-              className="space-y-4"
-              variants={containerVariants} // Apply container variants
-              initial="hidden"
-              animate="show"
-              transition={{ delay: 0.3 }} // Adjusted delay
-            >
-               <div className="flex justify-between items-center">
-                  <div className="flex items-center space-x-2">
-                      <PlusCircle className="w-5 h-5 text-primary" />
-                      <h2 className="text-xl md:text-2xl font-semibold">Mock Exams</h2>
-                  </div>
-                  {/* Add any controls like "View All" if needed */}
-               </div>
-               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                   {examCards.map((card, index) => (
-                    <motion.div key={index} variants={itemVariants}>
-                      <ExamCard
-                        title={card.title}
-                        icon={card.icon}
-                        bgColorClass={card.bgColorClass}
-                        textColorClass={card.textColorClass}
-                        isNew={card.isNew}
-                        data-ai-hint={card.dataAiHint}
-                      />
-                    </motion.div>
-                  ))}
-               </div>
-            </motion.div>
-
-            {/* Top Promotional Banner with animation */}
-           <motion.div
-             className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900/80 text-primary-foreground p-6 rounded-xl shadow-lg flex flex-col items-start justify-between relative overflow-hidden min-h-[120px]"
-             variants={itemVariants}
-             initial="hidden"
-             animate="show"
-             transition={{ delay: 0.1 }}
-           >
-             <div className="space-y-1">
-                 <h2 className="text-xl md:text-2xl font-semibold mb-2">
-                 {/* {randomQuote ? `"${randomQuote.quote}"` : "Loading quote..."} // <-- Temporarily commented out */}
-                 "Temporary Motivational Message!"
-               </h2>
-                {/* {randomQuote && ( // <-- Temporarily commented out
-                    <p className="text-sm md:text-base opacity-80">
-                        - {randomQuote.author}
-                    </p>
-                )} */}
-                <p className="text-sm md:text-base opacity-80">
-                    - OpennMind
-                </p>
-               <p className="text-sm md:text-base mt-2">
-                 Keep pushing! &lt;3
-               </p>
-             </div>
-           </motion.div>
 
            {/* Learn With Section with animation */}
            <motion.div
@@ -404,7 +371,7 @@ export default function Home() {
              variants={containerVariants} // Container variants
              initial="hidden"
              animate="show"
-             transition={{ delay: 0.4 }} // Even further delay
+             transition={{ delay: 0.3 }} // Further delay
            >
              <div className="flex items-center space-x-2">
                 <Lightbulb className="w-5 h-5 text-yellow-500" />
@@ -432,6 +399,37 @@ export default function Home() {
                  </motion.div>
               </div>
            </motion.div>
+
+            {/* Mock Exams Section with animation */}
+            <motion.div
+              className="space-y-4"
+              variants={containerVariants} // Apply container variants
+              initial="hidden"
+              animate="show"
+              transition={{ delay: 0.4 }} // Adjusted delay
+            >
+               <div className="flex justify-between items-center">
+                  <div className="flex items-center space-x-2">
+                      <PlusCircle className="w-5 h-5 text-primary" />
+                      <h2 className="text-xl md:text-2xl font-semibold">Mock Exams</h2>
+                  </div>
+                  {/* Add any controls like "View All" if needed */}
+               </div>
+               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                   {examCards.map((card, index) => (
+                    <motion.div key={index} variants={itemVariants}>
+                      <ExamCard
+                        title={card.title}
+                        icon={card.icon}
+                        bgColorClass={card.bgColorClass}
+                        textColorClass={card.textColorClass}
+                        isNew={card.isNew}
+                        data-ai-hint={card.dataAiHint}
+                      />
+                    </motion.div>
+                  ))}
+               </div>
+            </motion.div>
 
 
         </motion.main>
