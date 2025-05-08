@@ -33,6 +33,7 @@ import React, { useState, useEffect, useRef } from 'react'; // Import useRef
 import Link from 'next/link'; // Import Link
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion'; // Import motion
+import quotesData from './quotes.json'; // Import the quotes JSON file
 
 // Import local images for subjects
 import itImage from './it.png';
@@ -144,19 +145,8 @@ const learnWithCards = [
 ];
 
 
-// Motivational Study Quotes
-const studyQuotes = [
-    "Believe you can and you're halfway there.",
-    "The expert in anything was once a beginner.",
-    "Success is the sum of small efforts, repeated day in and day out.",
-    "Don't watch the clock; do what it does. Keep going.",
-    "The only way to do great work is to love what you do.",
-    "Push yourself, because no one else is going to do it for you.",
-    "Your limitation—it's only your imagination.",
-    "The future belongs to those who believe in the beauty of their dreams.",
-    "Study hard, do good, and the good life will follow.",
-    "It always seems impossible until it's done."
-];
+// Motivational Study Quotes are now imported from JSON
+// const studyQuotes = [ ... ];
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -182,8 +172,10 @@ export default function Home() {
   const [showRightArrow, setShowRightArrow] = useState(false);
 
   useEffect(() => {
-    // Select a random quote on client-side mount
-    setRandomQuote(studyQuotes[Math.floor(Math.random() * studyQuotes.length)]);
+    // Select a random quote from the imported JSON data
+    const allQuotes = quotesData.quotes;
+    const randomIndex = Math.floor(Math.random() * allQuotes.length);
+    setRandomQuote(allQuotes[randomIndex].quote); // Set the quote text
 
     // Determine greeting based on local time
     const hour = new Date().getHours();
@@ -251,13 +243,18 @@ export default function Home() {
       <div className="flex flex-col flex-1 overflow-hidden"> {/* Keep overflow-hidden here for header/sidebar layout */}
         <Header />
         {/* Main content area allows vertical scrolling */}
-        <main className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 bg-background">
+        <motion.main
+          className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 bg-background"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
+        >
            {/* Greeting with animation */}
            <motion.h1
              className="text-3xl font-bold text-foreground"
-             initial={{ opacity: 0, y: -20 }}
-             animate={{ opacity: 1, y: 0 }}
-             transition={{ duration: 0.5 }}
+             variants={itemVariants}
+             initial="hidden"
+             animate="show"
            >
              {greeting}, {userName}
            </motion.h1>
@@ -265,9 +262,10 @@ export default function Home() {
            {/* Top Promotional Banner with animation */}
            <motion.div
              className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900/80 text-primary-foreground p-6 rounded-xl shadow-lg flex items-center justify-between relative overflow-hidden"
-             initial={{ opacity: 0, scale: 0.9 }}
-             animate={{ opacity: 1, scale: 1 }}
-             transition={{ duration: 0.5, delay: 0.1 }}
+             variants={itemVariants}
+             initial="hidden"
+             animate="show"
+             transition={{ delay: 0.1 }}
            >
              <div className="z-10">
                <h2 className="text-xl md:text-2xl font-semibold mb-2">{randomQuote || "Loading quote..."}</h2> {/* Display quote or loading message */}
@@ -282,14 +280,49 @@ export default function Home() {
               </div>
            </motion.div>
 
+            {/* Mock Exams Section with animation */}
+            <motion.div
+              className="space-y-4"
+              variants={containerVariants} // Apply container variants
+              initial="hidden"
+              animate="show"
+              transition={{ delay: 0.2 }} // Slight delay
+            >
+               <motion.div className="flex items-center space-x-2 cursor-pointer group" variants={itemVariants}>
+                  <PlusCircle className="w-5 h-5 text-primary" />
+                  <h2 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">Mock exams</h2>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
+               </motion.div>
+                <motion.div
+                  className="grid grid-cols-1 md:grid-cols-3 gap-4"
+                  variants={containerVariants} // Stagger children
+                  initial="hidden"
+                  animate="show"
+                >
+                  {examCards.map((card, index) => (
+                    <motion.div key={index} variants={itemVariants}>
+                      <ExamCard
+                        title={card.title}
+                        icon={card.icon} // Pass icon component
+                        bgColorClass={card.bgColorClass}
+                        textColorClass={card.textColorClass} // Pass text color for icon
+                        isNew={card.isNew}
+                        dataAiHint={card.dataAiHint}
+                      />
+                    </motion.div>
+                  ))}
+                </motion.div>
+            </motion.div>
+
            {/* My Subjects Section with animation */}
             <motion.div
               className="space-y-4"
-              variants={itemVariants}
+              variants={containerVariants}
               initial="hidden"
               animate="show"
+              transition={{ delay: 0.3 }} // Further delay
             >
-             <div className="flex justify-between items-center">
+             <motion.div className="flex justify-between items-center" variants={itemVariants}>
                <div className="flex items-center space-x-2 cursor-pointer group">
                  <Bookmark className="w-5 h-5 text-primary" />
                  <h2 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">My subjects</h2>
@@ -311,7 +344,7 @@ export default function Home() {
                    </a>
                  </Link>
                </div>
-             </div>
+             </motion.div>
 
              {/* Horizontal scroll container with arrows */}
              <motion.div
@@ -370,57 +403,24 @@ export default function Home() {
              </motion.div>
            </motion.div>
 
-            {/* Mock Exams Section with animation */}
-            <motion.div
-              className="space-y-4"
-              variants={itemVariants}
-              initial="hidden"
-              animate="show"
-              transition={{ delay: 0.2 }} // Slight delay
-            >
-               <div className="flex items-center space-x-2 cursor-pointer group">
-                  <PlusCircle className="w-5 h-5 text-primary" />
-                  <h2 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">Mock exams</h2>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
-               </div>
-                <motion.div
-                  className="grid grid-cols-1 md:grid-cols-3 gap-4"
-                  variants={containerVariants}
-                  initial="hidden"
-                  animate="show"
-                >
-                  {examCards.map((card, index) => (
-                    <motion.div key={index} variants={itemVariants}>
-                      <ExamCard
-                        title={card.title}
-                        icon={card.icon} // Pass icon component
-                        bgColorClass={card.bgColorClass}
-                        textColorClass={card.textColorClass} // Pass text color for icon
-                        isNew={card.isNew}
-                        dataAiHint={card.dataAiHint}
-                      />
-                    </motion.div>
-                  ))}
-                </motion.div>
-            </motion.div>
 
            {/* Learn With Section with animation */}
            <motion.div
              className="space-y-4"
-             variants={itemVariants}
+             variants={containerVariants} // Container variants
              initial="hidden"
              animate="show"
-             transition={{ delay: 0.3 }} // Further delay
+             transition={{ delay: 0.4 }} // Even further delay
            >
-             <div className="flex items-center space-x-2 cursor-pointer group">
+             <motion.div className="flex items-center space-x-2 cursor-pointer group" variants={itemVariants}>
                 <Lightbulb className="w-5 h-5 text-yellow-500" />
                 <h2 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">Learn with</h2>
                 <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
-             </div>
+             </motion.div>
               {/* Use LearnWithCard component */}
               <motion.div
                 className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
-                variants={containerVariants}
+                variants={containerVariants} // Stagger children
                 initial="hidden"
                 animate="show"
               >
@@ -438,7 +438,7 @@ export default function Home() {
                  <motion.div variants={itemVariants}>
                    <Card className="p-4 bg-muted/50 dark:bg-card/80 rounded-xl border-0 flex items-center justify-center h-full min-h-[144px] md:min-h-[144px]">
                        <CardContent className="text-center p-0">
-                         <p className="text-muted-foreground text-sm">Learning content coming soon...</p>
+                         <p className="text-muted-foreground text-sm">More learning tools coming soon...</p>
                        </CardContent>
                    </Card>
                  </motion.div>
@@ -446,8 +446,9 @@ export default function Home() {
            </motion.div>
 
 
-        </main>
+        </motion.main>
       </div>
     </div>
   );
 }
+
