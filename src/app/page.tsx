@@ -1,13 +1,13 @@
 
-'use client'; // Add 'use client' directive for useState and useEffect
+'use client'; // Add 'use client' directive for useState, useEffect, and framer-motion
 
-import Image from 'next/image';
+import Image, { type StaticImageData } from 'next/image';
 import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar"; // Updated Sidebar import
 import { SubjectCard } from "@/components/ui/subject-card";
 import { ExamCard } from "@/components/ui/exam-card";
 import { LearnWithCard } from "@/components/ui/learn-with-card";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"; // Ensure Card and related components are imported
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"; // Import Card and related components
 import { Button } from "@/components/ui/button";
 import {
   ArrowRight,
@@ -27,10 +27,12 @@ import {
   Timer, // Icon for Timed Exam
   PenTool, // Icon for Sketchpad
   GraduationCap, // Icon for Revision Plan
+  type LucideIcon,
 } from "lucide-react";
 import React, { useState, useEffect, useRef } from 'react'; // Import useRef
 import Link from 'next/link'; // Import Link
 import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion'; // Import motion
 
 // Import local images for subjects
 import itImage from './it.png';
@@ -94,7 +96,14 @@ const subjects = [
 
 
 // Data for Exam Cards using icons
-const examCards = [
+const examCards: {
+  title: string;
+  icon: LucideIcon;
+  bgColorClass: string;
+  textColorClass: string;
+  isNew?: boolean;
+  dataAiHint: string;
+}[] = [
  {
     title: "Random exam",
     icon: Dices, // Use imported icon
@@ -148,6 +157,21 @@ const studyQuotes = [
     "Study hard, do good, and the good life will follow.",
     "It always seems impossible until it's done."
 ];
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1, // Stagger children animation
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+};
 
 export default function Home() {
   const userName = "Rudransh"; // Mock user name
@@ -228,11 +252,23 @@ export default function Home() {
         <Header />
         {/* Main content area allows vertical scrolling */}
         <main className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 bg-background">
-          {/* Dynamic Greeting */}
-          <h1 className="text-3xl font-bold text-foreground">{greeting}, {userName}</h1>
+           {/* Greeting with animation */}
+           <motion.h1
+             className="text-3xl font-bold text-foreground"
+             initial={{ opacity: 0, y: -20 }}
+             animate={{ opacity: 1, y: 0 }}
+             transition={{ duration: 0.5 }}
+           >
+             {greeting}, {userName}
+           </motion.h1>
 
-           {/* Top Promotional Banner */}
-           <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900/80 text-primary-foreground p-6 rounded-xl shadow-lg flex items-center justify-between relative overflow-hidden">
+           {/* Top Promotional Banner with animation */}
+           <motion.div
+             className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900/80 text-primary-foreground p-6 rounded-xl shadow-lg flex items-center justify-between relative overflow-hidden"
+             initial={{ opacity: 0, scale: 0.9 }}
+             animate={{ opacity: 1, scale: 1 }}
+             transition={{ duration: 0.5, delay: 0.1 }}
+           >
              <div className="z-10">
                <h2 className="text-xl md:text-2xl font-semibold mb-2">{randomQuote || "Loading quote..."}</h2> {/* Display quote or loading message */}
                <Button variant="secondary" size="sm" className="bg-white/20 hover:bg-white/30 text-white px-4 py-1 text-xs h-auto rounded-full shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105 active:scale-95">
@@ -244,33 +280,15 @@ export default function Home() {
                     <path d="M50,0 C22.4,0 0,22.4 0,50 C0,77.6 22.4,100 50,100 C77.6,100 100,77.6 100,50 C100,22.4 77.6,0 50,0 Z M50,10 C66.6,10 80,23.4 80,40 C80,56.6 66.6,70 50,70 C33.4,70 20,56.6 20,40 C20,23.4 33.4,10 50,10 Z M50,80 C38.9,80 30,71.1 30,60 L70,60 C70,71.1 61.1,80 50,80 Z"/>
                  </svg>
               </div>
-           </div>
+           </motion.div>
 
-            {/* Mock Exams Section */}
-            <div className="space-y-4">
-               <div className="flex items-center space-x-2 cursor-pointer group">
-                  <PlusCircle className="w-5 h-5 text-primary" />
-                  <h2 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">Mock exams</h2>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
-               </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {examCards.map((card, index) => (
-                    <ExamCard
-                      key={index}
-                      title={card.title}
-                      icon={card.icon} // Pass icon component
-                      bgColorClass={card.bgColorClass}
-                      textColorClass={card.textColorClass} // Pass text color for icon
-                      isNew={card.isNew}
-                      dataAiHint={card.dataAiHint}
-                    />
-                  ))}
-                </div>
-            </div>
-
-
-           {/* My Subjects Section */}
-            <div className="space-y-4">
+           {/* My Subjects Section with animation */}
+            <motion.div
+              className="space-y-4"
+              variants={itemVariants}
+              initial="hidden"
+              animate="show"
+            >
              <div className="flex justify-between items-center">
                <div className="flex items-center space-x-2 cursor-pointer group">
                  <Bookmark className="w-5 h-5 text-primary" />
@@ -296,21 +314,27 @@ export default function Home() {
              </div>
 
              {/* Horizontal scroll container with arrows */}
-             <div className="relative group">
+             <motion.div
+                className="relative group"
+                variants={containerVariants} // Stagger children
+                initial="hidden"
+                animate="show"
+              >
                 <div
                    ref={scrollContainerRef}
                    className="flex w-full space-x-4 pb-4 overflow-x-auto scroll-smooth scrollbar-hide" // scrollbar-hide utility might need Tailwind config
                    onScroll={checkScrollArrows} // Add onScroll handler here too
                 >
                    {subjects.map((subject, index) => (
-                     <SubjectCard
-                       key={index}
-                       title={subject.title} // Pass title for overlay/alt text
-                       imageUrl={subject.imageUrl}
-                       bgColorClass={subject.bgColorClass}
-                       className="w-[235px] h-[350px] flex-shrink-0" // Increased size
-                       data-ai-hint={subject.dataAiHint}
-                     />
+                     <motion.div key={index} variants={itemVariants}>
+                       <SubjectCard
+                         title={subject.title} // Pass title for overlay/alt text
+                         imageUrl={subject.imageUrl}
+                         bgColorClass={subject.bgColorClass}
+                         className="w-[235px] h-[350px] flex-shrink-0" // Maintained size
+                         data-ai-hint={subject.dataAiHint}
+                       />
+                     </motion.div>
                    ))}
                  </div>
 
@@ -343,37 +367,83 @@ export default function Home() {
                  >
                     <ChevronRight className="h-5 w-5" />
                  </Button>
-             </div>
-           </div>
+             </motion.div>
+           </motion.div>
 
+            {/* Mock Exams Section with animation */}
+            <motion.div
+              className="space-y-4"
+              variants={itemVariants}
+              initial="hidden"
+              animate="show"
+              transition={{ delay: 0.2 }} // Slight delay
+            >
+               <div className="flex items-center space-x-2 cursor-pointer group">
+                  <PlusCircle className="w-5 h-5 text-primary" />
+                  <h2 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">Mock exams</h2>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
+               </div>
+                <motion.div
+                  className="grid grid-cols-1 md:grid-cols-3 gap-4"
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="show"
+                >
+                  {examCards.map((card, index) => (
+                    <motion.div key={index} variants={itemVariants}>
+                      <ExamCard
+                        title={card.title}
+                        icon={card.icon} // Pass icon component
+                        bgColorClass={card.bgColorClass}
+                        textColorClass={card.textColorClass} // Pass text color for icon
+                        isNew={card.isNew}
+                        dataAiHint={card.dataAiHint}
+                      />
+                    </motion.div>
+                  ))}
+                </motion.div>
+            </motion.div>
 
-
-           {/* Learn With Section */}
-           <div className="space-y-4">
+           {/* Learn With Section with animation */}
+           <motion.div
+             className="space-y-4"
+             variants={itemVariants}
+             initial="hidden"
+             animate="show"
+             transition={{ delay: 0.3 }} // Further delay
+           >
              <div className="flex items-center space-x-2 cursor-pointer group">
                 <Lightbulb className="w-5 h-5 text-yellow-500" />
                 <h2 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">Learn with</h2>
                 <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
              </div>
               {/* Use LearnWithCard component */}
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              <motion.div
+                className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+                variants={containerVariants}
+                initial="hidden"
+                animate="show"
+              >
                  {learnWithCards.map((card, index) => (
-                    <LearnWithCard
-                      key={index}
-                      title={card.title}
-                      icon={card.icon}
-                      bgColorClass={card.bgColorClass}
-                      textColorClass={card.textColorClass}
-                    />
+                    <motion.div key={index} variants={itemVariants}>
+                      <LearnWithCard
+                        title={card.title}
+                        icon={card.icon}
+                        bgColorClass={card.bgColorClass}
+                        textColorClass={card.textColorClass}
+                      />
+                    </motion.div>
                  ))}
-                 {/* Example Placeholder Card - Replace with actual content */}
-                 <Card className="p-4 bg-muted/50 dark:bg-card/80 rounded-xl border-0 flex items-center justify-center h-full min-h-[144px] md:min-h-[144px]">
-                    <CardContent className="text-center p-0">
-                      <p className="text-muted-foreground text-sm">Learning content coming soon...</p>
-                    </CardContent>
-                 </Card>
-              </div>
-           </div>
+                 {/* Example Placeholder Card */}
+                 <motion.div variants={itemVariants}>
+                   <Card className="p-4 bg-muted/50 dark:bg-card/80 rounded-xl border-0 flex items-center justify-center h-full min-h-[144px] md:min-h-[144px]">
+                       <CardContent className="text-center p-0">
+                         <p className="text-muted-foreground text-sm">Learning content coming soon...</p>
+                       </CardContent>
+                   </Card>
+                 </motion.div>
+              </motion.div>
+           </motion.div>
 
 
         </main>

@@ -49,12 +49,14 @@ import {
   Scissors,
   Filter,
   FileText,
+  type LucideIcon, // Import LucideIcon type
 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
-import { Popover, PopoverContent, PopoverAnchor, PopoverTrigger } from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverAnchor, PopoverTrigger } from "@/components/ui/popover"; // Import Popover components
 import { cn } from '@/lib/utils';
 import { Sidebar } from '@/components/layout/sidebar'; // Import standard Sidebar
 import { Header } from '@/components/layout/header'; // Import standard Header
+import { motion, AnimatePresence } from 'framer-motion'; // Import motion
 
 // Demo note data structure (expanded slightly) - Consider moving this to a data source or state management
 interface Note {
@@ -82,7 +84,12 @@ const sampleNotes: Note[] = [
 ];
 
 // Define slash command options
-const slashCommands = [
+interface SlashCommand {
+    name: string;
+    icon: LucideIcon | (() => React.ReactNode); // Allow function for custom rendering
+    level?: number; // For headings
+}
+const slashCommands: SlashCommand[] = [
   { name: 'Heading 1', icon: Hash, level: 1 },
   { name: 'Heading 2', icon: Hash, level: 2 },
   { name: 'Bulleted List', icon: () => <ul className="list-disc pl-1 text-xs"><li></li></ul> },
@@ -97,7 +104,12 @@ const slashCommands = [
 ];
 
 // Define AI action options
-const aiActions = [
+interface AIAction {
+    name: string;
+    icon: LucideIcon;
+    action: () => void;
+}
+const aiActions: AIAction[] = [
     { name: 'Summarize', icon: ScrollText, action: () => console.log('AI Action: Summarize') },
     { name: 'Action Points', icon: ListChecks, action: () => console.log('AI Action: Action Points') },
     { name: 'Main Points', icon: ListOrdered, action: () => console.log('AI Action: Main Points') },
@@ -166,23 +178,26 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
 
     const shouldOpenPopover =
         charJustTyped === '/' &&
-        (cursorPos === 1 || [' ', '\n', ''].includes(charBeforeSlash) || charBeforeSlash.match(/\W/) );
+        (cursorPos === 1 || [' ', '\n', ''].includes(charBeforeSlash) || (charBeforeSlash && charBeforeSlash.match(/\W/)) ); // Added check for charBeforeSlash existence
 
     if (shouldOpenPopover) {
         slashTriggeredRef.current = true;
         selectionRef.current = { start: cursorPos - 1, end: cursorPos };
         calculateAndSetPopoverPosition(textarea, cursorPos - 1);
         setSlashPopoverOpen(true);
-        setIsTextSelected(false);
+        setIsTextSelected(false); // Close formatting toolbar if open
     } else if (slashPopoverOpen && slashTriggeredRef.current) {
-        const textAroundCursor = value.substring(selectionRef.current?.start ?? 0, cursorPos);
-        if (!textAroundCursor.startsWith('/')) {
-            setSlashPopoverOpen(false);
-            slashTriggeredRef.current = false;
+        const textAfterSlashStart = value.substring(selectionRef.current?.start ?? 0);
+        // Close if space/newline typed immediately after slash or text no longer starts with /
+        if (charJustTyped === ' ' || charJustTyped === '\n' || !textAfterSlashStart.startsWith('/')) {
+             setSlashPopoverOpen(false);
+             slashTriggeredRef.current = false;
         } else {
-            calculateAndSetPopoverPosition(textarea, selectionRef.current?.start ?? 0);
+             // Update position if still typing command name
+             calculateAndSetPopoverPosition(textarea, selectionRef.current?.start ?? 0);
         }
     } else if (charJustTyped !== '/') {
+        // Close if cursor moves before the slash command start position
         const currentSelection = textarea.selectionStart === textarea.selectionEnd ? { start: textarea.selectionStart, end: textarea.selectionEnd } : null;
         if (slashPopoverOpen && (!selectionRef.current || (currentSelection && currentSelection.start <= selectionRef.current.start))) {
              setSlashPopoverOpen(false);
@@ -191,21 +206,34 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
     }
   };
 
+
   React.useEffect(() => {
     const textarea = contentRef.current;
     if (!textarea) return;
-    const resizeObserver = new ResizeObserver(() => {
-      adjustTextareaHeight(textarea);
-    });
+
+    const adjustHeight = () => adjustTextareaHeight(textarea);
+
+    // Initial adjustment
+    adjustHeight();
+
+    // Adjust on resize
+    const resizeObserver = new ResizeObserver(adjustHeight);
     resizeObserver.observe(textarea);
-    adjustTextareaHeight(textarea);
-    return () => resizeObserver.disconnect();
-  }, [noteContent]);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []); // Re-run only on mount/unmount
+
 
   const adjustTextareaHeight = (textarea: HTMLTextAreaElement | null) => {
     if (textarea) {
-      textarea.style.height = 'auto';
-      textarea.style.height = `${textarea.scrollHeight}px`;
+       // Temporarily reduce height to allow shrinking
+       textarea.style.height = 'auto';
+       // Set height based on scroll height
+       textarea.style.height = `${textarea.scrollHeight}px`;
+       // Ensure parent/main can scroll if needed
+       textarea.style.overflowY = 'hidden'; // Prevent internal scrollbar
     }
   };
 
@@ -278,32 +306,39 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
                const hasSelection = start !== end;
 
                if (hasSelection) {
+                    // Only show formatting toolbar if slash command is not active
                    if (!slashPopoverOpen) {
                        selectionRef.current = { start, end };
                        calculateAndSetToolbarPosition(textarea, start);
                        setIsTextSelected(true);
                    } else {
-                       setIsTextSelected(false);
+                       setIsTextSelected(false); // Hide if slash command popover is open
                    }
                } else {
-                    setIsTextSelected(false);
+                    setIsTextSelected(false); // Hide toolbar if no selection
+                    // Keep selectionRef if slash popover is open for command insertion logic
                     if (!slashPopoverOpen || !slashTriggeredRef.current) {
                         selectionRef.current = null;
                     }
                }
            } else {
+                // Handle blur or focus loss from textarea
                 const activeEl = document.activeElement;
                 const isFocusInsideToolbar = formattingToolbarRef.current?.contains(activeEl);
                 const isFocusInsideSlashPopover = document.querySelector('[data-radix-popover-content][data-popover-type="slash"]')?.contains(activeEl);
-                 const isFocusInsideAiPopover = document.querySelector('[data-radix-popover-content][data-popover-type="ai"]')?.contains(activeEl);
+                const isFocusInsideAiPopover = document.querySelector('[data-radix-popover-content][data-popover-type="ai"]')?.contains(activeEl);
 
-                if (!isFocusInsideToolbar) setIsTextSelected(false);
+                if (!isFocusInsideToolbar) setIsTextSelected(false); // Hide toolbar if focus lost, unless focus is inside toolbar itself
+
+                // Close popovers if focus moves outside them
                 if (!isFocusInsideSlashPopover && slashPopoverOpen) {
                     setSlashPopoverOpen(false);
                     slashTriggeredRef.current = false;
                  }
                  if (!isFocusInsideAiPopover && aiPopoverOpen) setAiPopoverOpen(false);
-                if (!slashPopoverOpen && !aiPopoverOpen && !isFocusInsideToolbar) {
+
+                // Clear selection ref if focus is not in textarea, toolbar, or popovers
+                if (!slashPopoverOpen && !aiPopoverOpen && !isFocusInsideToolbar && document.activeElement !== contentRef.current) {
                      selectionRef.current = null;
                  }
            }
@@ -320,23 +355,29 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
         measureDiv.style.padding = window.getComputedStyle(textarea).padding;
         measureDiv.style.border = window.getComputedStyle(textarea).border;
         measureDiv.style.font = window.getComputedStyle(textarea).font;
-        measureDiv.style.width = `${textarea.clientWidth}px`;
-        measureDiv.style.boxSizing = 'border-box';
+        measureDiv.style.width = `${textarea.clientWidth}px`; // Use clientWidth
+        measureDiv.style.boxSizing = 'border-box'; // Important for accuracy
+        measureDiv.style.lineHeight = window.getComputedStyle(textarea).lineHeight;
+        measureDiv.style.letterSpacing = window.getComputedStyle(textarea).letterSpacing;
+
 
         const textBefore = textarea.value.substring(0, position);
-        const textAfter = textarea.value.substring(position);
-        measureDiv.textContent = textBefore;
+        // Use a zero-width space or similar invisible char for measurement span
         const cursorSpan = document.createElement('span');
-        cursorSpan.textContent = '|';
+        cursorSpan.textContent = '\u200B'; // Zero-width space
+        measureDiv.textContent = textBefore;
         measureDiv.appendChild(cursorSpan);
-        measureDiv.appendChild(document.createTextNode(textAfter));
+        measureDiv.appendChild(document.createTextNode(textarea.value.substring(position)));
+
         document.body.appendChild(measureDiv);
 
-        const cursorRect = cursorSpan.getBoundingClientRect();
+        // Use span's offsetLeft/offsetTop relative to the measureDiv
+        const spanRect = cursorSpan.getBoundingClientRect();
         const textareaRect = textarea.getBoundingClientRect();
 
-        const top = cursorRect.top - textareaRect.top + textarea.scrollTop;
-        const left = cursorRect.left - textareaRect.left + textarea.scrollLeft + 5;
+        // Adjust for scroll position within the textarea
+        const top = spanRect.top - textareaRect.top + textarea.scrollTop;
+        const left = spanRect.left - textareaRect.left + textarea.scrollLeft + 5; // Small horizontal offset
 
         document.body.removeChild(measureDiv);
 
@@ -346,10 +387,12 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
             popoverAnchorRef.current.style.left = `${left}px`;
             popoverAnchorRef.current.style.width = '1px';
             popoverAnchorRef.current.style.height = '1px';
+            popoverAnchorRef.current.style.pointerEvents = 'none'; // Ensure it doesn't block clicks
         }
    };
 
    const calculateAndSetToolbarPosition = (textarea: HTMLTextAreaElement, position: number) => {
+        // Similar measurement logic as popover, but position toolbar above selection
         const measureDiv = document.createElement('div');
         measureDiv.style.position = 'absolute';
         measureDiv.style.visibility = 'hidden';
@@ -361,10 +404,11 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
         measureDiv.style.font = window.getComputedStyle(textarea).font;
         measureDiv.style.width = `${textarea.clientWidth}px`;
         measureDiv.style.boxSizing = 'border-box';
+        measureDiv.style.lineHeight = window.getComputedStyle(textarea).lineHeight;
 
         const textBefore = textarea.value.substring(0, position);
         const selectionSpan = document.createElement('span');
-        selectionSpan.textContent = '|';
+        selectionSpan.textContent = '\u200B'; // Zero-width space
         measureDiv.textContent = textBefore;
         measureDiv.appendChild(selectionSpan);
         measureDiv.appendChild(document.createTextNode(textarea.value.substring(position)));
@@ -372,21 +416,28 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
 
         const spanRect = selectionSpan.getBoundingClientRect();
         const textareaRect = textarea.getBoundingClientRect();
-        const top = spanRect.top - textareaRect.top + textarea.scrollTop - 45;
-        const left = spanRect.left - textareaRect.left + textarea.scrollLeft + textarea.clientWidth / 2;
+
+        // Position toolbar slightly above the start of the selection
+        const top = spanRect.top - textareaRect.top + textarea.scrollTop - 45; // Adjust vertical offset as needed
+        // Center horizontally relative to the start of the selection or textarea width
+        const left = spanRect.left - textareaRect.left + textarea.scrollLeft;
 
         document.body.removeChild(measureDiv);
 
         if (formattingToolbarRef.current) {
             formattingToolbarRef.current.style.position = 'absolute';
-            formattingToolbarRef.current.style.top = `${Math.max(textarea.offsetTop, top)}px`;
-            formattingToolbarRef.current.style.left = `${left}px`;
-            formattingToolbarRef.current.style.transform = 'translateX(-50%)';
+             // Clamp top position to be within textarea bounds
+             formattingToolbarRef.current.style.top = `${Math.max(textarea.offsetTop, top)}px`;
+             // Center the toolbar horizontally over the selection start (or middle of textarea if needed)
+            formattingToolbarRef.current.style.left = `${left + 10}px`; // Adjust horizontal position
+            formattingToolbarRef.current.style.transform = 'translateX(0)'; // Reset transform if not centering exactly
             formattingToolbarRef.current.style.zIndex = '50';
         }
    };
 
+
   const handleBlur = (event: React.FocusEvent<HTMLTextAreaElement>) => {
+      // Delay hiding to allow clicks on popover/toolbar
       setTimeout(() => {
           const activeEl = document.activeElement;
           const isFocusInsideToolbar = formattingToolbarRef.current?.contains(activeEl);
@@ -394,7 +445,7 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
            const isFocusInsideAiPopover = document.querySelector('[data-radix-popover-content][data-popover-type="ai"]')?.contains(activeEl);
 
           if (!isFocusInsideToolbar) {
-              setIsTextSelected(false);
+              setIsTextSelected(false); // Hide toolbar if focus is lost (and not in toolbar)
           }
           if (!isFocusInsideSlashPopover && slashPopoverOpen) {
                 setSlashPopoverOpen(false);
@@ -403,10 +454,9 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
            if (!isFocusInsideAiPopover && aiPopoverOpen) {
                setAiPopoverOpen(false);
            }
-          if (!isFocusInsideToolbar && !isFocusInsideSlashPopover && !isFocusInsideAiPopover) {
-               selectionRef.current = null;
-           }
-      }, 150);
+          // Don't clear selectionRef here immediately on blur, it might be needed by popovers/toolbar
+          // Clear it only when truly moving away or deselecting text (handled in handleSelectionChange)
+      }, 150); // Adjust delay if needed
   };
 
    React.useEffect(() => {
@@ -415,15 +465,15 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
             if (slashPopoverOpen) {
              setSlashPopoverOpen(false);
              slashTriggeredRef.current = false;
-             selectionRef.current = null;
+             selectionRef.current = null; // Clear selection ref on escape
              event.preventDefault();
             } else if (aiPopoverOpen) {
               setAiPopoverOpen(false);
               event.preventDefault();
             } else if (isTextSelected) {
                 setIsTextSelected(false);
-                selectionRef.current = null;
-                if (contentRef.current) contentRef.current.blur();
+                selectionRef.current = null; // Clear selection ref
+                if (contentRef.current) contentRef.current.blur(); // Optionally blur textarea
                 event.preventDefault();
             }
        }
@@ -432,9 +482,6 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
      return () => document.removeEventListener('keydown', handleKeyDown);
    }, [slashPopoverOpen, aiPopoverOpen, isTextSelected]);
 
-  React.useEffect(() => {
-    adjustTextareaHeight(contentRef.current);
-  }, []);
 
   const currentNoteData = currentNoteId ? sampleNotes.find(n => n.id === currentNoteId) : null;
   const wikipediaLink = "https://en.wikipedia.org/wiki/Jeff_Bezos"; // Example link
@@ -445,11 +492,16 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
       <Sidebar />
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header />
-        {/* Main Content Area - Adjusted for standard layout */}
-        <main className="flex-1 overflow-y-auto p-6 md:p-8 lg:p-10 relative bg-background">
+        {/* Main Content Area - Allow overflow for page scroll */}
+        <motion.main
+          className="flex-1 overflow-y-auto p-6 md:p-8 lg:p-10 relative bg-background"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
            <div className="max-w-3xl mx-auto">
                {/* Back Button */}
-               <Button variant="ghost" className="text-muted-foreground hover:text-foreground mb-4 px-0 h-auto">
+               <Button variant="ghost" className="text-muted-foreground hover:text-foreground mb-4 px-0 h-auto hover:scale-110 active:scale-95">
                   <ArrowLeft className="w-4 h-4 mr-1.5" />
                   Back to notes {/* Or dynamic based on context */}
                </Button>
@@ -465,7 +517,6 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
                 onInput={(e) => adjustTextareaHeight(e.target as HTMLTextAreaElement)}
                 className="text-3xl md:text-4xl font-bold border-none focus-visible:ring-0 shadow-none p-0 resize-none bg-transparent overflow-hidden h-auto leading-tight focus:outline-none mb-6 w-full block"
                 rows={1}
-                style={{ height: 'auto' }}
               />
 
               {/* Metadata and AI Trigger */}
@@ -477,13 +528,13 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
                     <div className="flex items-center"><LinkIcon className="w-4 h-4 mr-3 text-muted-foreground"/><span className="w-20 text-muted-foreground">URL</span>{currentNoteData?.url ? <a href={currentNoteData.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline truncate dark:text-blue-400">{currentNoteData.url}</a> : <span>-</span>}</div>
                     <div className="flex items-center"><List className="w-4 h-4 mr-3 text-muted-foreground"/><span className="w-20 text-muted-foreground">Name</span><span>{noteTitle || 'Untitled'}</span></div>
                     <div className="flex items-center"><Type className="w-4 h-4 mr-3 text-muted-foreground"/><span className="w-20 text-muted-foreground">Type</span><span>{currentNoteData?.type || 'Note'}</span></div>
-                    <Button variant="ghost" className="text-muted-foreground hover:text-foreground px-0 h-auto -ml-1"><Plus className="w-4 h-4 mr-1.5"/> Add property</Button>
+                    <Button variant="ghost" className="text-muted-foreground hover:text-foreground px-0 h-auto -ml-1 hover:scale-110 active:scale-95"><Plus className="w-4 h-4 mr-1.5"/> Add property</Button>
                  </div>
 
                   {/* AI Action Popover Trigger */}
                    <Popover open={aiPopoverOpen} onOpenChange={setAiPopoverOpen}>
                         <PopoverTrigger asChild>
-                             <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary rounded-full hover:bg-primary/10">
+                             <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary rounded-full hover:bg-primary/10 hover:scale-110 active:scale-95">
                                  <Wand2 className="w-5 h-5" />
                                  <span className="sr-only">AI Actions</span>
                              </Button>
@@ -502,7 +553,7 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
                                         variant="ghost"
                                         className="w-full justify-start h-8 px-2 text-sm font-normal hover:bg-muted dark:hover:bg-muted/50"
                                         onClick={() => handleAiAction(action.action)}
-                                        onMouseDown={(e) => e.preventDefault()}
+                                        onMouseDown={(e) => e.preventDefault()} // Prevent focus shift that closes popover
                                     >
                                         <action.icon className="w-4 h-4 mr-2 text-muted-foreground" />
                                         <span>{action.name}</span>
@@ -515,40 +566,46 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
 
               <Separator className="mb-8" />
 
-              {/* Floating Formatting Toolbar */}
-               <div
-                    ref={formattingToolbarRef}
-                    style={{
-                         opacity: isTextSelected ? 1 : 0,
-                         pointerEvents: isTextSelected ? 'auto' : 'none',
-                    }}
-                    className={cn(
-                         "absolute z-50 bg-background/80 dark:bg-zinc-800/80 backdrop-blur-sm py-1 px-1 rounded-md border border-border/30 shadow-lg transition-opacity duration-200",
-                    )}>
-                    <div className="flex items-center gap-0.5 p-0 rounded-md w-min">
-                       <Button variant="ghost" size="icon" className="h-7 w-7 hover:scale-105 active:scale-95"><Bold className="w-4 h-4" /></Button>
-                       <Button variant="ghost" size="icon" className="h-7 w-7 hover:scale-105 active:scale-95"><Italic className="w-4 h-4" /></Button>
-                       <Button variant="ghost" size="icon" className="h-7 w-7 hover:scale-105 active:scale-95"><Underline className="w-4 h-4" /></Button>
-                       <Button variant="ghost" size="icon" className="h-7 w-7 hover:scale-105 active:scale-95"><Strikethrough className="w-4 h-4" /></Button>
-                       <Separator orientation="vertical" className="h-5 mx-1" />
-                       <Button variant="ghost" size="icon" className="h-7 w-7 hover:scale-105 active:scale-95"><Highlighter className="w-4 h-4" /></Button>
-                       <Button variant="ghost" size="icon" className="h-7 w-7 hover:scale-105 active:scale-95"><LinkIcon className="w-4 h-4" /></Button>
-                       <Separator orientation="vertical" className="h-5 mx-1" />
-                       <Button variant="ghost" size="icon" className="h-7 w-7 hover:scale-105 active:scale-95" onClick={handleInsertImage} title="Insert Image">
-                         <ImageIcon className="w-4 h-4" />
-                         <span className="sr-only">Insert Image</span>
-                       </Button>
-                       <Button variant="ghost" size="icon" className="h-7 w-7 hover:scale-105 active:scale-95" onClick={handleInsertVideo} title="Insert Video">
-                         <Video className="w-4 h-4" />
-                         <span className="sr-only">Insert Video</span>
-                       </Button>
-                    </div>
-                 </div>
+              {/* Floating Formatting Toolbar - uses AnimatePresence */}
+               <AnimatePresence>
+                {isTextSelected && (
+                   <motion.div
+                        ref={formattingToolbarRef}
+                        initial={{ opacity: 0, y: 5, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 5, scale: 0.95 }}
+                        transition={{ duration: 0.15, ease: "easeOut" }}
+                        className={cn(
+                             "absolute z-50 bg-background/80 dark:bg-zinc-800/80 backdrop-blur-sm py-1 px-1 rounded-md border border-border/30 shadow-lg",
+                        )}>
+                        <div className="flex items-center gap-0.5 p-0 rounded-md w-min">
+                           <Button variant="ghost" size="icon" className="h-7 w-7 hover:scale-105 active:scale-95"><Bold className="w-4 h-4" /></Button>
+                           <Button variant="ghost" size="icon" className="h-7 w-7 hover:scale-105 active:scale-95"><Italic className="w-4 h-4" /></Button>
+                           <Button variant="ghost" size="icon" className="h-7 w-7 hover:scale-105 active:scale-95"><Underline className="w-4 h-4" /></Button>
+                           <Button variant="ghost" size="icon" className="h-7 w-7 hover:scale-105 active:scale-95"><Strikethrough className="w-4 h-4" /></Button>
+                           <Separator orientation="vertical" className="h-5 mx-1" />
+                           <Button variant="ghost" size="icon" className="h-7 w-7 hover:scale-105 active:scale-95"><Highlighter className="w-4 h-4" /></Button>
+                           <Button variant="ghost" size="icon" className="h-7 w-7 hover:scale-105 active:scale-95"><LinkIcon className="w-4 h-4" /></Button>
+                           <Separator orientation="vertical" className="h-5 mx-1" />
+                           <Button variant="ghost" size="icon" className="h-7 w-7 hover:scale-105 active:scale-95" onClick={handleInsertImage} title="Insert Image">
+                             <ImageIcon className="w-4 h-4" />
+                             <span className="sr-only">Insert Image</span>
+                           </Button>
+                           <Button variant="ghost" size="icon" className="h-7 w-7 hover:scale-105 active:scale-95" onClick={handleInsertVideo} title="Insert Video">
+                             <Video className="w-4 h-4" />
+                             <span className="sr-only">Insert Video</span>
+                           </Button>
+                        </div>
+                     </motion.div>
+                )}
+               </AnimatePresence>
 
                {/* Main Content Textarea with Slash Command Popover */}
                 <div className="relative w-full">
+                 {/* Invisible div used as the anchor for the popover */}
                  <div ref={popoverAnchorRef} className="absolute w-0 h-0"/>
                  <Popover open={slashPopoverOpen} onOpenChange={setSlashPopoverOpen}>
+                    {/* Anchor the popover to the invisible div */}
                     <PopoverAnchor asChild>
                         <div/>
                     </PopoverAnchor>
@@ -557,36 +614,46 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
                       placeholder="Start writing your note... Type '/' for commands."
                       value={noteContent}
                       onChange={handleContentChange}
-                      onSelect={handleSelectionChange}
-                      onBlur={handleBlur}
+                      onSelect={handleSelectionChange} // Use onSelect to detect selection changes
+                      onMouseDown={handleSelectionChange} // Also check on mouse down
+                      onKeyDown={handleSelectionChange} // Check after key presses too
+                      onBlur={handleBlur} // Handle losing focus
                       onClick={(e) => {
+                         // Close slash popover if clicking outside the potential command area
                          if (slashPopoverOpen && slashTriggeredRef.current && e.target === contentRef.current) {
                              const cursorPos = contentRef.current?.selectionStart ?? 0;
-                             if(selectionRef.current && cursorPos > selectionRef.current.start && contentRef.current?.value.substring(selectionRef.current.start, cursorPos).startsWith('/')){
-                                // Clicked within command, keep open
-                             } else {
+                             if(!(selectionRef.current && cursorPos > selectionRef.current.start && contentRef.current?.value.substring(selectionRef.current.start, cursorPos).startsWith('/'))) {
                                 setSlashPopoverOpen(false);
                                 slashTriggeredRef.current = false;
                              }
                          }
                       }}
                        className="text-base border-none focus-visible:ring-0 shadow-none p-0 resize-none bg-transparent w-full leading-relaxed focus:outline-none min-h-[300px] block"
-                       style={{ height: 'auto' }}
+                       style={{ height: 'auto', overflowY: 'hidden' }} // Ensure textarea grows and page scrolls
                     />
                    <PopoverContent
                         className="w-60 p-1 bg-background dark:bg-zinc-800 border border-border shadow-lg rounded-lg"
                         side="bottom"
                         align="start"
                         sideOffset={10}
-                        onOpenAutoFocus={(e) => e.preventDefault()}
+                        onOpenAutoFocus={(e) => e.preventDefault()} // Prevent focus stealing
                         onInteractOutside={(e) => {
+                             // Allow interaction with toolbar without closing popover
+                             if (formattingToolbarRef.current?.contains(e.target as Node)) {
+                                 return;
+                             }
+                             // Allow interaction with AI popover trigger/content
+                              if ((e.target as HTMLElement)?.closest('[data-radix-popover-trigger]') || (e.target as HTMLElement)?.closest('[data-popover-type="ai"]')) {
+                                 return;
+                              }
+                             // Close if interacting outside textarea and popover content itself
                              if (e.target !== contentRef.current) {
                                 setSlashPopoverOpen(false);
                                 slashTriggeredRef.current = false;
                             }
                         }}
                          data-popover-type="slash"
-                         style={{ zIndex: 60 }}
+                         style={{ zIndex: 60 }} // Ensure popover is above toolbar
                    >
                      <div className="text-xs text-muted-foreground px-2 py-1">Blocks</div>
                      <div className="flex flex-col space-y-0.5">
@@ -596,10 +663,10 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
                            variant="ghost"
                            className="w-full justify-start h-8 px-2 text-sm font-normal hover:bg-muted dark:hover:bg-muted/50"
                            onClick={() => handleSelectSlashCommand(cmd.name)}
-                            onMouseDown={(e) => e.preventDefault()}
+                            onMouseDown={(e) => e.preventDefault()} // Prevent focus shift
                          >
                             {typeof cmd.icon === 'function' ? (
-                              React.createElement(cmd.icon, { className: "w-4 h-4 mr-2 text-muted-foreground" })
+                              React.createElement(cmd.icon) // Render custom icon component
                             ) : (
                               <cmd.icon className="w-4 h-4 mr-2 text-muted-foreground" />
                             )}
@@ -629,7 +696,7 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
                   </div>
                )}
             </div> {/* End max-w-3xl */}
-        </main>
+        </motion.main>
       </div>
     </div>
   );

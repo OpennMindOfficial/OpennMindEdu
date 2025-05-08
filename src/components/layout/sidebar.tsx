@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -38,13 +39,14 @@ import {
   BookOpenCheck,
   Target,
   Send,
+  type LucideIcon, // Import LucideIcon type
 } from 'lucide-react';
 import * as React from 'react';
 import { motion } from 'framer-motion';
 
 interface NavItemProps {
   href: string;
-  icon: React.ElementType;
+  icon: LucideIcon; // Use LucideIcon type directly
   label: string;
   badgeCount?: number;
   secondaryText?: string;
@@ -72,29 +74,22 @@ function NavItem({
           'relative flex items-center justify-between text-sm font-medium transition-colors h-9 px-3 rounded-md group',
           isSubItem ? 'pl-9' : '',
           isActive
-            ? 'text-foreground'
-            : 'text-muted-foreground hover:text-foreground',
+            ? 'text-foreground bg-muted dark:bg-muted/50' // Keep bg for active item
+            : 'text-muted-foreground hover:text-foreground hover:bg-muted/50 dark:hover:bg-muted/30', // Add hover bg
         )}
         onHoverStart={() => setIsHovered(true)}
         onHoverEnd={() => setIsHovered(false)}
+        whileHover={{ x: 2 }} // Slight horizontal shift on hover
+        transition={{ type: 'spring', stiffness: 400, damping: 15 }}
       >
-        {(isHovered || isActive) && (
-            <motion.span
-                layoutId="sidebarHighlight"
-                className="absolute inset-0 z-0 rounded-md bg-muted dark:bg-muted/50"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.15 }}
-            />
-        )}
+         {/* Motion span removed, bg handled by className */}
         <div className="relative z-10 flex items-center overflow-hidden flex-grow">
              <motion.div
                 whileHover={{ scale: 1.1, rotate: -5 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 15 }}
                 className="flex-shrink-0 mr-3"
              >
-                <Icon className={cn("h-4 w-4", isActive ? "text-foreground" : "")} />
+                <Icon className={cn("h-4 w-4", isActive ? "text-primary" : "")} /> {/* Active icon color */}
              </motion.div>
             <span className="truncate">{label}</span>
             {isDropdown && <ChevronDown className="h-4 w-4 ml-1 text-muted-foreground" />}
@@ -124,12 +119,17 @@ interface NavSectionProps {
 
 function NavSection({ title, children }: NavSectionProps) {
   return (
-    <div className="px-3 py-2">
+    <motion.div
+       className="px-3 py-2"
+       initial={{ opacity: 0, y: 10 }}
+       animate={{ opacity: 1, y: 0 }}
+       transition={{ delay: 0.1 }} // Stagger sections slightly
+     >
       <h2 className="mb-2 px-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
         {title}
       </h2>
       <div className="grid items-start gap-0.5">{children}</div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -150,7 +150,7 @@ export function Sidebar() {
         { href: '/ask-doubt', icon: Lightbulb, label: 'Ask Doubt'}, // Corrected link
         { href: '/notes', icon: BookOpen, label: 'Notes'},
         { href: '/mock-exams', icon: PlusCircle, label: 'Mock Exams'},
-        { href: '/timed-exams', icon: Clock, label: 'Timed Exams'},
+        { href: '/timed-exams', icon: Clock, label: 'Timed Exams'}, // Added timed exams
         { href: '/questionbank', icon: HelpCircle, label: 'Questionbank'},
         { href: '/study-plan', icon: CalendarCheck, label: 'Study Plan'},
         { href: '/performance-tracking', icon: TrendingUp, label: 'Performance Tracking'},
@@ -166,16 +166,20 @@ export function Sidebar() {
     ];
 
   return (
-    <aside className="hidden md:flex flex-col w-64 border-r bg-card shrink-0 h-screen">
+    <motion.aside
+      className="hidden md:flex flex-col w-64 border-r bg-card shrink-0 h-screen"
+      initial={{ x: -256, opacity: 0 }} // Start off-screen left
+      animate={{ x: 0, opacity: 1 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+    >
         <div className="flex items-center justify-between h-16 px-3 border-b">
             <Dialog open={isPopupOpen} onOpenChange={setIsPopupOpen}>
               <DialogTrigger asChild>
                  <Button
                      variant="outline"
                      className={cn(
-                         "w-full justify-between border-muted-foreground/30 h-9 text-sm font-normal text-foreground px-3",
-                         "hover:bg-muted/50",
-                         "hover:scale-100 active:scale-100"
+                         "w-full justify-between border-muted-foreground/30 h-9 text-sm font-normal text-foreground px-3 hover:bg-muted/50 dark:hover:bg-muted/30",
+                         "hover:scale-100 active:scale-100" // Keep standard scale behavior
                      )}
                  >
                      <div className="flex items-center gap-2">
@@ -243,15 +247,27 @@ export function Sidebar() {
 
         <ScrollArea className="flex-1 py-4">
              <NavSection title="Study Tools">
-                  {opennMindItems.map((item) => (
-                    <NavItem key={item.href} {...item} isActive={pathname === item.href} />
+                  {opennMindItems.map((item, index) => (
+                     <motion.div
+                        key={item.href}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.1 + index * 0.03 }} // Stagger individual items
+                      >
+                       <NavItem {...item} isActive={pathname === item.href} />
+                     </motion.div>
                   ))}
              </NavSection>
         </ScrollArea>
 
-        <div className="mt-auto p-3 border-t">
+        <motion.div
+          className="mt-auto p-3 border-t"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 + opennMindItems.length * 0.03 }} // Delay based on items above
+        >
             <NavItem href="/settings" icon={Settings} label="Account settings" isActive={pathname === '/settings'} />
-        </div>
-    </aside>
+        </motion.div>
+    </motion.aside>
   );
 }

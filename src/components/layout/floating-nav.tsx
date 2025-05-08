@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState } from 'react';
@@ -121,8 +122,8 @@ export const FloatingNav = ({ className }: { className?: string }) => {
       <AnimatePresence mode="wait">
         <motion.div
           initial={{
-            opacity: 1,
-            y: 0, // Start in view
+            opacity: 0,
+            y: -100, // Start above the view
           }}
           animate={{
             y: visible ? 0 : -100,
@@ -130,6 +131,7 @@ export const FloatingNav = ({ className }: { className?: string }) => {
           }}
           transition={{
             duration: 0.2,
+            ease: "easeInOut", // Smooth easing
           }}
           className={cn(
             'flex max-w-fit fixed top-4 inset-x-0 mx-auto border border-border rounded-lg bg-card/80 backdrop-blur-sm shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)] z-50 px-4 py-2 items-center justify-center space-x-4',
@@ -149,7 +151,9 @@ export const FloatingNav = ({ className }: { className?: string }) => {
                   <TooltipTrigger asChild>
                     {/* Use Link only if it's not a dropdown trigger */}
                     {navItem.subItems ? (
-                      <button
+                      <motion.button // Add motion to button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
                         className={cn(
                           'relative dark:text-neutral-50 items-center flex space-x-1 text-foreground hover:text-primary transition-colors px-3 py-1.5 rounded-lg' // Adjusted padding and rounding
                         )}
@@ -158,19 +162,24 @@ export const FloatingNav = ({ className }: { className?: string }) => {
                         <span className="hidden sm:block text-sm font-medium">
                           {navItem.name}
                         </span>
-                      </button>
+                      </motion.button>
                     ) : (
-                      <Link
-                        href={navItem.link}
-                        className={cn(
-                          'relative dark:text-neutral-50 items-center flex space-x-1 text-foreground hover:text-primary transition-colors px-3 py-1.5 rounded-lg' // Adjusted padding and rounding
-                        )}
+                      <motion.div // Wrap Link for motion properties
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
                       >
-                        <navItem.icon className="h-5 w-5" />
-                        <span className="hidden sm:block text-sm font-medium">
-                          {navItem.name}
-                        </span>
-                      </Link>
+                        <Link
+                          href={navItem.link}
+                          className={cn(
+                            'relative dark:text-neutral-50 items-center flex space-x-1 text-foreground hover:text-primary transition-colors px-3 py-1.5 rounded-lg' // Adjusted padding and rounding
+                          )}
+                        >
+                          <navItem.icon className="h-5 w-5" />
+                          <span className="hidden sm:block text-sm font-medium">
+                            {navItem.name}
+                          </span>
+                        </Link>
+                      </motion.div>
                     )}
                   </TooltipTrigger>
                   <TooltipContent>
@@ -220,26 +229,32 @@ export const FloatingNav = ({ className }: { className?: string }) => {
       </AnimatePresence>
 
        {/* Render Tool Windows */}
-       {Object.entries(openTools).map(([toolId, isOpen]) => {
-         const ToolComponent = toolComponents[toolId];
-         const toolData = navItems.flatMap(n => n.subItems || []).find(s => s.toolId === toolId);
-         if (isOpen && ToolComponent && toolData) {
-           return (
-             <ToolWindow
-               key={toolId}
-               title={toolData.name}
-               isOpen={isOpen}
-               onClose={() => handleCloseTool(toolId)}
-               // Optional: Pass initial position/size
-               // initialX={100 + (Object.keys(openTools).indexOf(toolId) * 50)} // Stagger windows
-               // initialY={100 + (Object.keys(openTools).indexOf(toolId) * 50)}
-             >
-               <ToolComponent />
-             </ToolWindow>
-           );
-         }
-         return null;
-       })}
+       <AnimatePresence>
+         {Object.entries(openTools).map(([toolId, isOpen]) => {
+           const ToolComponent = toolComponents[toolId];
+           const toolData = navItems.flatMap(n => n.subItems || []).find(s => s.toolId === toolId);
+           if (isOpen && ToolComponent && toolData) {
+             return (
+               <motion.div
+                 key={toolId}
+                 initial={{ opacity: 0, scale: 0.8 }}
+                 animate={{ opacity: 1, scale: 1 }}
+                 exit={{ opacity: 0, scale: 0.8 }}
+                 transition={{ duration: 0.2 }}
+               >
+                 <ToolWindow
+                   title={toolData.name}
+                   isOpen={isOpen}
+                   onClose={() => handleCloseTool(toolId)}
+                 >
+                   <ToolComponent />
+                 </ToolWindow>
+               </motion.div>
+             );
+           }
+           return null;
+         })}
+       </AnimatePresence>
     </>
   );
 };

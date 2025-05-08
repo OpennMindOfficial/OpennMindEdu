@@ -1,13 +1,21 @@
+
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Bell, CircleHelp, Settings, Zap, ShieldQuestion, GraduationCap, Bug } from "lucide-react";
+import { Search, Bell, CircleHelp, Settings, GraduationCap, Bug } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import Link from "next/link";
 import { SparkleButton } from '@/components/common/sparkle-button'; // Import the new SparkleButton
+import { ShieldQuestion } from 'lucide-react'; // Ensure ShieldQuestion is imported
+import { motion } from 'framer-motion'; // Import motion
 
 export function Header() {
   return (
-    <header className="flex items-center justify-between h-16 px-6 border-b bg-card shrink-0">
+    <motion.header
+      className="flex items-center justify-between h-16 px-6 border-b bg-card shrink-0"
+      initial={{ y: -64, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+    >
       <div className="flex items-center gap-4">
          {/* Logo Section */}
          <div className="flex items-center gap-2 font-bold text-lg text-foreground">
@@ -44,7 +52,7 @@ export function Header() {
           <span className="sr-only">Help</span>
         </Button>
 
-        {/* Upgrade Button - Replaced with SparkleButton */}
+        {/* Upgrade Button - Using SparkleButton */}
         <SparkleButton className="px-4"> {/* Use px-4 for padding */}
             Upgrade
         </SparkleButton>
@@ -66,6 +74,6 @@ export function Header() {
            </a>
         </Link>
       </div>
-    </header>
+    </motion.header>
   );
 }

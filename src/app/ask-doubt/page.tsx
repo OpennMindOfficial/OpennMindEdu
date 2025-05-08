@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -18,6 +17,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { askDoubt, type AskDoubtInput, type AskDoubtOutput } from '@/ai/flows/ask-doubt-flow'; // Import the Genkit flow
 import { checkDoubt, type CheckDoubtInput, type CheckDoubtOutput } from '@/ai/flows/ask-doubt-check-job-flow'; // Corrected import path
 import Image from 'next/image'; // Import next/image
+import { motion, AnimatePresence } from 'framer-motion'; // Import motion
 
 // Define message structure
 interface ChatMessage {
@@ -42,6 +42,11 @@ const subjects = [
   "Social Science",
   "Hindi",
 ];
+
+const messageVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
+};
 
 export default function AskDoubtPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -145,7 +150,7 @@ export default function AskDoubtPage() {
        const idMessage: ChatMessage = {
          id: Date.now().toString() + '-id',
          sender: 'ai',
-         text: `Your doubt has been submitted. Your Doubt ID is: ${assignedDoubtId}. You can use this ID to check the status later.`,
+         text: `Your Doubt ID is: ${assignedDoubtId}. You can use this ID to check the status later.`,
        };
        setMessages(prevMessages => [...prevMessages, idMessage]);
 
@@ -269,7 +274,12 @@ export default function AskDoubtPage() {
         <Header />
         <main className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 bg-transparent relative"> {/* Made main bg transparent and relative */}
            {/* Background Illustration */}
-           <div className="absolute inset-0 z-[-1] overflow-hidden opacity-20 dark:opacity-10 pointer-events-none">
+           <motion.div
+             className="absolute inset-0 z-[-1] overflow-hidden opacity-20 dark:opacity-10 pointer-events-none"
+             initial={{ opacity: 0 }}
+             animate={{ opacity: 1 }}
+             transition={{ duration: 1, delay: 0.5 }}
+           >
               {/* Large faint brain illustration or abstract pattern */}
               <Brain className="absolute -right-20 -bottom-20 w-96 h-96 text-primary/30 transform rotate-12" strokeWidth={0.5}/>
               {/* Smaller abstract shapes */}
@@ -282,195 +292,234 @@ export default function AskDoubtPage() {
                 <line x1="30" y1="30" x2="70" y2="70" stroke="currentColor" strokeOpacity="0.2" strokeWidth="1"/>
                 <line x1="70" y1="30" x2="30" y2="70" stroke="currentColor" strokeOpacity="0.2" strokeWidth="1"/>
               </svg>
-           </div>
-          <div className="flex items-center gap-3">
+           </motion.div>
+          <motion.div
+            className="flex items-center gap-3"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
              <Brain className="w-7 h-7 text-primary" />
              <h1 className="text-2xl md:text-3xl font-bold text-foreground">Ask Your Doubt</h1>
-          </div>
+          </motion.div>
 
-           {/* Doubt Status Check Section */}
-           <Card className="bg-card/80 dark:bg-card/70 border border-border/20 backdrop-blur-lg rounded-xl shadow-lg p-4 mb-6">
-             <div className="flex items-center gap-3 mb-2">
-                <FileQuestion className="w-5 h-5 text-accent" />
-               <h3 className="text-base font-semibold text-foreground">Check Doubt Status</h3>
-             </div>
-             <div className="flex items-center space-x-2">
-               <Input
-                 type="text"
-                 placeholder="Enter Doubt ID"
-                 value={doubtIdToCheck}
-                 onChange={(e) => setDoubtIdToCheck(e.target.value)}
-                 className="flex-1 rounded-lg border-input bg-background/80 dark:bg-input/80 text-sm shadow-inner h-9"
-                 disabled={isCheckingStatus}
-               />
-               <Button
-                 onClick={handleCheckStatus}
-                 disabled={isCheckingStatus || !doubtIdToCheck.trim()}
-                 className="hover:scale-110 active:scale-95 h-9"
-                 size="sm"
-               >
-                 {isCheckingStatus ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Check'}
-               </Button>
-             </div>
-           </Card>
-
-          {/* Main Chat Card */}
-          <Card className="bg-card/80 dark:bg-card/70 border border-border/20 backdrop-blur-lg rounded-xl flex flex-col h-[calc(100vh-320px)] shadow-xl overflow-hidden"> {/* Adjusted height to account for status check card */}
-            {/* Header with Subject Selector */}
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 border-b border-border/20 px-4 py-3 bg-card/90 dark:bg-card/80 sticky top-0 z-10">
-              <CardTitle className="text-base md:text-lg text-foreground font-semibold">AI Tutor Session</CardTitle>
-              <Select value={selectedSubject} onValueChange={setSelectedSubject}>
-                <SelectTrigger className="w-[180px] bg-background dark:bg-input rounded-lg shadow-sm text-sm h-9">
-                  <SelectValue placeholder="Select Subject" />
-                </SelectTrigger>
-                <SelectContent className="bg-popover border-border shadow-lg rounded-lg">
-                  {subjects.map((subject) => (
-                    <SelectItem key={subject} value={subject} className="cursor-pointer focus:bg-muted">
-                      {subject}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </CardHeader>
-
-            {/* Chat Message Area */}
-            <CardContent className="flex-1 flex flex-col p-4 overflow-hidden"> {/* Removed pt-0 */}
-              <ScrollArea ref={chatContainerRef} className="flex-1 mb-4 pr-4 -mr-4">
-                <div className="space-y-5"> {/* Increased spacing */}
-                    {messages.map((message) => (
-                      <div key={message.id} className={`flex items-start gap-3 ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                         {message.sender === 'ai' && (
-                           <Avatar className="w-8 h-8 border border-border/30 shadow-sm">
-                             {/* Placeholder AI avatar */}
-                             <AvatarImage src="/placeholder-ai.jpg" alt="AI" data-ai-hint="robot ai brain"/>
-                             <AvatarFallback className="bg-primary/20 text-primary"><Bot size={16}/></AvatarFallback>
-                           </Avatar>
-                         )}
-                         <div className={cn("rounded-xl py-2.5 px-4 max-w-[75%] md:max-w-[65%] break-words shadow-md",
-                            message.sender === 'user'
-                                ? "bg-primary text-primary-foreground rounded-br-none" // User bubble style
-                                : "bg-secondary dark:bg-muted/70 text-secondary-foreground rounded-bl-none")}> {/* AI bubble style */}
-                           {message.text && <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>}
-                           {message.image && (
-                             <div className="mt-2 rounded-lg overflow-hidden border border-border/20">
-                               <Image
-                                 src={message.image}
-                                 alt="Uploaded content"
-                                 width={200} // Set explicit width
-                                 height={150} // Set explicit height
-                                 className="max-h-48 w-auto object-contain cursor-pointer transition-transform hover:scale-105"
-                                 onClick={() => window.open(message.image, '_blank')} // Open image in new tab on click
-                                 unoptimized // If using base64 Data URI
-                               />
-                             </div>
-                           )}
-                         </div>
-                         {message.sender === 'user' && (
-                             <Avatar className="w-8 h-8 border border-border/30 shadow-sm">
-                                 {/* Placeholder User avatar */}
-                                 <AvatarImage src="/placeholder-user.jpg" alt="User" data-ai-hint="person user"/>
-                                 <AvatarFallback className="bg-muted text-muted-foreground"><User size={16}/></AvatarFallback>
-                             </Avatar>
-                         )}
-                      </div>
-                    ))}
-                     {/* Loading indicator moved inside scroll area */}
-                    {isLoading && messages[messages.length - 1]?.text === 'Thinking...' && (
-                        <div className="flex items-start gap-3 justify-start">
-                         <Avatar className="w-8 h-8 border border-border/30 shadow-sm">
-                           <AvatarImage src="/placeholder-ai.jpg" alt="AI" data-ai-hint="robot ai brain"/>
-                           <AvatarFallback className="bg-primary/20 text-primary"><Bot size={16}/></AvatarFallback>
-                         </Avatar>
-                        <div className="rounded-xl py-2.5 px-4 bg-secondary dark:bg-muted/70 text-secondary-foreground rounded-bl-none shadow-md inline-flex items-center">
-                          <span className="text-sm italic">Thinking...</span>
-                          <Loader2 className="ml-2 h-4 w-4 animate-spin text-primary" />
-                        </div>
-                      </div>
-                    )}
-                </div>
-              </ScrollArea>
-
-              {/* Input Area */}
-              <div className="flex items-end space-x-2 border-t border-border/20 pt-4 bg-card/90 dark:bg-card/80 px-4 pb-3 -mx-4 -mb-4 sticky bottom-0 z-10">
-                 {/* Hidden file input */}
-                 <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleImageUpload}
-                    accept="image/*" // Accept only images
-                    className="hidden"
+           {/* Doubt Status Check Section with animation */}
+           <motion.div
+             initial={{ opacity: 0, x: -20 }}
+             animate={{ opacity: 1, x: 0 }}
+             transition={{ duration: 0.5, delay: 0.1 }}
+           >
+             <Card className="bg-card/80 dark:bg-card/70 border border-border/20 backdrop-blur-lg rounded-xl shadow-lg p-4 mb-6">
+               <div className="flex items-center gap-3 mb-2">
+                  <FileQuestion className="w-5 h-5 text-accent" />
+                 <h3 className="text-base font-semibold text-foreground">Check Doubt Status</h3>
+               </div>
+               <div className="flex items-center space-x-2">
+                 <Input
+                   type="text"
+                   placeholder="Enter Doubt ID"
+                   value={doubtIdToCheck}
+                   onChange={(e) => setDoubtIdToCheck(e.target.value)}
+                   className="flex-1 rounded-lg border-input bg-background/80 dark:bg-input/80 text-sm shadow-inner h-9"
+                   disabled={isCheckingStatus}
                  />
-                 {/* Image Upload Button */}
                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={triggerImageUpload}
-                    className="hover:scale-110 active:scale-95 text-muted-foreground hover:text-primary"
-                    aria-label="Upload Image"
-                    disabled={isLoading || !!photo || isCheckingStatus} // Disable if photo already selected, loading or checking status
+                   onClick={handleCheckStatus}
+                   disabled={isCheckingStatus || !doubtIdToCheck.trim()}
+                   className="hover:scale-110 active:scale-95 h-9"
+                   size="sm"
                  >
-                    <ImagePlus className="h-5 w-5" />
+                   {isCheckingStatus ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Check'}
                  </Button>
-                 {/* Text Input */}
-                <Textarea
-                  placeholder="Type your doubt here, or upload an image..."
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey && !isLoading && !isCheckingStatus) { // Prevent send while loading or checking status
-                      e.preventDefault();
-                      handleSend();
-                    }
-                  }}
-                  className="flex-1 rounded-lg border-input bg-background/80 dark:bg-input/80 min-h-[40px] max-h-[120px] resize-none text-sm shadow-inner" // Added shadow-inner
-                  rows={1} // Start with 1 row
-                  disabled={isLoading || isCheckingStatus} // Disable during both loading states
-                />
-                {/* Send Button */}
-                <Button
-                  size="icon" // Changed to icon button
-                  onClick={handleSend}
-                  disabled={isLoading || isCheckingStatus || (!input.trim() && !photo) || !selectedSubject}
-                  className="hover:scale-110 active:scale-95 w-9 h-9 rounded-lg" // Made it square-ish
-                  aria-label="Send message"
-                >
-                  {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                </Button>
-              </div>
-              {/* Image Preview */}
-              {photo && (
-                  <div className="mt-2 p-1.5 border border-border/30 rounded-lg bg-muted/50 relative w-fit self-start ml-12 shadow-sm"> {/* Aligned with input */}
-                      <Image
-                        src={photo}
-                        alt="Preview"
-                        width={80} // Explicit width
-                        height={60} // Explicit height
-                        className="max-h-20 rounded object-contain" // Adjusted max-h
-                        unoptimized // If using base64 Data URI
-                       />
-                       <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => {
-                                setPhoto(null);
-                                if (fileInputRef.current) fileInputRef.current.value = ''; // Clear file input on remove
-                            }}
-                            className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-0.5 h-5 w-5 hover:bg-destructive/90 hover:scale-110"
-                            aria-label="Remove image"
-                            disabled={isLoading || isCheckingStatus} // Disable remove while loading or checking status
-                       >
-                           <X className="w-3 h-3" />
-                       </Button>
-                  </div>
-              )}
-            </CardContent> {/* Closing CardContent */}
-          </Card> {/* Closing Card */}
+               </div>
+             </Card>
+           </motion.div>
+
+          {/* Main Chat Card with animation */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <Card className="bg-card/80 dark:bg-card/70 border border-border/20 backdrop-blur-lg rounded-xl flex flex-col h-[calc(100vh-320px)] shadow-xl overflow-hidden"> {/* Adjusted height to account for status check card */}
+              {/* Header with Subject Selector */}
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 border-b border-border/20 px-4 py-3 bg-card/90 dark:bg-card/80 sticky top-0 z-10">
+                <CardTitle className="text-base md:text-lg text-foreground font-semibold">AI Tutor Session</CardTitle>
+                <Select value={selectedSubject} onValueChange={setSelectedSubject}>
+                  <SelectTrigger className="w-[180px] bg-background dark:bg-input rounded-lg shadow-sm text-sm h-9">
+                    <SelectValue placeholder="Select Subject" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover border-border shadow-lg rounded-lg">
+                    {subjects.map((subject) => (
+                      <SelectItem key={subject} value={subject} className="cursor-pointer focus:bg-muted">
+                        {subject}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </CardHeader>
+
+              {/* Chat Message Area */}
+              <CardContent className="flex-1 flex flex-col p-4 overflow-hidden"> {/* Removed pt-0 */}
+                <ScrollArea ref={chatContainerRef} className="flex-1 mb-4 pr-4 -mr-4">
+                  <AnimatePresence initial={false}>
+                    <motion.div className="space-y-5"> {/* Increased spacing */}
+                        {messages.map((message) => (
+                           <motion.div
+                              key={message.id}
+                              variants={messageVariants}
+                              initial="hidden"
+                              animate="visible"
+                              exit="hidden"
+                              layout // Added layout animation
+                              className={`flex items-start gap-3 ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                           >
+                             {message.sender === 'ai' && (
+                               <Avatar className="w-8 h-8 border border-border/30 shadow-sm">
+                                 {/* Placeholder AI avatar */}
+                                 <AvatarImage src="/placeholder-ai.jpg" alt="AI" data-ai-hint="robot ai brain"/>
+                                 <AvatarFallback className="bg-primary/20 text-primary"><Bot size={16}/></AvatarFallback>
+                               </Avatar>
+                             )}
+                             <div className={cn("rounded-xl py-2.5 px-4 max-w-[75%] md:max-w-[65%] break-words shadow-md",
+                                message.sender === 'user'
+                                    ? "bg-primary text-primary-foreground rounded-br-none" // User bubble style
+                                    : "bg-secondary dark:bg-muted/70 text-secondary-foreground rounded-bl-none")}> {/* AI bubble style */}
+                               {message.text && <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>}
+                               {message.image && (
+                                 <div className="mt-2 rounded-lg overflow-hidden border border-border/20">
+                                   <Image
+                                     src={message.image}
+                                     alt="Uploaded content"
+                                     width={200} // Set explicit width
+                                     height={150} // Set explicit height
+                                     className="max-h-48 w-auto object-contain cursor-pointer transition-transform hover:scale-105"
+                                     onClick={() => window.open(message.image, '_blank')} // Open image in new tab on click
+                                     unoptimized // If using base64 Data URI
+                                   />
+                                 </div>
+                               )}
+                             </div>
+                             {message.sender === 'user' && (
+                                 <Avatar className="w-8 h-8 border border-border/30 shadow-sm">
+                                     {/* Placeholder User avatar */}
+                                     <AvatarImage src="/placeholder-user.jpg" alt="User" data-ai-hint="person user"/>
+                                     <AvatarFallback className="bg-muted text-muted-foreground"><User size={16}/></AvatarFallback>
+                                 </Avatar>
+                             )}
+                           </motion.div>
+                        ))}
+                         {/* Loading indicator moved inside scroll area */}
+                        {isLoading && messages[messages.length - 1]?.text === 'Thinking...' && (
+                            <motion.div
+                              key="thinking-indicator"
+                              variants={messageVariants}
+                              initial="hidden"
+                              animate="visible"
+                              layout
+                              className="flex items-start gap-3 justify-start"
+                            >
+                             <Avatar className="w-8 h-8 border border-border/30 shadow-sm">
+                               <AvatarImage src="/placeholder-ai.jpg" alt="AI" data-ai-hint="robot ai brain"/>
+                               <AvatarFallback className="bg-primary/20 text-primary"><Bot size={16}/></AvatarFallback>
+                             </Avatar>
+                            <div className="rounded-xl py-2.5 px-4 bg-secondary dark:bg-muted/70 text-secondary-foreground rounded-bl-none shadow-md inline-flex items-center">
+                              <span className="text-sm italic">Thinking...</span>
+                              <Loader2 className="ml-2 h-4 w-4 animate-spin text-primary" />
+                            </div>
+                          </motion.div>
+                        )}
+                    </motion.div>
+                  </AnimatePresence>
+                </ScrollArea>
+
+                {/* Input Area */}
+                <div className="flex items-end space-x-2 border-t border-border/20 pt-4 bg-card/90 dark:bg-card/80 px-4 pb-3 -mx-4 -mb-4 sticky bottom-0 z-10">
+                   {/* Hidden file input */}
+                   <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleImageUpload}
+                      accept="image/*" // Accept only images
+                      className="hidden"
+                   />
+                   {/* Image Upload Button */}
+                   <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={triggerImageUpload}
+                      className="hover:scale-110 active:scale-95 text-muted-foreground hover:text-primary"
+                      aria-label="Upload Image"
+                      disabled={isLoading || !!photo || isCheckingStatus} // Disable if photo already selected, loading or checking status
+                   >
+                      <ImagePlus className="h-5 w-5" />
+                   </Button>
+                   {/* Text Input */}
+                  <Textarea
+                    placeholder="Type your doubt here, or upload an image..."
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey && !isLoading && !isCheckingStatus) { // Prevent send while loading or checking status
+                        e.preventDefault();
+                        handleSend();
+                      }
+                    }}
+                    className="flex-1 rounded-lg border-input bg-background/80 dark:bg-input/80 min-h-[40px] max-h-[120px] resize-none text-sm shadow-inner" // Added shadow-inner
+                    rows={1} // Start with 1 row
+                    disabled={isLoading || isCheckingStatus} // Disable during both loading states
+                  />
+                  {/* Send Button */}
+                  <Button
+                    size="icon" // Changed to icon button
+                    onClick={handleSend}
+                    disabled={isLoading || isCheckingStatus || (!input.trim() && !photo) || !selectedSubject}
+                    className="hover:scale-110 active:scale-95 w-9 h-9 rounded-lg" // Made it square-ish
+                    aria-label="Send message"
+                  >
+                    {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                  </Button>
+                </div>
+                {/* Image Preview */}
+                <AnimatePresence>
+                {photo && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0, y: 10 }}
+                      animate={{ opacity: 1, height: 'auto', y: 0 }}
+                      exit={{ opacity: 0, height: 0, y: 10 }}
+                      className="mt-2 p-1.5 border border-border/30 rounded-lg bg-muted/50 relative w-fit self-start ml-12 shadow-sm" // Aligned with input
+                    >
+                        <Image
+                          src={photo}
+                          alt="Preview"
+                          width={80} // Explicit width
+                          height={60} // Explicit height
+                          className="max-h-20 rounded object-contain" // Adjusted max-h
+                          unoptimized // If using base64 Data URI
+                         />
+                         <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => {
+                                  setPhoto(null);
+                                  if (fileInputRef.current) fileInputRef.current.value = ''; // Clear file input on remove
+                              }}
+                              className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-0.5 h-5 w-5 hover:bg-destructive/90 hover:scale-110"
+                              aria-label="Remove image"
+                              disabled={isLoading || isCheckingStatus} // Disable remove while loading or checking status
+                         >
+                             <X className="w-3 h-3" />
+                         </Button>
+                    </motion.div>
+                )}
+                </AnimatePresence>
+              </CardContent> {/* Closing CardContent */}
+            </Card> {/* Closing Card */}
+          </motion.div>
 
         </main> {/* Closing main */}
       </div> {/* Closing content wrapper div */}
     </div> // Closing main wrapper div
   ); // Closing return
 } // Closing function
-
-
 
