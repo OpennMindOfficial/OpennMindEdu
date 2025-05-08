@@ -262,7 +262,7 @@ export default function Home() {
              {greeting}, {userName}
            </motion.h1>
 
-            {/* Top Promotional Banner (Quote) with animation */}
+           {/* Top Promotional Banner (Quote) with animation */}
            <motion.div
              className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900/80 text-primary-foreground p-6 rounded-xl shadow-lg flex flex-col items-start justify-between relative overflow-hidden min-h-[120px]"
              variants={itemVariants}
@@ -280,12 +280,12 @@ export default function Home() {
                     </p>
                 )}
                {/* Optional: Add a static message if needed */}
-               {/* <p className="text-sm md:text-base mt-2">Keep pushing! &lt;3</p> */}
+               <p className="text-sm md:text-base mt-2">Keep pushing! &lt;3</p>
              </div>
            </motion.div>
 
 
-           {/* My Subjects Section with animation */}
+            {/* My Subjects Section with animation */}
            <motion.div
              className="space-y-4"
              variants={containerVariants} // Apply container variants
