@@ -1,9 +1,9 @@
+
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
-import Script from "next/script"; // Import Script component
 import { Toaster } from "@/components/ui/toaster"; // Import Toaster
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -19,13 +19,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning >
       <head>
-        {/* Desmos API Script */}
-        <Script
-            src="https://www.desmos.com/api/v1.10/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"
-            strategy="beforeInteractive" // Load before page is interactive
-        />
+        {/* Desmos API Script removed */}
       </head>
       <body
         className={cn(
@@ -39,8 +35,8 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-           {children}
-           <Toaster /> {/* Add Toaster here */}
+          {children}
+          <Toaster /> {/* Restore Toaster */}
         </ThemeProvider>
       </body>
     </html>

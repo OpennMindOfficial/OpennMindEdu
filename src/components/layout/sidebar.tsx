@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -16,12 +15,12 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"; // Import Dialog components
-import { Textarea } from "@/components/ui/textarea"; // Import Textarea
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Settings,
   Home,
-  MessageSquare,
+  MessageSquare, // Keep for potential re-use, represents chat
   FileText,
   Lightbulb,
   PlusCircle,
@@ -38,7 +37,7 @@ import {
   Layers,
   BookOpenCheck,
   Target,
-  Send, // Import Send icon
+  Send,
 } from 'lucide-react';
 import * as React from 'react';
 import { motion } from 'framer-motion';
@@ -146,23 +145,24 @@ export function Sidebar() {
       // Add logic to send the suggestion
     };
 
+    // Order based on assumed priority/frequency of use
     const opennMindItems = [
-        { href: '/chat', icon: MessageSquare, label: 'Chat With AI'},
+        { href: '/ask-doubt', icon: Lightbulb, label: 'Ask Doubt'}, // Corrected link
+        { href: '/notes', icon: BookOpen, label: 'Notes'},
         { href: '/mock-exams', icon: PlusCircle, label: 'Mock Exams'},
         { href: '/timed-exams', icon: Clock, label: 'Timed Exams'},
         { href: '/questionbank', icon: HelpCircle, label: 'Questionbank'},
-        { href: '/notes', icon: BookOpen, label: 'Notes'},
-        { href: '/ncert-explanations', icon: BookOpenCheck, label: 'NCERT Explanations'},
-        { href: '/predicted-papers', icon: FileText, label: 'Predicted Papers'},
-        { href: '/predict-grade', icon: Lightbulb, label: 'Predict Grade' },
         { href: '/study-plan', icon: CalendarCheck, label: 'Study Plan'},
         { href: '/performance-tracking', icon: TrendingUp, label: 'Performance Tracking'},
+        { href: '/ncert-explanations', icon: BookOpenCheck, label: 'NCERT Explanations'},
         { href: '/pdf-to-notes', icon: FileStack, label: 'PDF To Notes'},
         { href: '/saved', icon: Bookmark, label: 'Saved'},
+        { href: '/predicted-papers', icon: FileText, label: 'Predicted Papers'},
+        { href: '/predict-grade', icon: Lightbulb, label: 'Predict Grade' },
         { href: '/all-subjects', icon: Home, label: 'All Subjects'},
-        { href: '/fun-shun', icon: Gamepad2, label: 'Fun Shun'},
-        { href: '/extra-courses', icon: Layers, label: 'Extra Courses'},
         { href: '/exam-mode', icon: Target, label: 'Exam Mode'},
+        { href: '/extra-courses', icon: Layers, label: 'Extra Courses'},
+        { href: '/fun-shun', icon: Gamepad2, label: 'Fun Shun'},
     ];
 
   return (

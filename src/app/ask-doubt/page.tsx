@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -112,21 +113,6 @@ export default function AskDoubtPage() {
         };
         // --- End Mock AI Response ---
 
-        // Uncomment below and replace mock with actual API call
-        /*
-        const response = await callDoubtApi({
-            subject: selectedSubject,
-            doubtText: currentInput,
-            imageDataUri: currentPhoto
-        });
-        const aiMessage: ChatMessage = {
-            id: Date.now().toString() + '-ai',
-            sender: 'ai',
-            text: response.explanation,
-            image: response.diagramUrl || undefined
-        };
-        */
-
        setMessages(prevMessages => [...prevMessages, aiMessage]);
 
     } catch (error) {
@@ -158,7 +144,6 @@ export default function AskDoubtPage() {
         title: 'Invalid File Type',
         description: 'Please upload an image file (e.g., PNG, JPG).',
       });
-      // if (fileInputRef.current) fileInputRef.current.value = ''; // Avoid clearing input ref directly here
       return;
     }
 
@@ -169,7 +154,6 @@ export default function AskDoubtPage() {
     reader.onerror = () => {
         console.error("Error reading file");
         toast({ variant: 'destructive', title: 'File Read Error', description: 'Could not read the selected image.' });
-        // if (fileInputRef.current) fileInputRef.current.value = ''; // Avoid clearing input ref directly here
     }
     reader.readAsDataURL(file);
   };
@@ -306,7 +290,7 @@ export default function AskDoubtPage() {
                             size="icon"
                             onClick={() => {
                                 setPhoto(null);
-                                // if (fileInputRef.current) fileInputRef.current.value = ''; // Avoid clearing input ref directly here
+                                if (fileInputRef.current) fileInputRef.current.value = ''; // Clear file input on remove
                             }}
                             className="absolute -top-3 -right-3 bg-destructive text-destructive-foreground rounded-full p-1 h-6 w-6 hover:bg-destructive/90 hover:scale-110"
                             aria-label="Remove image"
@@ -326,7 +310,7 @@ export default function AskDoubtPage() {
 // Helper function for API call (replace with actual implementation)
 async function callDoubtApi(data: { subject: string; doubtText: string; imageDataUri: string | null }): Promise<{ explanation: string; diagramUrl?: string }> {
     console.log("Calling AI API with:", data);
-    // Replace with your actual fetch call to the Genkit flow or backend API
+    // Replace with your actual fetch call to your backend AI API
     await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate delay
 
     // Example response structure
@@ -335,3 +319,4 @@ async function callDoubtApi(data: { subject: string; doubtText: string; imageDat
         // diagramUrl: 'https://example.com/diagram.png' // Optional diagram URL
     };
 }
+
