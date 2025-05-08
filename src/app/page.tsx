@@ -93,29 +93,29 @@ const subjects = [
 ];
 
 
-// Data for Exam Cards using images
+// Data for Exam Cards using icons
 const examCards = [
-  {
+ {
     title: "Random exam",
-    imageUrl: i1,
+    icon: Dices, // Use imported icon
     bgColorClass: "bg-gradient-to-br from-blue-200/50 to-white dark:from-blue-800/30 dark:to-background",
-    textColorClass: "text-blue-800 dark:text-blue-300", // Match icon color theme
+    textColorClass: "text-blue-800 dark:text-blue-300",
     isNew: false,
     dataAiHint: "random dice",
   },
   {
     title: "Custom exam",
-    imageUrl: i2,
+    icon: SlidersHorizontal, // Use imported icon
     bgColorClass: "bg-gradient-to-br from-green-200/50 to-white dark:from-green-800/30 dark:to-background",
-    textColorClass: "text-green-800 dark:text-green-300", // Match icon color theme
+    textColorClass: "text-green-800 dark:text-green-300",
     isNew: true,
     dataAiHint: "custom settings sliders",
   },
   {
     title: "Timed exam",
-    imageUrl: i3,
+    icon: Timer, // Use imported icon
     bgColorClass: "bg-gradient-to-br from-pink-200/50 to-white dark:from-pink-800/30 dark:to-background",
-    textColorClass: "text-pink-800 dark:text-pink-300", // Match icon color theme
+    textColorClass: "text-pink-800 dark:text-pink-300",
     isNew: true,
     dataAiHint: "timed clock stopwatch",
   },
@@ -246,7 +246,7 @@ export default function Home() {
               </div>
            </div>
 
-            {/* Mock Exams Section - Moved Up */}
+            {/* Mock Exams Section */}
             <div className="space-y-4">
                <div className="flex items-center space-x-2 cursor-pointer group">
                   <PlusCircle className="w-5 h-5 text-primary" />
@@ -258,7 +258,7 @@ export default function Home() {
                     <ExamCard
                       key={index}
                       title={card.title}
-                      imageUrl={card.imageUrl} // Pass image prop
+                      icon={card.icon} // Pass icon component
                       bgColorClass={card.bgColorClass}
                       textColorClass={card.textColorClass} // Pass text color for icon
                       isNew={card.isNew}
@@ -269,7 +269,7 @@ export default function Home() {
             </div>
 
 
-           {/* My Subjects Section - Moved Down */}
+           {/* My Subjects Section */}
             <div className="space-y-4">
              <div className="flex justify-between items-center">
                <div className="flex items-center space-x-2 cursor-pointer group">
@@ -381,8 +381,3 @@ export default function Home() {
     </div>
   );
 }
-
-
-    
-
-    

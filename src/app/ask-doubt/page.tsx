@@ -11,9 +11,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Send, ImagePlus, Loader2, Bot, User, X } from "lucide-react"; // Moved X import here
+import { Send, ImagePlus, Loader2, Bot, User, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
+import { askDoubt, type AskDoubtInput, type AskDoubtOutput } from '@/ai/flows/ask-doubt-flow'; // Import the Genkit flow
 
 // Define message structure
 interface ChatMessage {
@@ -86,32 +87,27 @@ export default function AskDoubtPage() {
     setInput('');
     setPhoto(null);
     if (fileInputRef.current) {
-        fileInputRef.current.value = ''; // Clear file input visually - Keeping this one as it's after state is handled
+        fileInputRef.current.value = ''; // Clear file input visually
     }
     setIsLoading(true);
 
-    // Simulate AI response (Replace with actual API call)
     try {
-        // --- Start Mock AI Response ---
-        await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate network delay
+        // Prepare input for the Genkit flow
+        const flowInput: AskDoubtInput = {
+            subject: selectedSubject,
+            doubtText: currentInput || undefined, // Pass undefined if empty
+            imageDataUri: currentPhoto || undefined, // Pass undefined if null
+        };
 
-        let aiText = `Okay, let's tackle this ${selectedSubject} doubt.`;
-        if (currentInput) {
-            aiText += ` You asked: "${currentInput}".`;
-        }
-        if (currentPhoto) {
-            aiText += ` You also uploaded an image. I'll analyze that too.`;
-        }
-         aiText += ` \n\n(Note: This is a simulated response. In a real application, I would provide a detailed explanation based on your query and image using AI.)`;
+        // Call the Genkit flow
+        const aiResponse: AskDoubtOutput = await askDoubt(flowInput);
 
-        // You could potentially return diagrams/illustrations as images in the response too
         const aiMessage: ChatMessage = {
           id: Date.now().toString() + '-ai',
           sender: 'ai',
-          text: aiText,
-          // image: 'data:image/png;base64,...' // Example if AI returns an image
+          text: aiResponse.explanation,
+          // image: aiResponse.diagramUrl // Handle potential diagram later
         };
-        // --- End Mock AI Response ---
 
        setMessages(prevMessages => [...prevMessages, aiMessage]);
 
@@ -126,7 +122,7 @@ export default function AskDoubtPage() {
         setMessages(prevMessages => [...prevMessages, {
             id: Date.now().toString() + '-error',
             sender: 'ai',
-            text: "Apologies, I couldn't process that request right now."
+            text: "Apologies, I couldn't process that request right now. Please check the console for details."
         }]);
     } finally {
         setIsLoading(false);
@@ -146,6 +142,17 @@ export default function AskDoubtPage() {
       });
       return;
     }
+     // Size limit (e.g., 4MB) - Gemini limit
+     const maxSizeInBytes = 4 * 1024 * 1024;
+     if (file.size > maxSizeInBytes) {
+       toast({
+         variant: 'destructive',
+         title: 'Image Too Large',
+         description: `Please upload an image smaller than ${maxSizeInBytes / 1024 / 1024}MB.`,
+       });
+       if (fileInputRef.current) fileInputRef.current.value = ''; // Clear file input on error
+       return;
+     }
 
     const reader = new FileReader();
     reader.onloadend = () => {
@@ -197,7 +204,7 @@ export default function AskDoubtPage() {
                              <AvatarFallback><Bot size={18}/></AvatarFallback>
                            </Avatar>
                          )}
-                         <div className={cn("rounded-xl py-2 px-3 max-w-[70%] md:max-w-[60%] break-words shadow-sm",
+                         <div className={cn("rounded-xl py-2 px-3 max-w-[70%] md:max-w-[60%] break-words shadow-sm whitespace-pre-wrap", // Added whitespace-pre-wrap
                             message.sender === 'user' ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground")}>
                            {message.text && <p>{message.text}</p>}
                            {message.image && (
@@ -258,7 +265,7 @@ export default function AskDoubtPage() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
+                    if (e.key === 'Enter' && !e.shiftKey && !isLoading) { // Prevent send while loading
                       e.preventDefault();
                       handleSend();
                     }
@@ -273,7 +280,7 @@ export default function AskDoubtPage() {
                   disabled={isLoading || (!input.trim() && !photo) || !selectedSubject}
                   className="hover:scale-110 active:scale-95"
                 >
-                  <Send className="w-4 h-4 mr-2" />
+                  {isLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Send className="w-4 h-4 mr-2" />}
                   Send
                 </Button>
               </div>
@@ -294,6 +301,7 @@ export default function AskDoubtPage() {
                             }}
                             className="absolute -top-3 -right-3 bg-destructive text-destructive-foreground rounded-full p-1 h-6 w-6 hover:bg-destructive/90 hover:scale-110"
                             aria-label="Remove image"
+                            disabled={isLoading} // Disable remove while loading
                        >
                            <X className="w-3.5 h-3.5" />
                        </Button>
@@ -306,17 +314,3 @@ export default function AskDoubtPage() {
     </div>
   );
 }
-
-// Helper function for API call (replace with actual implementation)
-async function callDoubtApi(data: { subject: string; doubtText: string; imageDataUri: string | null }): Promise<{ explanation: string; diagramUrl?: string }> {
-    console.log("Calling AI API with:", data);
-    // Replace with your actual fetch call to your backend AI API
-    await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate delay
-
-    // Example response structure
-    return {
-        explanation: `This is a detailed AI explanation for your doubt about ${data.subject}. You asked about "${data.doubtText}". ${data.imageDataUri ? 'I have also analyzed the image you provided.' : ''} ... [detailed steps/concepts go here] ...`,
-        // diagramUrl: 'https://example.com/diagram.png' // Optional diagram URL
-    };
-}
-
