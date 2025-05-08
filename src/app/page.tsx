@@ -32,8 +32,8 @@ import {
 import React, { useState, useEffect, useRef } from 'react'; // Import useRef
 import Link from 'next/link'; // Import Link
 import { cn } from '@/lib/utils';
-import { motion } from 'framer-motion'; // Import motion
-import quotesData from './quotes.json'; // Import the quotes JSON file
+import { motion, AnimatePresence } from 'framer-motion'; // Import motion
+// import quotesData from './quotes.json'; // Import the quotes JSON file // <-- Temporarily commented out
 
 // Import local images for subjects
 import itImage from './it.png';
@@ -44,62 +44,61 @@ import mathImage from './maths.png';
 import scienceImage from './science.png'; // Assuming this file exists
 import hindiImage from './hindi.png';
 
-// Import local images for exams
-import i1 from './i1.png';
-import i2 from './i2.png';
-import i3 from './i3.png';
+// Import images for exam cards
+import i1 from './i1.png'; // Random exam
+import i2 from './i2.png'; // Custom exam
+import i3 from './i3.png'; // Timed exam
 
-interface Quote {
-    quote: string;
-    author: string;
-}
+// interface Quote { // <-- Temporarily commented out
+//     quote: string;
+//     author: string;
+// }
 
-
+// Data for Subject Cards
 const subjects = [
   {
     title: "Information Technology",
     imageUrl: itImage,
-    bgColorClass: "bg-blue-100 dark:bg-blue-900/30", // Example: Light blueish
+    bgColorClass: "bg-blue-100 dark:bg-blue-900/30",
     dataAiHint: "technology computer",
   },
   {
     title: "English Language & Literature",
     imageUrl: englishLitImage,
-    bgColorClass: "bg-pink-100 dark:bg-pink-900/30", // Example: Light pinkish
+    bgColorClass: "bg-pink-100 dark:bg-pink-900/30",
     dataAiHint: "english literature book",
   },
   {
     title: "Social Science",
-    imageUrl: socialSciImage, // Assuming this file exists
-    bgColorClass: "bg-orange-100 dark:bg-orange-900/30", // Example: Light orangeish
+    imageUrl: socialSciImage,
+    bgColorClass: "bg-orange-100 dark:bg-orange-900/30",
     dataAiHint: "social science globe",
   },
   {
     title: "English Communicative",
     imageUrl: englishCommImage,
-    bgColorClass: "bg-yellow-100 dark:bg-yellow-900/30", // Example: Light yellowish
+    bgColorClass: "bg-yellow-100 dark:bg-yellow-900/30",
     dataAiHint: "english communication speech",
   },
   {
     title: "Mathematics",
     imageUrl: mathImage,
-    bgColorClass: "bg-teal-100 dark:bg-teal-900/30", // Example: Light tealish
+    bgColorClass: "bg-teal-100 dark:bg-teal-900/30",
     dataAiHint: "math formula",
   },
   {
     title: "Science",
-    imageUrl: scienceImage, // Assuming this file exists
-    bgColorClass: "bg-indigo-100 dark:bg-indigo-900/30", // Example: Light indigosh
+    imageUrl: scienceImage,
+    bgColorClass: "bg-indigo-100 dark:bg-indigo-900/30",
     dataAiHint: "science atom",
   },
   {
     title: "Hindi",
     imageUrl: hindiImage,
-    bgColorClass: "bg-red-100 dark:bg-red-900/30", // Example: Light reddish
+    bgColorClass: "bg-red-100 dark:bg-red-900/30",
     dataAiHint: "hindi language script",
   },
 ];
-
 
 // Data for Exam Cards using icons
 const examCards: {
@@ -170,17 +169,17 @@ const itemVariants = {
 
 export default function Home() {
   const userName = "Rudransh"; // Mock user name
-  const [randomQuote, setRandomQuote] = useState<Quote | null>(null); // State holds the quote object
+  // const [randomQuote, setRandomQuote] = useState<Quote | null>(null); // <-- Temporarily commented out
   const [greeting, setGreeting] = useState('');
   const scrollContainerRef = useRef<HTMLDivElement>(null); // Ref for scroll container
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
 
   useEffect(() => {
-    // Select a random quote from the imported JSON data
-    const allQuotes = quotesData.quotes;
-    const randomIndex = Math.floor(Math.random() * allQuotes.length);
-    setRandomQuote(allQuotes[randomIndex]); // Set the entire quote object
+    // // Select a random quote from the imported JSON data // <-- Temporarily commented out
+    // const allQuotes = quotesData.quotes;
+    // const randomIndex = Math.floor(Math.random() * allQuotes.length);
+    // setRandomQuote(allQuotes[randomIndex]); // Set the entire quote object
 
     // Determine greeting based on local time
     const hour = new Date().getHours();
@@ -242,10 +241,10 @@ export default function Home() {
 
 
   return (
-    // Removed overflow-hidden from the root div to allow content scrolling
-    <div className="flex h-screen bg-background text-foreground">
+    // Wrap the entire content in a single parent div for correct JSX structure
+    <div className="flex h-screen bg-background text-foreground overflow-hidden">
       <Sidebar /> {/* Use updated Sidebar */}
-      <div className="flex flex-col flex-1 overflow-hidden"> {/* Keep overflow-hidden here for header/sidebar layout */}
+      <div className="flex flex-col flex-1 overflow-hidden">
         <Header />
         {/* Main content area allows vertical scrolling */}
         <motion.main
@@ -264,158 +263,140 @@ export default function Home() {
              {greeting}, {userName}
            </motion.h1>
 
-           {/* Top Promotional Banner with animation */}
+           {/* My Subjects Section with animation */}
            <motion.div
-             className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900/80 text-primary-foreground p-6 rounded-xl shadow-lg flex flex-col items-start justify-between relative overflow-hidden min-h-[120px]" // Use flex-col and min-h
-             variants={itemVariants}
+             className="space-y-4"
+             variants={containerVariants} // Apply container variants
              initial="hidden"
              animate="show"
-             transition={{ delay: 0.1 }}
+             transition={{ delay: 0.2 }} // Adjusted delay
            >
-             <div className="z-10 w-full"> {/* Make this div full width */}
-               <h2 className="text-xl md:text-2xl font-semibold mb-1">
-                 {randomQuote ? `"${randomQuote.quote}"` : "Loading quote..."} {/* Display only quote */}
-               </h2>
-                {randomQuote && (
-                    <span className="block text-base font-normal text-primary-foreground/80 mb-3"> {/* Smaller font size, lighter, margin bottom */}
-                        - {randomQuote.author}
-                    </span>
-                )}
-               <Button variant="secondary" size="sm" className="bg-white/20 hover:bg-white/30 text-white px-4 py-1 text-xs h-auto rounded-full shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105 active:scale-95">
-                 Keep pushing! &lt;3
-               </Button>
+             <div className="flex justify-between items-center">
+                 <div className="flex items-center space-x-2 cursor-pointer group">
+                     <Bookmark className="w-5 h-5 text-primary" />
+                     <h2 className="text-xl md:text-2xl font-semibold text-foreground group-hover:text-primary transition-colors">My subjects</h2>
+                     <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform"/>
+                 </div>
+                 <div className="flex items-center space-x-4 text-sm">
+                     <Button variant="ghost" className="text-muted-foreground hover:text-foreground hover:scale-105 active:scale-95">Change subjects</Button>
+                     <Button variant="ghost" className="text-muted-foreground hover:text-foreground hover:scale-105 active:scale-95">Browse all</Button>
+                 </div>
              </div>
-             <div className="absolute right-0 bottom-[-20px] opacity-70 z-0 w-32 h-32 md:w-40 md:h-40">
-                 <svg viewBox="0 0 100 100" fill="currentColor" className="text-blue-400 w-full h-full">
-                    <path d="M50,0 C22.4,0 0,22.4 0,50 C0,77.6 22.4,100 50,100 C77.6,100 100,77.6 100,50 C100,22.4 77.6,0 50,0 Z M50,10 C66.6,10 80,23.4 80,40 C80,56.6 66.6,70 50,70 C33.4,70 20,56.6 20,40 C20,23.4 33.4,10 50,10 Z M50,80 C38.9,80 30,71.1 30,60 L70,60 C70,71.1 61.1,80 50,80 Z"/>
-                 </svg>
-              </div>
+
+             {/* Horizontal scroll container with arrows */}
+             <div className="relative">
+                 <div ref={scrollContainerRef} className="w-full overflow-x-auto scrollbar-hide whitespace-nowrap">
+                   <div className="flex w-max space-x-4 pb-4"> {/* Use flex w-max */}
+                   {subjects.map((subject, index) => (
+                     <motion.div
+                        key={index}
+                        variants={itemVariants}
+                        className="w-[240px] h-[340px] flex-shrink-0" // Adjusted size
+                     >
+                       <SubjectCard
+                         title={subject.title}
+                         imageUrl={subject.imageUrl}
+                         bgColorClass={subject.bgColorClass}
+                         data-ai-hint={subject.dataAiHint || subject.title.split(' ')[0].toLowerCase()}
+                         className="w-full h-full" // Ensure card fills the container
+                       />
+                     </motion.div>
+                   ))}
+                 </div>
+                 {/* Removed scrollbar component */}
+                 </div>
+
+                 {/* Left Scroll Button */}
+                 <AnimatePresence>
+                 {showLeftArrow && (
+                     <motion.div
+                         initial={{ opacity: 0 }}
+                         animate={{ opacity: 1 }}
+                         exit={{ opacity: 0 }}
+                         className="absolute left-0 top-1/2 -translate-y-1/2 transform -translate-x-3 z-10"
+                     >
+                        <Button variant="outline" size="icon" className="rounded-full shadow-md w-8 h-8 hover:scale-105 active:scale-95" onClick={() => scroll('left')}>
+                           <ChevronLeft className="h-4 w-4" />
+                        </Button>
+                     </motion.div>
+                 )}
+                 </AnimatePresence>
+
+                 {/* Right Scroll Button */}
+                 <AnimatePresence>
+                 {showRightArrow && (
+                     <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="absolute right-0 top-1/2 -translate-y-1/2 transform translate-x-3 z-10"
+                     >
+                        <Button variant="outline" size="icon" className="rounded-full shadow-md w-8 h-8 hover:scale-105 active:scale-95" onClick={() => scroll('right')}>
+                           <ChevronRight className="h-4 w-4" />
+                        </Button>
+                     </motion.div>
+                 )}
+                 </AnimatePresence>
+             </div>
            </motion.div>
 
-            {/* Mock Exams Section with animation */}
+           {/* Mock Exams Section with animation */}
             <motion.div
               className="space-y-4"
               variants={containerVariants} // Apply container variants
               initial="hidden"
               animate="show"
-              transition={{ delay: 0.2 }} // Slight delay
+              transition={{ delay: 0.3 }} // Adjusted delay
             >
-               <motion.div className="flex items-center space-x-2 cursor-pointer group" variants={itemVariants}>
-                  <PlusCircle className="w-5 h-5 text-primary" />
-                  <h2 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">Mock exams</h2>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
-               </motion.div>
-                <motion.div
-                  className="grid grid-cols-1 md:grid-cols-3 gap-4"
-                  variants={containerVariants} // Stagger children
-                  initial="hidden"
-                  animate="show"
-                >
-                  {examCards.map((card, index) => (
+               <div className="flex justify-between items-center">
+                  <div className="flex items-center space-x-2">
+                      <PlusCircle className="w-5 h-5 text-primary" />
+                      <h2 className="text-xl md:text-2xl font-semibold">Mock Exams</h2>
+                  </div>
+                  {/* Add any controls like "View All" if needed */}
+               </div>
+               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                   {examCards.map((card, index) => (
                     <motion.div key={index} variants={itemVariants}>
                       <ExamCard
                         title={card.title}
-                        icon={card.icon} // Pass icon component
+                        icon={card.icon}
                         bgColorClass={card.bgColorClass}
-                        textColorClass={card.textColorClass} // Pass text color for icon
+                        textColorClass={card.textColorClass}
                         isNew={card.isNew}
-                        dataAiHint={card.dataAiHint}
+                        data-ai-hint={card.dataAiHint}
                       />
                     </motion.div>
                   ))}
-                </motion.div>
+               </div>
             </motion.div>
 
-
-           {/* My Subjects Section with animation */}
-            <motion.div
-              className="space-y-4"
-              variants={containerVariants}
-              initial="hidden"
-              animate="show"
-              transition={{ delay: 0.3 }} // Further delay
-            >
-             <motion.div className="flex justify-between items-center" variants={itemVariants}>
-               <div className="flex items-center space-x-2 cursor-pointer group">
-                 <Bookmark className="w-5 h-5 text-primary" />
-                 <h2 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">My subjects</h2>
-                 <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
-               </div>
-               <div className="flex items-center space-x-4 text-sm">
-                 <Link href="/all-subjects" passHref legacyBehavior>
-                   <a>
-                     <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground rounded-full shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105 active:scale-95">
-                       Change subjects
-                     </Button>
-                   </a>
-                 </Link>
-                 <Link href="/all-subjects" passHref legacyBehavior>
-                    <a>
-                     <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground rounded-full shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105 active:scale-95">
-                       Browse all
-                     </Button>
-                   </a>
-                 </Link>
-               </div>
-             </motion.div>
-
-             {/* Horizontal scroll container with arrows */}
-             <motion.div
-                className="relative group"
-                variants={containerVariants} // Stagger children
-                initial="hidden"
-                animate="show"
-              >
-                <div
-                   ref={scrollContainerRef}
-                   className="flex w-full space-x-4 pb-4 overflow-x-auto scroll-smooth scrollbar-hide" // scrollbar-hide utility might need Tailwind config
-                   onScroll={checkScrollArrows} // Add onScroll handler here too
-                >
-                   {subjects.map((subject, index) => (
-                     <motion.div key={index} variants={itemVariants}>
-                       <SubjectCard
-                         title={subject.title} // Pass title for overlay/alt text
-                         imageUrl={subject.imageUrl}
-                         bgColorClass={subject.bgColorClass}
-                         className="w-[235px] h-[350px] flex-shrink-0" // Maintained size
-                         data-ai-hint={subject.dataAiHint}
-                       />
-                     </motion.div>
-                   ))}
-                 </div>
-
-                 {/* Left Scroll Button */}
-                 <Button
-                     variant="secondary"
-                     size="icon"
-                     className={cn(
-                         "absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 z-10 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300",
-                         "hover:scale-110 active:scale-95", // Bubble effect
-                         showLeftArrow ? "visible" : "invisible" // Control visibility via state
-                     )}
-                     onClick={() => scroll('left')}
-                     aria-label="Scroll left"
-                 >
-                    <ChevronLeft className="h-5 w-5" />
-                 </Button>
-
-                 {/* Right Scroll Button */}
-                 <Button
-                     variant="secondary"
-                     size="icon"
-                     className={cn(
-                         "absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-10 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300",
-                          "hover:scale-110 active:scale-95", // Bubble effect
-                         showRightArrow ? "visible" : "invisible" // Control visibility via state
-                     )}
-                     onClick={() => scroll('right')}
-                     aria-label="Scroll right"
-                 >
-                    <ChevronRight className="h-5 w-5" />
-                 </Button>
-             </motion.div>
+            {/* Top Promotional Banner with animation */}
+           <motion.div
+             className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900/80 text-primary-foreground p-6 rounded-xl shadow-lg flex flex-col items-start justify-between relative overflow-hidden min-h-[120px]"
+             variants={itemVariants}
+             initial="hidden"
+             animate="show"
+             transition={{ delay: 0.1 }}
+           >
+             <div className="space-y-1">
+                 <h2 className="text-xl md:text-2xl font-semibold mb-2">
+                 {/* {randomQuote ? `"${randomQuote.quote}"` : "Loading quote..."} // <-- Temporarily commented out */}
+                 "Temporary Motivational Message!"
+               </h2>
+                {/* {randomQuote && ( // <-- Temporarily commented out
+                    <p className="text-sm md:text-base opacity-80">
+                        - {randomQuote.author}
+                    </p>
+                )} */}
+                <p className="text-sm md:text-base opacity-80">
+                    - OpennMind
+                </p>
+               <p className="text-sm md:text-base mt-2">
+                 Keep pushing! &lt;3
+               </p>
+             </div>
            </motion.div>
-
 
            {/* Learn With Section with animation */}
            <motion.div
@@ -425,18 +406,12 @@ export default function Home() {
              animate="show"
              transition={{ delay: 0.4 }} // Even further delay
            >
-             <motion.div className="flex items-center space-x-2 cursor-pointer group" variants={itemVariants}>
+             <div className="flex items-center space-x-2">
                 <Lightbulb className="w-5 h-5 text-yellow-500" />
-                <h2 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">Learn with</h2>
-                <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
-             </motion.div>
+                <h2 className="text-xl md:text-2xl font-semibold">Learn With</h2>
+             </div>
               {/* Use LearnWithCard component */}
-              <motion.div
-                className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
-                variants={containerVariants} // Stagger children
-                initial="hidden"
-                animate="show"
-              >
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                  {learnWithCards.map((card, index) => (
                     <motion.div key={index} variants={itemVariants}>
                       <LearnWithCard
@@ -449,13 +424,13 @@ export default function Home() {
                  ))}
                  {/* Example Placeholder Card */}
                  <motion.div variants={itemVariants}>
-                   <Card className="p-4 bg-muted/50 dark:bg-card/80 rounded-xl border-0 flex items-center justify-center h-full min-h-[144px] md:min-h-[144px]">
+                   <Card className="p-4 bg-muted/50 dark:bg-card/80 rounded-xl border-0 h-32 md:h-36 flex items-center justify-center">
                        <CardContent className="text-center p-0">
                          <p className="text-muted-foreground text-sm">More learning tools coming soon...</p>
                        </CardContent>
                    </Card>
                  </motion.div>
-              </motion.div>
+              </div>
            </motion.div>
 
 
@@ -464,4 +439,3 @@ export default function Home() {
     </div>
   );
 }
-
