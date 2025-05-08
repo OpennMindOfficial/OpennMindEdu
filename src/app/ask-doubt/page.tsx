@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Send, ImagePlus, Loader2, Bot, User } from "lucide-react";
+import { Send, ImagePlus, Loader2, Bot, User, X } from "lucide-react"; // Moved X import here
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -293,20 +293,26 @@ export default function AskDoubtPage() {
                   Send
                 </Button>
               </div>
-              {/* Image Preview (Optional) */}
+              {/* Image Preview */}
               {photo && (
                   <div className="mt-2 p-2 border rounded-md bg-muted/30 relative w-fit">
-                      <img src={photo} alt="Preview" className="max-h-20 rounded object-contain" />
-                       <button
+                      <img
+                        src={photo}
+                        alt="Preview"
+                        className="max-h-24 rounded object-contain" // Increased max-h slightly
+                       />
+                       <Button
+                            variant="ghost"
+                            size="icon"
                             onClick={() => {
                                 setPhoto(null);
                                 if (fileInputRef.current) fileInputRef.current.value = ''; // Clear file input when removing preview
                             }}
-                            className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-0.5 hover:scale-110"
+                            className="absolute -top-3 -right-3 bg-destructive text-destructive-foreground rounded-full p-1 h-6 w-6 hover:bg-destructive/90 hover:scale-110"
                             aria-label="Remove image"
                        >
-                           <X size={14} />
-                       </button>
+                           <X className="w-3.5 h-3.5" />
+                       </Button>
                   </div>
               )}
             </CardContent>
@@ -329,4 +335,3 @@ async function callDoubtApi(data: { subject: string; doubtText: string; imageDat
         // diagramUrl: 'https://example.com/diagram.png' // Optional diagram URL
     };
 }
-import { X } from 'lucide-react'; // Make sure X is imported
