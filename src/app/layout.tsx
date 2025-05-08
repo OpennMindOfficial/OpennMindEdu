@@ -42,8 +42,8 @@ export default function RootLayout({
           disableTransitionOnChange
         >
            {/* Render FloatingNav - Ensure it's rendered here */}
-           <FloatingNav />
            {children}
+           <FloatingNav /> {/* Moved FloatingNav to the end, but still within ThemeProvider */}
            <Toaster /> {/* Add Toaster back */}
         </ThemeProvider>
       </body>
