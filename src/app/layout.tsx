@@ -1,5 +1,4 @@
 
-
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -7,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster"; // Import Toaster
 import Script from "next/script"; // Import Script
+// import { FloatingNav } from "@/components/layout/floating-nav"; // Remove import for FloatingNav
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -42,6 +42,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
            {/* Wrap children for potential page transitions */}
+           {/* <FloatingNav /> Remove FloatingNav rendering */}
            {children}
            <Toaster /> {/* Add Toaster back */}
         </ThemeProvider>
