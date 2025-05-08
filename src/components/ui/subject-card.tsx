@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -16,16 +17,17 @@ interface SubjectCardProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export function SubjectCard({ title, imageUrl, bgColorClass, className, ...props }: SubjectCardProps) {
   return (
-    <motion.div // Outer container for hover state and lift effect
+    // Outer container remains a motion.div for potential future layout animations, but removed whileHover lift
+    <motion.div
       className={cn(
         "overflow-visible", // Allow shadow to be visible
-        "transition-all duration-300 ease-out", // Keep transition for shadow
         "rounded-xl group", // Add group class here for hover targeting
         "relative",
         className // Apply width/height etc.
       )}
       {...props}
-      whileHover={{ y: -8, transition: { type: "spring", stiffness: 300, damping: 15 } }} // Apply lift effect only to the outer div
+      // Removed whileHover lift effect from the entire card container
+      // whileHover={{ y: -8, transition: { type: "spring", stiffness: 300, damping: 15 } }}
     >
       <Card className={cn(
         "overflow-hidden rounded-xl", // Rounding and clipping
@@ -33,7 +35,7 @@ export function SubjectCard({ title, imageUrl, bgColorClass, className, ...props
         bgColorClass || "bg-card/60 dark:bg-muted/40", // Background
         "w-full h-full", // Fill container
         "relative", // For absolute positioning inside
-        "shadow-md group-hover:shadow-xl transition-shadow duration-300 ease-out" // Add shadow effect on group hover
+        "shadow-md group-hover:shadow-xl transition-shadow duration-300 ease-out" // Keep shadow effect on group hover
       )}>
         <CardContent className="p-0 relative h-full">
           {/* Image container */}
@@ -47,10 +49,10 @@ export function SubjectCard({ title, imageUrl, bgColorClass, className, ...props
               style={{ objectFit: 'cover' }}
               className={cn(
                   "block w-full h-full",
-                  "transition-transform duration-300 ease-out group-hover:scale-105", // Scale image *within* its container on group hover
-                  "transform-style-preserve-3d"
+                  "transition-transform duration-300 ease-out group-hover:scale-105", // Keep image scaling on group hover
+                  "transform-style-preserve-3d" // For potential 3D effects if needed later
               )}
-              priority={false}
+              priority={false} // Adjust priority as needed, likely false for multiple images
               sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
             />
           </div>
