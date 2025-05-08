@@ -85,7 +85,7 @@ export default function AskDoubtPage() {
     setInput('');
     setPhoto(null);
     if (fileInputRef.current) {
-        fileInputRef.current.value = ''; // Clear file input visually
+        fileInputRef.current.value = ''; // Clear file input visually - Keeping this one as it's after state is handled
     }
     setIsLoading(true);
 
@@ -158,7 +158,7 @@ export default function AskDoubtPage() {
         title: 'Invalid File Type',
         description: 'Please upload an image file (e.g., PNG, JPG).',
       });
-       if (fileInputRef.current) fileInputRef.current.value = ''; // Clear invalid file
+      // if (fileInputRef.current) fileInputRef.current.value = ''; // Avoid clearing input ref directly here
       return;
     }
 
@@ -169,7 +169,7 @@ export default function AskDoubtPage() {
     reader.onerror = () => {
         console.error("Error reading file");
         toast({ variant: 'destructive', title: 'File Read Error', description: 'Could not read the selected image.' });
-        if (fileInputRef.current) fileInputRef.current.value = ''; // Clear on error
+        // if (fileInputRef.current) fileInputRef.current.value = ''; // Avoid clearing input ref directly here
     }
     reader.readAsDataURL(file);
   };
@@ -306,7 +306,7 @@ export default function AskDoubtPage() {
                             size="icon"
                             onClick={() => {
                                 setPhoto(null);
-                                if (fileInputRef.current) fileInputRef.current.value = ''; // Clear file input when removing preview
+                                // if (fileInputRef.current) fileInputRef.current.value = ''; // Avoid clearing input ref directly here
                             }}
                             className="absolute -top-3 -right-3 bg-destructive text-destructive-foreground rounded-full p-1 h-6 w-6 hover:bg-destructive/90 hover:scale-110"
                             aria-label="Remove image"
