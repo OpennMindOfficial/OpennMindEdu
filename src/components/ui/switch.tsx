@@ -1,4 +1,4 @@
-'use client';
+"use client"
 
 import * as React from "react"
 import * as SwitchPrimitives from "@radix-ui/react-switch"
@@ -45,17 +45,19 @@ export interface SwitchProps
 const Switch = React.forwardRef<
   React.ElementRef<typeof SwitchPrimitives.Root>,
   SwitchProps // Use the extended interface
->(({ className, size, ...props }, ref) => (
-  <SwitchPrimitives.Root
-    className={cn(switchVariants({ size }), className)} // Apply root variants
-    {...props}
-    ref={ref}
-  >
-    <SwitchPrimitives.Thumb
-      className={cn(thumbVariants({ size }))} // Apply thumb variants based on the same size prop
-    />
-  </SwitchPrimitives.Root>
-));
+>(({ className, size, ...props }, ref) => {
+  return (
+    <SwitchPrimitives.Root
+      className={cn(switchVariants({ size }), className)} // Apply root variants
+      {...props}
+      ref={ref}
+    >
+      <SwitchPrimitives.Thumb
+        className={cn(thumbVariants({ size }))} // Apply thumb variants based on the same size prop
+      />
+    </SwitchPrimitives.Root>
+  );
+});
 Switch.displayName = SwitchPrimitives.Root.displayName
 
 export { Switch };
