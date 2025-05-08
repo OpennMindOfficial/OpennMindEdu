@@ -53,21 +53,27 @@ export function Header() {
         </Button>
 
         {/* Upgrade Button - Using SparkleButton */}
-        <SparkleButton className="px-4"> {/* Use px-4 for padding */}
+        <SparkleButton className="px-4 hover:scale-105 active:scale-95"> {/* Use px-4 for padding and add bubble effect */}
             Upgrade
         </SparkleButton>
 
         <ThemeToggle />
 
-        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground hover:scale-105 active:scale-95">
-            <Settings className="h-5 w-5" />
-            <span className="sr-only">Settings</span>
-        </Button>
+        <Link href="/settings" passHref legacyBehavior>
+          <a>
+            <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground hover:scale-105 active:scale-95">
+                <Settings className="h-5 w-5" />
+                <span className="sr-only">Settings</span>
+            </Button>
+          </a>
+        </Link>
+
 
         {/* Bug Report Button */}
         <Link href="/bug-report" passHref legacyBehavior>
            <a>
-             <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 hover:scale-105 active:scale-95"> {/* Apply destructive color on hover */}
+             {/* Apply destructive color on hover */}
+             <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 hover:scale-105 active:scale-95">
                  <Bug className="h-5 w-5" />
                  <span className="sr-only">Report a Bug</span>
              </Button>
