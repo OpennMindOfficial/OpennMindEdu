@@ -3,8 +3,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
-// Removed FloatingNav import
 import Script from "next/script"; // Import Script component
+import { Toaster } from "@/components/ui/toaster"; // Import Toaster
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -39,8 +39,8 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {/* Removed relative positioning container and FloatingNav */}
            {children}
+           <Toaster /> {/* Add Toaster here */}
         </ThemeProvider>
       </body>
     </html>
