@@ -1,12 +1,11 @@
+'use server';
 /**
  * @fileOverview AI flow for checking the status of a doubt previously submitted by the user.
  */
-'use strict';
 
 import { ai } from '@/ai/genkit';
-import { z } from 'zod'; // Corrected import: Use zod directly
-import { defineFlow, defineTool } from '@genkit-ai/core'; // Corrected import: Use @genkit-ai/core
-
+import { z } from 'genkit'; // Use genkit's zod export
+import { defineFlow, defineTool } from '@genkit-ai/core'; // Use @genkit-ai/core
 
 // Define the input schema using Zod
 const CheckDoubtInputSchema = z.object({
