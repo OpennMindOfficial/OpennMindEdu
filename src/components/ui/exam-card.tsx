@@ -1,7 +1,7 @@
 
 'use client';
 
-import type React from 'react';
+import React from 'react'; // Added React import
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button"; // Import Button
@@ -31,7 +31,7 @@ export function ExamCard({ title, icon: Icon, bgColorClass, textColorClass, isNe
       <Card
         className={cn(
           "overflow-hidden rounded-xl border-0 shadow-md transition-all duration-300 ease-in-out", // Added transition-all
-          "relative h-[140px] md:h-[140px]", // Decreased height further
+          "relative h-[144px] md:h-[144px]", // Maintained height
           "flex flex-col justify-between cursor-pointer", // Added cursor-pointer
           bgColorClass,
           className
@@ -76,3 +76,4 @@ export function ExamCard({ title, icon: Icon, bgColorClass, textColorClass, isNe
     </motion.div>
   );
 }
+
