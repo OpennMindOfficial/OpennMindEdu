@@ -6,7 +6,6 @@ import {
   AnimatePresence,
 } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import Link from 'next/link';
 import {
   Tooltip,
   TooltipContent,
@@ -26,6 +25,7 @@ import {
   LayoutDashboard,
   HelpCircle,
   BookOpenText,
+  SlidersHorizontal, // Correct Icon for Tools
 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { ToolWindow } from '@/components/tools/tool-window';
@@ -55,7 +55,7 @@ interface OpenToolsState {
 const navItems: NavItem[] = [
   {
     name: 'Tools',
-    icon: BrainCircuit,
+    icon: SlidersHorizontal, // Using SlidersHorizontal for Tools
     subItems: [
       { name: 'Scientific Calculator', toolId: 'sci-calc', icon: Calculator },
       { name: 'Graphing Calculator', toolId: 'graph-calc', icon: BookText },
@@ -104,100 +104,115 @@ export const FloatingNav = ({ className }: { className?: string }) => {
     router.push(link);
   };
 
+  const floatingNavVariants = {
+      hidden: { opacity: 0, y: 20 },
+      visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
+  };
+
+  const subMenuVariants = {
+      open: { opacity: 1, y: 0, scale: 1, display: "block", transition: { duration: 0.2, ease: "easeOut" } },
+      closed: { opacity: 0, y: -10, scale: 0.95, transition: { duration: 0.15, ease: "easeIn" }, display: "none" },
+  };
+
+
   return (
     <>
-      <motion.div
-        className={cn(
-          'flex max-w-fit fixed bottom-4 inset-x-0 mx-auto border border-border rounded-full bg-card/80 backdrop-blur-sm shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)] z-50 px-4 py-2 items-center justify-center space-x-4',
-          className
-        )}
-        initial={{ opacity: 0, y: 100 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, ease: "easeOut" }}
-      >
-        <TooltipProvider delayDuration={0}>
-          {navItems.map((navItem: NavItem, idx: number) => (
-            <div
-              key={`link=${idx}`}
-              className="relative"
-              onMouseEnter={() => setHoveredItem(navItem.name)}
-              onMouseLeave={() => setHoveredItem(null)}
-            >
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  {navItem.subItems ? (
-                    <motion.button
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.95 }}
-                      className={cn(
-                        'relative dark:text-neutral-50 items-center flex space-x-1 text-foreground hover:text-primary transition-colors px-3 py-1.5 rounded-full'
-                      )}
-                    >
-                      <navItem.icon className="h-5 w-5" />
-                      <span className="sr-only">{navItem.name}</span>
-                    </motion.button>
-                  ) : (
-                    <motion.button
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.95 }}
-                      className={cn(
-                        'relative dark:text-neutral-50 items-center flex space-x-1 text-foreground hover:text-primary transition-colors px-3 py-1.5 rounded-full',
-                      )}
-                      onClick={() => {
-                        if (navItem.link) {
-                          navigate(navItem.link);
-                        }
-                      }}
-                    >
-                      <navItem.icon className="h-5 w-5" />
-                      <span className="sr-only">{navItem.name}</span>
-                    </motion.button>
-                  )}
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>{navItem.name}</p>
-                </TooltipContent>
-              </Tooltip>
+      <TooltipProvider delayDuration={0}>
+        <motion.div
+          className={cn(
+            'fixed bottom-4 inset-x-0 mx-auto w-fit bg-card/80 backdrop-blur-sm shadow-lg z-50 px-3 py-2 rounded-full border border-border',
+            'flex items-center justify-center space-x-3',
+            className
+          )}
+          variants={floatingNavVariants}
+          initial="hidden"
+          animate="visible"
+          transition={{ duration: 0.4, ease: "easeOut" }}
+        >
+            {navItems.map((navItem: NavItem, idx: number) => (
+              <motion.div
+                  key={`navitem-${idx}`}
+                  className="relative"
+                  onMouseEnter={() => setHoveredItem(navItem.name)}
+                  onMouseLeave={() => setHoveredItem(null)}
+              >
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                      {navItem.subItems ? (
+                         <motion.button
+                           className={cn(
+                             "group relative flex items-center justify-center p-2 rounded-full hover:bg-secondary text-muted-foreground hover:text-foreground",
+                             "transition-colors duration-200 ease-in-out"
+                           )}
+                           whileHover={{ scale: 1.1 }}
+                           whileTap={{ scale: 0.95 }}
+                         >
+                            <navItem.icon className="w-5 h-5" />
+                            <span className="sr-only">{navItem.name}</span>
+                         </motion.button>
+                       ) : (
+                           <motion.button
+                             className={cn(
+                               "group relative flex items-center justify-center p-2 rounded-full hover:bg-secondary text-muted-foreground hover:text-foreground",
+                               "transition-colors duration-200 ease-in-out"
+                             )}
+                             onClick={() => {
+                               if (navItem.link) {
+                                 navigate(navItem.link);
+                               }
+                             }}
+                             whileHover={{ scale: 1.1 }}
+                             whileTap={{ scale: 0.95 }}
+                           >
+                             <navItem.icon className="w-5 h-5" />
+                             <span className="sr-only">{navItem.name}</span>
+                           </motion.button>
+                       )}
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{navItem.name}</p>
+                  </TooltipContent>
+                </Tooltip>
 
-              <AnimatePresence>
-                {hoveredItem === navItem.name && navItem.subItems && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                    transition={{ duration: 0.15, ease: 'easeOut' }}
-                    className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-56 rounded-lg bg-card border border-border shadow-lg py-1 z-50"
-                  >
-                    {navItem.subItems.map((subItem) => {
-                      const ToolComponent = toolComponents[subItem.toolId];
-                      const isToolOpen = openTools[subItem.toolId] || false;
+                 <AnimatePresence>
+                  {hoveredItem === navItem.name && navItem.subItems && (
+                    <motion.div
+                        className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 rounded-md bg-card border border-border shadow-lg p-1 z-50 w-60"
+                        variants={subMenuVariants}
+                        initial="closed"
+                        animate="open"
+                        exit="closed"
+                    >
+                      {navItem.subItems.map((subItem) => {
+                        const ToolComponent = toolComponents[subItem.toolId];
+                        const isToolOpen = openTools[subItem.toolId] || false;
 
-                      return (
-                        <div
-                          key={subItem.toolId}
-                          className="flex items-center justify-between px-3 py-2 text-sm hover:bg-muted rounded-md mx-1 cursor-pointer"
-                          onClick={() => handleToggleTool(subItem.toolId)}
-                        >
-                          <div className="flex items-center gap-2">
-                            <subItem.icon className="w-4 h-4 text-muted-foreground" />
-                            <span className="text-foreground">{subItem.name}</span>
+                        return (
+                          <div
+                            key={subItem.toolId}
+                            className="flex items-center justify-between px-2 py-1.5 text-sm hover:bg-muted rounded-md mx-1 cursor-pointer"
+                            onClick={() => handleToggleTool(subItem.toolId)}
+                          >
+                            <div className="flex items-center gap-2">
+                              <subItem.icon className="w-4 h-4 text-muted-foreground" />
+                              <span className="text-foreground">{subItem.name}</span>
+                            </div>
+                            <Switch
+                              checked={isToolOpen}
+                              onCheckedChange={() => handleToggleTool(subItem.toolId)}
+                              aria-label={`Enable ${subItem.name}`}
+                              size="sm"
+                            />
                           </div>
-                          <Switch
-                            checked={isToolOpen}
-                            onCheckedChange={() => handleToggleTool(subItem.toolId)}
-                            aria-label={`Enable ${subItem.name}`}
-                            size="sm"
-                          />
-                        </div>
-                      );
-                    })}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          ))}
-        </TooltipProvider>
-      </motion.div>
+                        );
+                      })}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            ))}
+        </motion.div>
+      </TooltipProvider>
 
       <AnimatePresence>
         {Object.entries(openTools).map(([toolId, isOpen]) => {
