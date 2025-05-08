@@ -41,6 +41,11 @@ import mathImage from './maths.png';
 import scienceImage from './science.png'; // Assuming this file exists
 import hindiImage from './hindi.png';
 
+// Import local images for exams
+import i1 from './i1.png';
+import i2 from './i2.png';
+import i3 from './i3.png';
+
 
 const subjects = [
   {
@@ -88,11 +93,11 @@ const subjects = [
 ];
 
 
-// Data for Exam Cards using icons
+// Data for Exam Cards using images
 const examCards = [
   {
     title: "Random exam",
-    icon: Dices, // Use Dices icon
+    imageUrl: i1,
     bgColorClass: "bg-gradient-to-br from-blue-200/50 to-white dark:from-blue-800/30 dark:to-background",
     textColorClass: "text-blue-800 dark:text-blue-300", // Match icon color theme
     isNew: false,
@@ -100,7 +105,7 @@ const examCards = [
   },
   {
     title: "Custom exam",
-    icon: SlidersHorizontal, // Use SlidersHorizontal icon
+    imageUrl: i2,
     bgColorClass: "bg-gradient-to-br from-green-200/50 to-white dark:from-green-800/30 dark:to-background",
     textColorClass: "text-green-800 dark:text-green-300", // Match icon color theme
     isNew: true,
@@ -108,7 +113,7 @@ const examCards = [
   },
   {
     title: "Timed exam",
-    icon: Timer, // Use Timer icon
+    imageUrl: i3,
     bgColorClass: "bg-gradient-to-br from-pink-200/50 to-white dark:from-pink-800/30 dark:to-background",
     textColorClass: "text-pink-800 dark:text-pink-300", // Match icon color theme
     isNew: true,
@@ -216,10 +221,12 @@ export default function Home() {
 
 
   return (
-    <div className="flex h-screen bg-background text-foreground overflow-hidden">
+    // Removed overflow-hidden from the root div to allow content scrolling
+    <div className="flex h-screen bg-background text-foreground">
       <Sidebar /> {/* Use updated Sidebar */}
-      <div className="flex flex-col flex-1 overflow-hidden">
+      <div className="flex flex-col flex-1 overflow-hidden"> {/* Keep overflow-hidden here for header/sidebar layout */}
         <Header />
+        {/* Main content area allows vertical scrolling */}
         <main className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 bg-background">
           {/* Dynamic Greeting */}
           <h1 className="text-3xl font-bold text-foreground">{greeting}, {userName}</h1>
@@ -228,7 +235,7 @@ export default function Home() {
            <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900/80 text-primary-foreground p-6 rounded-xl shadow-lg flex items-center justify-between relative overflow-hidden">
              <div className="z-10">
                <h2 className="text-xl md:text-2xl font-semibold mb-2">{randomQuote || "Loading quote..."}</h2> {/* Display quote or loading message */}
-               <Button variant="secondary" size="sm" className="bg-white/20 hover:bg-white/30 text-white px-4 py-1 text-xs h-auto rounded-full shadow-sm hover:shadow-md transition-all duration-300">
+               <Button variant="secondary" size="sm" className="bg-white/20 hover:bg-white/30 text-white px-4 py-1 text-xs h-auto rounded-full shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105 active:scale-95">
                  Keep pushing! &lt;3
                </Button>
              </div>
@@ -251,7 +258,7 @@ export default function Home() {
                     <ExamCard
                       key={index}
                       title={card.title}
-                      icon={card.icon} // Pass icon prop
+                      imageUrl={card.imageUrl} // Pass image prop
                       bgColorClass={card.bgColorClass}
                       textColorClass={card.textColorClass} // Pass text color for icon
                       isNew={card.isNew}
@@ -273,14 +280,14 @@ export default function Home() {
                <div className="flex items-center space-x-4 text-sm">
                  <Link href="/all-subjects" passHref legacyBehavior>
                    <a>
-                     <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground rounded-full shadow-sm hover:shadow-md transition-all duration-300">
+                     <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground rounded-full shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105 active:scale-95">
                        Change subjects
                      </Button>
                    </a>
                  </Link>
                  <Link href="/all-subjects" passHref legacyBehavior>
                     <a>
-                     <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground rounded-full shadow-sm hover:shadow-md transition-all duration-300">
+                     <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground rounded-full shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105 active:scale-95">
                        Browse all
                      </Button>
                    </a>
@@ -301,7 +308,7 @@ export default function Home() {
                        title={subject.title} // Pass title for overlay/alt text
                        imageUrl={subject.imageUrl}
                        bgColorClass={subject.bgColorClass}
-                       className="w-[225px] h-[340px] flex-shrink-0" // Adjust size as needed
+                       className="w-[235px] h-[350px] flex-shrink-0" // Increased size
                        data-ai-hint={subject.dataAiHint}
                      />
                    ))}
@@ -362,7 +369,7 @@ export default function Home() {
                  {/* Example Placeholder Card - Replace with actual content */}
                  <Card className="p-4 bg-muted/50 dark:bg-card/80 rounded-xl border-0 flex items-center justify-center h-full min-h-[144px] md:min-h-[144px]">
                     <CardContent className="text-center p-0">
-                      <p className="text-muted-foreground text-sm">More learning tools coming soon...</p>
+                      <p className="text-muted-foreground text-sm">Learning content coming soon...</p>
                     </CardContent>
                  </Card>
               </div>
@@ -375,5 +382,7 @@ export default function Home() {
   );
 }
 
+
+    
 
     
