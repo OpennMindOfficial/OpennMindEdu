@@ -49,6 +49,11 @@ import i1 from './i1.png';
 import i2 from './i2.png';
 import i3 from './i3.png';
 
+interface Quote {
+    quote: string;
+    author: string;
+}
+
 
 const subjects = [
   {
@@ -165,7 +170,7 @@ const itemVariants = {
 
 export default function Home() {
   const userName = "Rudransh"; // Mock user name
-  const [randomQuote, setRandomQuote] = useState('');
+  const [randomQuote, setRandomQuote] = useState<Quote | null>(null); // State holds the quote object
   const [greeting, setGreeting] = useState('');
   const scrollContainerRef = useRef<HTMLDivElement>(null); // Ref for scroll container
   const [showLeftArrow, setShowLeftArrow] = useState(false);
@@ -175,7 +180,7 @@ export default function Home() {
     // Select a random quote from the imported JSON data
     const allQuotes = quotesData.quotes;
     const randomIndex = Math.floor(Math.random() * allQuotes.length);
-    setRandomQuote(allQuotes[randomIndex].quote); // Set the quote text
+    setRandomQuote(allQuotes[randomIndex]); // Set the entire quote object
 
     // Determine greeting based on local time
     const hour = new Date().getHours();
@@ -268,7 +273,9 @@ export default function Home() {
              transition={{ delay: 0.1 }}
            >
              <div className="z-10">
-               <h2 className="text-xl md:text-2xl font-semibold mb-2">{randomQuote || "Loading quote..."}</h2> {/* Display quote or loading message */}
+               <h2 className="text-xl md:text-2xl font-semibold mb-2">
+                 {randomQuote ? `"${randomQuote.quote}" - ${randomQuote.author}` : "Loading quote..."} {/* Display quote and author */}
+               </h2>
                <Button variant="secondary" size="sm" className="bg-white/20 hover:bg-white/30 text-white px-4 py-1 text-xs h-auto rounded-full shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105 active:scale-95">
                  Keep pushing! &lt;3
                </Button>
@@ -280,39 +287,6 @@ export default function Home() {
               </div>
            </motion.div>
 
-            {/* Mock Exams Section with animation */}
-            <motion.div
-              className="space-y-4"
-              variants={containerVariants} // Apply container variants
-              initial="hidden"
-              animate="show"
-              transition={{ delay: 0.2 }} // Slight delay
-            >
-               <motion.div className="flex items-center space-x-2 cursor-pointer group" variants={itemVariants}>
-                  <PlusCircle className="w-5 h-5 text-primary" />
-                  <h2 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">Mock exams</h2>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
-               </motion.div>
-                <motion.div
-                  className="grid grid-cols-1 md:grid-cols-3 gap-4"
-                  variants={containerVariants} // Stagger children
-                  initial="hidden"
-                  animate="show"
-                >
-                  {examCards.map((card, index) => (
-                    <motion.div key={index} variants={itemVariants}>
-                      <ExamCard
-                        title={card.title}
-                        icon={card.icon} // Pass icon component
-                        bgColorClass={card.bgColorClass}
-                        textColorClass={card.textColorClass} // Pass text color for icon
-                        isNew={card.isNew}
-                        dataAiHint={card.dataAiHint}
-                      />
-                    </motion.div>
-                  ))}
-                </motion.div>
-            </motion.div>
 
            {/* My Subjects Section with animation */}
             <motion.div
@@ -402,6 +376,40 @@ export default function Home() {
                  </Button>
              </motion.div>
            </motion.div>
+
+            {/* Mock Exams Section with animation */}
+            <motion.div
+              className="space-y-4"
+              variants={containerVariants} // Apply container variants
+              initial="hidden"
+              animate="show"
+              transition={{ delay: 0.2 }} // Slight delay
+            >
+               <motion.div className="flex items-center space-x-2 cursor-pointer group" variants={itemVariants}>
+                  <PlusCircle className="w-5 h-5 text-primary" />
+                  <h2 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">Mock exams</h2>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
+               </motion.div>
+                <motion.div
+                  className="grid grid-cols-1 md:grid-cols-3 gap-4"
+                  variants={containerVariants} // Stagger children
+                  initial="hidden"
+                  animate="show"
+                >
+                  {examCards.map((card, index) => (
+                    <motion.div key={index} variants={itemVariants}>
+                      <ExamCard
+                        title={card.title}
+                        icon={card.icon} // Pass icon component
+                        bgColorClass={card.bgColorClass}
+                        textColorClass={card.textColorClass} // Pass text color for icon
+                        isNew={card.isNew}
+                        dataAiHint={card.dataAiHint}
+                      />
+                    </motion.div>
+                  ))}
+                </motion.div>
+            </motion.div>
 
 
            {/* Learn With Section with animation */}
