@@ -11,8 +11,8 @@ const nextConfig = {
                 net: false,
                 http2: false,
                 dns: false,
-                async_hooks: false,
-                'node:async_hooks': false, // Explicitly handle the node: prefix
+                async_hooks: false, // Fallback for 'async_hooks'
+                'node:async_hooks': false, // Explicitly handle the 'node:async_hooks' prefix
             };
         }
 
