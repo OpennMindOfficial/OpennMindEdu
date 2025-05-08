@@ -41,7 +41,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-           {/* Render FloatingNav */}
+           {/* Render FloatingNav - Ensure it's rendered here */}
            <FloatingNav />
            {children}
            <Toaster /> {/* Add Toaster back */}
