@@ -11,6 +11,7 @@ const nextConfig = {
                 net: false,
                 http2: false, // Add http2 fallback
                 dns: false, // Add dns fallback
+                async_hooks: false, // Add async_hooks fallback
             };
         }
 
