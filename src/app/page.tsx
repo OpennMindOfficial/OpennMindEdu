@@ -266,16 +266,21 @@ export default function Home() {
 
            {/* Top Promotional Banner with animation */}
            <motion.div
-             className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900/80 text-primary-foreground p-6 rounded-xl shadow-lg flex items-center justify-between relative overflow-hidden"
+             className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900/80 text-primary-foreground p-6 rounded-xl shadow-lg flex flex-col items-start justify-between relative overflow-hidden min-h-[120px]" // Use flex-col and min-h
              variants={itemVariants}
              initial="hidden"
              animate="show"
              transition={{ delay: 0.1 }}
            >
-             <div className="z-10">
-               <h2 className="text-xl md:text-2xl font-semibold mb-2">
-                 {randomQuote ? `"${randomQuote.quote}" - ${randomQuote.author}` : "Loading quote..."} {/* Display quote and author */}
+             <div className="z-10 w-full"> {/* Make this div full width */}
+               <h2 className="text-xl md:text-2xl font-semibold mb-1">
+                 {randomQuote ? `"${randomQuote.quote}"` : "Loading quote..."} {/* Display only quote */}
                </h2>
+                {randomQuote && (
+                    <span className="block text-base font-normal text-primary-foreground/80 mb-3"> {/* Smaller font size, lighter, margin bottom */}
+                        - {randomQuote.author}
+                    </span>
+                )}
                <Button variant="secondary" size="sm" className="bg-white/20 hover:bg-white/30 text-white px-4 py-1 text-xs h-auto rounded-full shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105 active:scale-95">
                  Keep pushing! &lt;3
                </Button>
@@ -286,6 +291,40 @@ export default function Home() {
                  </svg>
               </div>
            </motion.div>
+
+            {/* Mock Exams Section with animation */}
+            <motion.div
+              className="space-y-4"
+              variants={containerVariants} // Apply container variants
+              initial="hidden"
+              animate="show"
+              transition={{ delay: 0.2 }} // Slight delay
+            >
+               <motion.div className="flex items-center space-x-2 cursor-pointer group" variants={itemVariants}>
+                  <PlusCircle className="w-5 h-5 text-primary" />
+                  <h2 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">Mock exams</h2>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
+               </motion.div>
+                <motion.div
+                  className="grid grid-cols-1 md:grid-cols-3 gap-4"
+                  variants={containerVariants} // Stagger children
+                  initial="hidden"
+                  animate="show"
+                >
+                  {examCards.map((card, index) => (
+                    <motion.div key={index} variants={itemVariants}>
+                      <ExamCard
+                        title={card.title}
+                        icon={card.icon} // Pass icon component
+                        bgColorClass={card.bgColorClass}
+                        textColorClass={card.textColorClass} // Pass text color for icon
+                        isNew={card.isNew}
+                        dataAiHint={card.dataAiHint}
+                      />
+                    </motion.div>
+                  ))}
+                </motion.div>
+            </motion.div>
 
 
            {/* My Subjects Section with animation */}
@@ -376,40 +415,6 @@ export default function Home() {
                  </Button>
              </motion.div>
            </motion.div>
-
-            {/* Mock Exams Section with animation */}
-            <motion.div
-              className="space-y-4"
-              variants={containerVariants} // Apply container variants
-              initial="hidden"
-              animate="show"
-              transition={{ delay: 0.2 }} // Slight delay
-            >
-               <motion.div className="flex items-center space-x-2 cursor-pointer group" variants={itemVariants}>
-                  <PlusCircle className="w-5 h-5 text-primary" />
-                  <h2 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">Mock exams</h2>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
-               </motion.div>
-                <motion.div
-                  className="grid grid-cols-1 md:grid-cols-3 gap-4"
-                  variants={containerVariants} // Stagger children
-                  initial="hidden"
-                  animate="show"
-                >
-                  {examCards.map((card, index) => (
-                    <motion.div key={index} variants={itemVariants}>
-                      <ExamCard
-                        title={card.title}
-                        icon={card.icon} // Pass icon component
-                        bgColorClass={card.bgColorClass}
-                        textColorClass={card.textColorClass} // Pass text color for icon
-                        isNew={card.isNew}
-                        dataAiHint={card.dataAiHint}
-                      />
-                    </motion.div>
-                  ))}
-                </motion.div>
-            </motion.div>
 
 
            {/* Learn With Section with animation */}
