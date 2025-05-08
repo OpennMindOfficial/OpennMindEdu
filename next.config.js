@@ -9,9 +9,10 @@ const nextConfig = {
                 fs: false,
                 tls: false,
                 net: false,
-                http2: false, // Add http2 fallback
-                dns: false, // Add dns fallback
-                async_hooks: false, // Add async_hooks fallback
+                http2: false,
+                dns: false,
+                async_hooks: false,
+                'node:async_hooks': false, // Explicitly handle the node: prefix
             };
         }
 
