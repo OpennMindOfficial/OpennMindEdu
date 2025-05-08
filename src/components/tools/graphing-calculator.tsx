@@ -1,3 +1,4 @@
+
 'use client'; // Required for useEffect and DOM manipulation
 
 import React, { useEffect, useRef } from 'react';

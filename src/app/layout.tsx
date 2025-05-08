@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster"; // Import Toaster
 import Script from "next/script"; // Import Script
-// import { FloatingNav } from "@/components/layout/floating-nav"; // Remove import for FloatingNav
+import { FloatingNav } from "@/components/layout/floating-nav"; // Import FloatingNav
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -41,8 +41,8 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-           {/* Wrap children for potential page transitions */}
-           {/* <FloatingNav /> Remove FloatingNav rendering */}
+           {/* Render FloatingNav */}
+           <FloatingNav />
            {children}
            <Toaster /> {/* Add Toaster back */}
         </ThemeProvider>
