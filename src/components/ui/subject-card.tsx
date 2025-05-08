@@ -1,14 +1,13 @@
-
 'use client';
 
 import React from 'react';
 import Image, { type StaticImageData } from 'next/image';
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from '@/lib/utils';
-import { motion } from 'framer-motion'; // Import motion
+import { motion } from 'framer-motion';
 
 interface SubjectCardProps extends React.HTMLAttributes<HTMLDivElement> {
-  title: string; // Keep title prop for potential future use or data attributes
+  title: string;
   imageUrl: string | StaticImageData;
   bgColorClass?: string;
   className?: string;
@@ -17,42 +16,46 @@ interface SubjectCardProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export function SubjectCard({ title, imageUrl, bgColorClass, className, ...props }: SubjectCardProps) {
   return (
-    <motion.div // Wrap the entire card logic in motion.div if individual animation control is needed later
+    <motion.div // Outer container for hover state and lift effect
       className={cn(
-        "overflow-hidden transition-all duration-300 ease-out hover:shadow-xl rounded-xl group", // Added group for potential hover effects within
-        className // Allows overriding width/height etc.
+        "overflow-visible", // Allow shadow to be visible
+        "transition-all duration-300 ease-out", // Keep transition for shadow
+        "rounded-xl group", // Add group class here for hover targeting
+        "relative",
+        className // Apply width/height etc.
       )}
-      {...props} // Spread the rest of the props including data-ai-hint
+      {...props}
+      whileHover={{ y: -8, transition: { type: "spring", stiffness: 300, damping: 15 } }} // Apply lift effect only to the outer div
     >
       <Card className={cn(
-        "overflow-hidden rounded-xl",
+        "overflow-hidden rounded-xl", // Rounding and clipping
         "border-0", // No border
-        bgColorClass || "bg-card/60 dark:bg-muted/40", // Apply bgColorClass or default to the card itself
-        "w-full h-full", // Ensure card fills the container
-        "relative" // Ensure relative positioning
+        bgColorClass || "bg-card/60 dark:bg-muted/40", // Background
+        "w-full h-full", // Fill container
+        "relative", // For absolute positioning inside
+        "shadow-md group-hover:shadow-xl transition-shadow duration-300 ease-out" // Add shadow effect on group hover
       )}>
         <CardContent className="p-0 relative h-full">
-          {/* Image */}
-           <motion.div
-             className="relative w-full h-full"
-             whileHover={{ scale: 1.05 }} // Apply scale effect on hover to the image container
-             transition={{ type: "spring", stiffness: 300, damping: 15 }}
-           >
-             <Image
-               src={imageUrl}
-               alt={title} // Keep alt text for accessibility
-               fill // Use fill to cover the container
-               style={{ objectFit: 'cover' }} // Cover ensures image fills space
-               className={cn(
-                   "block w-full h-full rounded-xl", // Apply rounding
-                   "transform-style-preserve-3d" // Required for 3D transforms if added later
-               )}
-               priority={false}
-               sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw" // Provide sizes hint
-             />
-           </motion.div>
-          {/* Optional: Add a subtle inner shadow or gradient for depth */}
-           <div className="absolute inset-0 rounded-xl ring-1 ring-inset ring-white/20 dark:ring-black/20 pointer-events-none"></div>
+          {/* Image container */}
+          <div
+            className="relative w-full h-full overflow-hidden rounded-xl" // Ensure overflow is hidden and rounding matches card
+          >
+            <Image
+              src={imageUrl}
+              alt={title}
+              fill
+              style={{ objectFit: 'cover' }}
+              className={cn(
+                  "block w-full h-full",
+                  "transition-transform duration-300 ease-out group-hover:scale-105", // Scale image *within* its container on group hover
+                  "transform-style-preserve-3d"
+              )}
+              priority={false}
+              sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+            />
+          </div>
+          {/* Optional: Inner shadow/gradient */}
+          <div className="absolute inset-0 rounded-xl ring-1 ring-inset ring-black/10 dark:ring-white/10 pointer-events-none"></div>
         </CardContent>
       </Card>
     </motion.div>
