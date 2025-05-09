@@ -36,7 +36,7 @@
 
     --ring: 215 80% 55%; /* Blue */
 
-    --radius: 0.5rem;
+    --radius: 0.75rem; /* Increased for a more playful, rounded feel */
   }
 
   .dark {
@@ -66,7 +66,7 @@
     --secondary-foreground: 210 20% 98%; /* Almost White */
 
 
-    --destructive: 0 62.8% 30.6%; /* Dark Red */
+    --destructive: 0 70% 50%; /* Adjusted Dark Red for better visibility */
     --destructive-foreground: 210 20% 98%; /* Almost White */
 
     --ring: 215 85% 65%; /* Blue */
