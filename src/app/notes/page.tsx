@@ -5,7 +5,7 @@ import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Search, Lightbulb } from "lucide-react"; // Added Lightbulb
+import { PlusCircle, Search, Lightbulb, ArrowLeft } from "lucide-react"; // Added Lightbulb and ArrowLeft
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -14,6 +14,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -88,10 +89,9 @@ export default function NotesPage() {
 
         {/* Non-cancelable Popup Dialog */}
         <Dialog open={isPopupOpen} onOpenChange={(open) => {
-          // Prevent closing by not changing state, or only allow closing if !open (which won't happen here)
-          if (!open) {
-            // This part can be removed if it should truly never close by onOpenChange
-            // setIsPopupOpen(false);
+          // Prevent closing by not changing state unless explicitly handled by a button
+          if (!open && isPopupOpen) { // Only allow programmatic close if desired
+            // setIsPopupOpen(false); // Example: can be set to false by a button
           }
         }}>
           <DialogContent
@@ -115,7 +115,18 @@ export default function NotesPage() {
                 Thank you for your patience. Please check back later.
               </p>
             </div>
-            {/* No footer or close buttons to make it non-cancelable */}
+            <DialogFooter>
+              <Link href="/" passHref legacyBehavior>
+                <Button
+                  variant="outline"
+                  className="hover:scale-105 active:scale-95"
+                  onClick={() => setIsPopupOpen(false)} // Also close popup on navigation
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back to Home
+                </Button>
+              </Link>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
