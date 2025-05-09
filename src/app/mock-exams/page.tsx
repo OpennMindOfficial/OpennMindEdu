@@ -108,26 +108,24 @@ export default function MockExamsPage() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="lg:col-span-2 flex items-center justify-center min-h-[400px] lg:min-h-[500px] relative group" // Added group for hover effects
+              className="lg:col-span-2 flex items-center justify-center min-h-[400px] lg:min-h-[500px] relative group"
             >
-              {/* This div takes full width of col-span-2 and centers content */}
               <div className="w-full h-full flex items-center justify-center relative">
-                {/* Background blur - positioned relative to this centering div */}
                 <div className="absolute w-2/3 h-2/3 bg-primary/10 dark:bg-primary/20 blur-3xl rounded-full -z-10 opacity-60 dark:opacity-40"></div>
 
-                {/* The "Screen" element that holds the logo */}
+                {/* The "Screen" element that holds the logo - Increased size and removed Card */}
                 <motion.div
-                  className="relative w-[70%] sm:w-[60%] md:w-[55%] lg:w-[60%] aspect-[3/4] z-10 rounded-2xl overflow-hidden bg-card/60 dark:bg-zinc-800/60 backdrop-blur-md shadow-xl border border-border/30 transform rotate-[-2.5deg] group-hover:rotate-[-1deg] group-hover:scale-[1.02] transition-all duration-300 ease-out"
+                  className="relative w-[80%] sm:w-[70%] md:w-[65%] lg:w-[70%] aspect-[3/4] z-10 rounded-2xl overflow-hidden bg-transparent backdrop-blur-md transform rotate-[-3.5deg] group-hover:rotate-[-1.5deg] group-hover:scale-[1.03] transition-all duration-300 ease-out"
                   initial={{ opacity: 0, scale: 0.8, rotate: -5 }}
-                  animate={{ opacity: 1, scale: 1, rotate: -2.5 }}
+                  animate={{ opacity: 1, scale: 1, rotate: -3.5 }}
                   transition={{ duration: 0.7, delay: 0.4, type: "spring", stiffness: 120, damping: 15 }}
                 >
                   <Image
                     src={OpennMindLogo}
                     alt="OpennMind Logo Screen"
                     layout="fill"
-                    objectFit="contain"
-                    className="p-10 md:p-12" // Generous padding for the logo to appear centered
+                    objectFit="contain" // Ensures the image fits within the curved container
+                    className="p-8 md:p-10" // Adjusted padding
                     data-ai-hint="logo brand"
                     priority // Prioritize logo loading
                   />
