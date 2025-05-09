@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Header } from "@/components/layout/header";
@@ -103,7 +104,7 @@ export default function MockExamsPage() {
               </Button>
             </motion.div>
 
-            {/* Right Panel: Exam Paper Illustration */}
+            {/* Right Panel: Exam Paper Illustration / OpennMind Logo Display */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -113,19 +114,19 @@ export default function MockExamsPage() {
               <div className="w-full h-full flex items-center justify-center relative">
                 <div className="absolute w-2/3 h-2/3 bg-primary/10 dark:bg-primary/20 blur-3xl rounded-full -z-10 opacity-60 dark:opacity-40"></div>
 
-                {/* The "Screen" element that holds the logo - Increased size and removed Card */}
+                {/* The "Screen" element that holds the logo */}
                 <motion.div
                   className="relative w-[80%] sm:w-[70%] md:w-[65%] lg:w-[70%] aspect-[3/4] z-10 rounded-2xl overflow-hidden bg-transparent backdrop-blur-md transform rotate-[-3.5deg] group-hover:rotate-[-1.5deg] group-hover:scale-[1.03] transition-all duration-300 ease-out"
                   initial={{ opacity: 0, scale: 0.8, rotate: -5 }}
-                  animate={{ opacity: 1, scale: 1, rotate: -3.5 }}
+                  animate={{ opacity: 1, scale: 1, rotate: -3.5 }} // Slight rotation for perspective, "straight" content
                   transition={{ duration: 0.7, delay: 0.4, type: "spring", stiffness: 120, damping: 15 }}
                 >
                   <Image
                     src={OpennMindLogo}
                     alt="OpennMind Logo Screen"
                     layout="fill"
-                    objectFit="contain" // Ensures the image fits within the curved container
-                    className="p-8 md:p-10" // Adjusted padding
+                    objectFit="contain" // Ensures the logo fits within the curved container and remains straight
+                    className="p-8 md:p-10" // Padding to simulate bezel, adjust as needed
                     data-ai-hint="logo brand"
                     priority // Prioritize logo loading
                   />
