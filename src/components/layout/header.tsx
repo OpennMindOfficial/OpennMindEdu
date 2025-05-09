@@ -55,13 +55,13 @@ export function Header() {
       <div className="flex items-center gap-4">
          {/* Logo Section */}
          <div className="flex items-center gap-2 font-bold text-lg text-foreground">
-            <div className="bg-foreground text-background rounded-md p-1.5 flex items-center justify-center">
+            <div className="flex items-center justify-center"> {/* Removed background and padding */}
              <Image
                 src={currentLogo}
                 alt="OpennMind Logo"
-                width={20} // Adjust width as needed (w-5 equivalent)
-                height={20} // Adjust height as needed (h-5 equivalent)
-                className="w-5 h-5" // Keep Tailwind classes for potential overrides or consistency
+                width={20} 
+                height={20} 
+                className="w-5 h-5" 
               />
             </div>
              OpennMind
@@ -120,4 +120,3 @@ export function Header() {
     </motion.header>
   );
 }
-
