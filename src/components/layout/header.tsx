@@ -3,40 +3,42 @@
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Bell, CircleHelp, Settings, GraduationCap, Bug } from "lucide-react";
+import { Search, Bell, CircleHelp, Settings, Bug, GraduationCap } from "lucide-react"; // Added GraduationCap back
 import { ThemeToggle } from "@/components/theme-toggle";
 import Link from "next/link";
-import { SparkleButton } from '@/components/common/sparkle-button'; // Import the new SparkleButton
-import { ShieldQuestion } from 'lucide-react'; // Ensure ShieldQuestion is imported
-import { motion } from 'framer-motion'; // Import motion
-import React, { useRef, useEffect } from 'react'; // Import useRef and useEffect
+import { SparkleButton } from '@/components/common/sparkle-button';
+import { ShieldQuestion } from 'lucide-react';
+import { motion } from 'framer-motion';
+import React, { useRef, useEffect } from 'react';
+// import Image from 'next/image'; // Removed next/image import as it was causing errors with local files
+// import { useTheme } from 'next-themes'; // Removed useTheme import as it's no longer needed for logo switching
+
+// Removed local image imports as they were causing issues
+// import lightThemeLogo from '@/app/lighttheme.png';
+// import darkThemeLogo from '@/app/darktheme.png';
 
 export function Header() {
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      // Check if the key pressed is '/' and the target is not an input/textarea/contentEditable
       if (
         event.key === '/' &&
         document.activeElement?.tagName !== 'INPUT' &&
         document.activeElement?.tagName !== 'TEXTAREA' &&
         !document.activeElement?.isContentEditable
       ) {
-        event.preventDefault(); // Prevent typing '/' in the body
-        searchInputRef.current?.focus(); // Focus the search input
+        event.preventDefault();
+        searchInputRef.current?.focus();
       }
     };
-
-    // Add event listener
     window.addEventListener('keydown', handleKeyDown);
-
-    // Cleanup function to remove event listener
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, []); // Empty dependency array means this effect runs once on mount
+  }, []);
 
+  // Removed useEffect for theme-based logo change as local image imports were problematic
 
   return (
     <motion.header
@@ -48,13 +50,12 @@ export function Header() {
       <div className="flex items-center gap-4">
          {/* Logo Section */}
          <div className="flex items-center gap-2 font-bold text-lg text-foreground">
-            <div className="bg-foreground text-background rounded-md p-1.5"> {/* Adjusted padding and rounding */}
-             {/* Using GraduationCap directly */}
-             <GraduationCap className="w-5 h-5" strokeWidth={2} />
+            <div className="bg-foreground text-background rounded-md p-1.5 flex items-center justify-center"> {/* Adjusted padding and bg */}
+             {/* Reverted to GraduationCap icon due to issues with local image imports */}
+             <GraduationCap className="w-5 h-5" />
             </div>
              OpennMind
-             {/* Using ShieldQuestion directly */}
-             <ShieldQuestion className="w-4 h-4 text-muted-foreground ml-[-4px]" /> {/* Adjusted margin */}
+             <ShieldQuestion className="w-4 h-4 text-muted-foreground ml-[-4px]" />
          </div>
       </div>
 
@@ -63,16 +64,16 @@ export function Header() {
         <div className="relative w-full max-w-xl">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            ref={searchInputRef} // Add ref to the input
+            ref={searchInputRef}
             type="search"
-            placeholder="Search for anything... (Press '/' to focus)" // Update placeholder
-            className="pl-10 w-full bg-background md:bg-muted dark:bg-input rounded-lg" // Changed to rounded-lg
+            placeholder="Search for anything... (Press '/' to focus)"
+            className="pl-10 w-full bg-background md:bg-muted dark:bg-input rounded-lg"
           />
         </div>
       </div>
 
       {/* Right Side Icons & Buttons */}
-      <div className="flex items-center gap-2"> {/* Reduced gap */}
+      <div className="flex items-center gap-2">
         <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground hover:scale-105 active:scale-95">
           <Bell className="h-5 w-5" />
           <span className="sr-only">Notifications</span>
@@ -82,8 +83,7 @@ export function Header() {
           <span className="sr-only">Help</span>
         </Button>
 
-        {/* Upgrade Button - Using SparkleButton */}
-        <SparkleButton className="px-4 hover:scale-105 active:scale-95"> {/* Use px-4 for padding and add bubble effect */}
+        <SparkleButton className="px-4 hover:scale-105 active:scale-95">
             Upgrade
         </SparkleButton>
 
@@ -98,13 +98,10 @@ export function Header() {
           </a>
         </Link>
 
-
-        {/* Bug Report Button */}
         <Link href="/bug-report" passHref legacyBehavior>
            <a>
-             {/* Apply destructive color on hover */}
-             <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 hover:scale-105 active:scale-95">
-                 <Bug className="h-5 w-5 text-red-500 dark:text-red-400 group-hover:text-destructive" /> {/* Direct color + group hover */}
+             <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 hover:scale-105 active:scale-95 group">
+                 <Bug className="h-5 w-5 text-red-400 dark:text-red-500 group-hover:text-destructive" />
                  <span className="sr-only">Report a Bug</span>
              </Button>
            </a>
