@@ -29,9 +29,9 @@ const headingOptions = [
   {
     text1: "Summarize",
     icon1: FileText,
-    text2: "documents",
+    text2: "documents", // This phrasing is concise for "Summarize documents" on one line
     color2: "text-blue-400",
-    text3: "using",
+    text3: "using", // "using AI in seconds" on the second line
     icon2: Sparkles,
     text4: "AI",
     color4: "text-purple-400",
@@ -43,7 +43,7 @@ const headingOptions = [
   {
     text1: "Extract",
     icon1: null,
-    text2: "insights", // Changed from "key points"
+    text2: "insights",
     color2: "text-teal-400",
     text3: "from",
     icon2: FileText,
@@ -122,7 +122,7 @@ export default function PdfToNotesPage() {
       <Sidebar />
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header />
-        <main className="flex-1 overflow-y-auto p-6 md:p-8 flex flex-col items-center justify-center bg-gradient-to-br from-background to-zinc-900/30 dark:from-black dark:to-zinc-900/50 text-foreground">
+        <main className="flex-1 overflow-y-auto px-6 md:px-8 pb-6 md:pb-8 pt-20 flex flex-col items-center justify-start bg-gradient-to-br from-background to-zinc-900/30 dark:from-black dark:to-zinc-900/50 text-foreground">
           <motion.div
             className="w-full max-w-2xl text-center space-y-10"
             initial={{ opacity: 0, y: 20 }}
@@ -133,21 +133,25 @@ export default function PdfToNotesPage() {
             <AnimatePresence mode="wait">
               <motion.h1
                 key={currentHeadingIndex}
-                className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight"
+                className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight min-h-[3em] flex flex-col justify-center items-center" // Added min-height and flex for vertical centering
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.5 }}
               >
-                {currentHeading.text1}{' '}
-                {currentHeading.icon1 && <currentHeading.icon1 className={cn("inline-block w-10 h-10 mb-1 sm:w-12 sm:h-12 md:w-14 md:h-14 align-middle", currentHeading.color2 || 'text-primary')} />}
-                <span className={currentHeading.color2}>{currentHeading.text2}</span>{' '}
-                {currentHeading.text3}{' '}
-                {currentHeading.icon2 && <currentHeading.icon2 className={cn("inline-block w-10 h-10 mb-1 sm:w-12 sm:h-12 md:w-14 md:h-14 align-middle", currentHeading.color4 || 'text-primary')} />}
-                <span className={currentHeading.color4}>{currentHeading.text4}</span>{' '}
-                {currentHeading.text5}{' '}
-                {currentHeading.icon3 && <currentHeading.icon3 className={cn("inline-block w-10 h-10 mb-1 sm:w-12 sm:h-12 md:w-14 md:h-14 align-middle", currentHeading.color6 || 'text-primary')} />}
-                <span className={currentHeading.color6}>{currentHeading.text6}</span>
+                <span>
+                  {currentHeading.text1}{' '}
+                  {currentHeading.icon1 && <currentHeading.icon1 className={cn("inline-block w-10 h-10 mb-1 sm:w-12 sm:h-12 md:w-14 md:h-14 align-middle", currentHeading.color2 || 'text-primary')} />}
+                  <span className={currentHeading.color2}>{currentHeading.text2}</span>{' '}
+                </span>
+                <span>
+                  {currentHeading.text3}{' '}
+                  {currentHeading.icon2 && <currentHeading.icon2 className={cn("inline-block w-10 h-10 mb-1 sm:w-12 sm:h-12 md:w-14 md:h-14 align-middle", currentHeading.color4 || 'text-primary')} />}
+                  <span className={currentHeading.color4}>{currentHeading.text4}</span>{' '}
+                  {currentHeading.text5}{' '}
+                  {currentHeading.icon3 && <currentHeading.icon3 className={cn("inline-block w-10 h-10 mb-1 sm:w-12 sm:h-12 md:w-14 md:h-14 align-middle", currentHeading.color6 || 'text-primary')} />}
+                  <span className={currentHeading.color6}>{currentHeading.text6}</span>
+                </span>
               </motion.h1>
             </AnimatePresence>
 
