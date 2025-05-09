@@ -122,10 +122,10 @@ export default function MockExamsPage() {
                   animate={{ opacity: 1, scale: 1, rotate: -8, y: 0 }}
                   transition={{ duration: 0.7, delay: 0.3, type: "spring", stiffness: 100 }}
                 >
-                  <Card className="h-full w-full bg-card shadow-2xl rounded-lg overflow-hidden border border-border/30">
+                  <Card className="h-full w-full bg-card shadow-2xl rounded-xl overflow-hidden border border-border/30"> {/* Ensure rounded-xl */}
                     <CardHeader className="p-3 border-b border-border/20 bg-muted/30">
                        <div className="flex items-center gap-1.5">
-                         <Image src="/dt.png" alt="OpennMind Logo" width={16} height={16} data-ai-hint="logo brand" />
+                         <Image src="/OpennMind.png" alt="OpennMind Logo" width={16} height={16} data-ai-hint="logo brand" />
                          <CardTitle className="text-xs font-semibold text-muted-foreground">OpennMind</CardTitle>
                        </div>
                     </CardHeader>
@@ -147,10 +147,10 @@ export default function MockExamsPage() {
                   animate={{ opacity: 1, scale: 1, rotate: 2, y: 0 }}
                   transition={{ duration: 0.7, delay: 0.4, type: "spring", stiffness: 100 }}
                 >
-                  <Card className="h-full w-full bg-card shadow-2xl rounded-lg overflow-hidden border border-border/30">
+                  <Card className="h-full w-full bg-card shadow-2xl rounded-xl overflow-hidden border border-border/30"> {/* Ensure rounded-xl */}
                      <CardHeader className="p-3 border-b border-border/20 bg-muted/30">
                         <div className="flex items-center gap-1.5">
-                         <Image src="/dt.png" alt="OpennMind Logo" width={16} height={16} data-ai-hint="logo brand" />
+                         <Image src="/OpennMind.png" alt="OpennMind Logo" width={16} height={16} data-ai-hint="logo brand" />
                          <CardTitle className="text-xs font-semibold text-muted-foreground">OpennMind</CardTitle>
                        </div>
                     </CardHeader>
@@ -171,10 +171,10 @@ export default function MockExamsPage() {
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.7, delay: 0.5, type: "spring", stiffness: 100 }}
                 >
-                  <Card className="h-full w-full bg-card shadow-2xl rounded-lg overflow-hidden border border-border/30">
+                  <Card className="h-full w-full bg-card shadow-2xl rounded-xl overflow-hidden border border-border/30"> {/* Ensure rounded-xl */}
                      <CardHeader className="p-4 border-b border-border/20 bg-muted/30">
                        <div className="flex items-center gap-2">
-                         <Image src="/dt.png" alt="OpennMind Logo" width={20} height={20} data-ai-hint="logo brand" />
+                         <Image src="/OpennMind.png" alt="OpennMind Logo" width={20} height={20} data-ai-hint="logo brand" />
                          <CardTitle className="text-sm font-bold text-foreground">OpennMind</CardTitle>
                        </div>
                     </CardHeader>
@@ -193,3 +193,4 @@ export default function MockExamsPage() {
     </div>
   );
 }
+
