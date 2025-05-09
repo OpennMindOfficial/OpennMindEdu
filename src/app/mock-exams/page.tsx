@@ -12,6 +12,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { motion } from 'framer-motion';
 import { PlusCircle, Zap } from "lucide-react";
 import Image from 'next/image';
+import OpennMindLogo from '@/app/OpennMind.png'; // Import the logo
 
 const subjects = ["Economics", "Mathematics", "Science", "English", "Social Science", "History", "Geography"];
 const questionTypes = ["MCQ", "Short Answer", "Essay", "Mixed (MCQ & Subjective)"];
@@ -111,7 +112,7 @@ export default function MockExamsPage() {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="lg:col-span-2 flex items-center justify-center min-h-[400px] lg:min-h-[500px] relative"
             >
-              <div className="relative w-full max-w-lg h-full">
+              <div className="relative w-full max-w-lg h-full flex items-center justify-center"> {/* Added flex for centering */}
                 {/* Background blur/glow */}
                 <div className="absolute inset-0 bg-primary/10 dark:bg-primary/5 blur-2xl rounded-full -z-10 transform scale-150"></div>
 
@@ -122,10 +123,10 @@ export default function MockExamsPage() {
                   animate={{ opacity: 1, scale: 1, rotate: -8, y: 0 }}
                   transition={{ duration: 0.7, delay: 0.3, type: "spring", stiffness: 100 }}
                 >
-                  <Card className="h-full w-full bg-card shadow-2xl rounded-xl overflow-hidden border border-border/30"> {/* Ensure rounded-xl */}
+                  <Card className="h-full w-full bg-card shadow-2xl rounded-xl overflow-hidden border border-border/30">
                     <CardHeader className="p-3 border-b border-border/20 bg-muted/30">
                        <div className="flex items-center gap-1.5">
-                         <Image src="/OpennMind.png" alt="OpennMind Logo" width={16} height={16} data-ai-hint="logo brand" />
+                         <Image src={OpennMindLogo} alt="OpennMind Logo" width={16} height={16} data-ai-hint="logo brand"/>
                          <CardTitle className="text-xs font-semibold text-muted-foreground">OpennMind</CardTitle>
                        </div>
                     </CardHeader>
@@ -147,10 +148,10 @@ export default function MockExamsPage() {
                   animate={{ opacity: 1, scale: 1, rotate: 2, y: 0 }}
                   transition={{ duration: 0.7, delay: 0.4, type: "spring", stiffness: 100 }}
                 >
-                  <Card className="h-full w-full bg-card shadow-2xl rounded-xl overflow-hidden border border-border/30"> {/* Ensure rounded-xl */}
+                  <Card className="h-full w-full bg-card shadow-2xl rounded-xl overflow-hidden border border-border/30">
                      <CardHeader className="p-3 border-b border-border/20 bg-muted/30">
                         <div className="flex items-center gap-1.5">
-                         <Image src="/OpennMind.png" alt="OpennMind Logo" width={16} height={16} data-ai-hint="logo brand" />
+                         <Image src={OpennMindLogo} alt="OpennMind Logo" width={16} height={16} data-ai-hint="logo brand"/>
                          <CardTitle className="text-xs font-semibold text-muted-foreground">OpennMind</CardTitle>
                        </div>
                     </CardHeader>
@@ -171,10 +172,10 @@ export default function MockExamsPage() {
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.7, delay: 0.5, type: "spring", stiffness: 100 }}
                 >
-                  <Card className="h-full w-full bg-card shadow-2xl rounded-xl overflow-hidden border border-border/30"> {/* Ensure rounded-xl */}
+                  <Card className="h-full w-full bg-card shadow-2xl rounded-xl overflow-hidden border border-border/30">
                      <CardHeader className="p-4 border-b border-border/20 bg-muted/30">
                        <div className="flex items-center gap-2">
-                         <Image src="/OpennMind.png" alt="OpennMind Logo" width={20} height={20} data-ai-hint="logo brand" />
+                         <Image src={OpennMindLogo} alt="OpennMind Logo" width={20} height={20} data-ai-hint="logo brand" />
                          <CardTitle className="text-sm font-bold text-foreground">OpennMind</CardTitle>
                        </div>
                     </CardHeader>
