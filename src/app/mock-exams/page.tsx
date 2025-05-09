@@ -116,12 +116,9 @@ export default function MockExamsPage() {
                  <Image
                     src={OpennMindLogo}
                     alt="OpennMind Logo"
-                    layout="intrinsic" 
-                    width={500} 
-                    height={300} 
-                    objectFit="contain" 
-                    // Image fills its parent div while maintaining aspect ratio. Reduced padding.
-                    className="rounded-2xl h-full w-full object-contain p-2" 
+                    layout="fill" 
+                    objectFit="cover" 
+                    className="rounded-2xl" 
                     data-ai-hint="logo brand"
                     priority
                   />
