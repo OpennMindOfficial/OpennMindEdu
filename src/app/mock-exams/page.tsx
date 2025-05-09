@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Header } from "@/components/layout/header";
@@ -141,3 +142,4 @@ export default function MockExamsPage() {
 }
 // Removed extraneous JSX that was causing the syntax error.
 // The component now correctly ends with the closing brace of the function.
+
