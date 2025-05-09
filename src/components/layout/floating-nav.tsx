@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   motion,
   AnimatePresence,
 } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import {
   Tooltip,
   TooltipContent,
@@ -21,6 +22,9 @@ import {
   BookText,
   Timer,
   FlaskConical,
+  ChevronDown,
+  ChevronUp,
+  Menu,
   type LucideIcon,
 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
@@ -78,9 +82,22 @@ const toolComponents: Record<string, React.ComponentType<any>> = {
   'pomodoro': PomodoroTimer,
 };
 
+const allowedPaths = ['/mock-exams', '/timed-exams'];
+const allowedPathPrefixes = ['/questionbank/'];
+
 export const FloatingNav = ({ className }: { className?: string }) => {
+  const pathname = usePathname();
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [openTools, setOpenTools] = useState<OpenToolsState>({});
+  const [isMinimized, setIsMinimized] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const currentPathIsAllowed =
+      allowedPaths.includes(pathname) ||
+      allowedPathPrefixes.some(prefix => pathname.startsWith(prefix));
+    setIsVisible(currentPathIsAllowed);
+  }, [pathname]);
 
   const handleToggleTool = (toolId: string) => {
     setOpenTools(prev => ({ ...prev, [toolId]: !prev[toolId] }));
@@ -90,6 +107,10 @@ export const FloatingNav = ({ className }: { className?: string }) => {
     setOpenTools(prev => ({ ...prev, [toolId]: false }));
   };
 
+  if (!isVisible) {
+    return null;
+  }
+
   return (
     <>
       <motion.div
@@ -97,93 +118,138 @@ export const FloatingNav = ({ className }: { className?: string }) => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: "easeOut" }}
         className={cn(
-          'flex max-w-fit fixed bottom-4 inset-x-0 mx-auto border border-border rounded-full bg-card/80 backdrop-blur-sm shadow-lg z-50 px-4 py-2 items-center justify-center space-x-4',
+          'flex max-w-fit fixed bottom-4 inset-x-0 mx-auto border border-border rounded-full bg-card/80 backdrop-blur-sm shadow-lg z-50 px-2 py-1.5 items-center justify-center space-x-1',
           className
         )}
       >
         <TooltipProvider delayDuration={0}>
-          {navItems.map((navItem: NavItem, idx: number) => (
-            <div
-              key={`link=${idx}`}
-              className="relative"
-              onMouseEnter={() => setHoveredItem(navItem.name)}
-              onMouseLeave={() => setHoveredItem(null)}
-            >
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  {navItem.subItems ? (
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className={cn(
-                        'relative items-center flex space-x-1 text-foreground hover:text-primary transition-colors px-3 py-1.5 rounded-full'
-                      )}
-                    >
-                      <navItem.icon className="h-5 w-5" />
-                      <span className="hidden sm:block text-sm font-medium">
-                        {navItem.name}
-                      </span>
-                    </motion.button>
-                  ) : (
-                    <motion.div
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <Link
-                        href={navItem.link}
-                        className={cn(
-                          'relative items-center flex space-x-1 text-foreground hover:text-primary transition-colors px-3 py-1.5 rounded-full'
-                        )}
-                      >
-                        <navItem.icon className="h-5 w-5" />
-                        <span className="hidden sm:block text-sm font-medium">
-                          {navItem.name}
-                        </span>
-                      </Link>
-                    </motion.div>
-                  )}
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>{navItem.name}</p>
-                </TooltipContent>
-              </Tooltip>
+          {/* Minimize/Enlarge Button */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <motion.button
+                onClick={() => setIsMinimized(!isMinimized)}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                className="p-1.5 rounded-full hover:bg-muted transition-colors"
+              >
+                {isMinimized ? <ChevronUp className="h-5 w-5 text-foreground" /> : <ChevronDown className="h-5 w-5 text-foreground" />}
+              </motion.button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{isMinimized ? 'Enlarge' : 'Minimize'}</p>
+            </TooltipContent>
+          </Tooltip>
 
-              <AnimatePresence>
-                {hoveredItem === navItem.name && navItem.subItems && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                    transition={{ duration: 0.15, ease: 'easeOut' }}
-                    className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-56 rounded-lg bg-card border border-border shadow-lg py-1 z-50"
+          <AnimatePresence initial={false}>
+            {!isMinimized && (
+              <motion.div
+                initial={{ opacity: 0, width: 0 }}
+                animate={{ opacity: 1, width: 'auto' }}
+                exit={{ opacity: 0, width: 0 }}
+                transition={{ duration: 0.2, ease: 'easeInOut' }}
+                className="flex items-center space-x-1 overflow-hidden"
+              >
+                {navItems.map((navItem: NavItem, idx: number) => (
+                  <div
+                    key={`link=${idx}`}
+                    className="relative"
+                    onMouseEnter={() => setHoveredItem(navItem.name)}
+                    onMouseLeave={() => setHoveredItem(null)}
                   >
-                    {navItem.subItems.map((subItem) => {
-                       const ToolComponent = toolComponents[subItem.toolId];
-                       const isToolOpen = openTools[subItem.toolId] || false;
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        {navItem.subItems ? (
+                          <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className={cn(
+                              'relative items-center flex space-x-1 text-foreground hover:text-primary transition-colors px-2.5 py-1.5 rounded-full'
+                            )}
+                          >
+                            <navItem.icon className="h-5 w-5" />
+                            <span className="hidden sm:block text-sm font-medium">
+                              {navItem.name}
+                            </span>
+                          </motion.button>
+                        ) : (
+                          <motion.div
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                          >
+                            <Link
+                              href={navItem.link}
+                              className={cn(
+                                'relative items-center flex space-x-1 text-foreground hover:text-primary transition-colors px-2.5 py-1.5 rounded-full'
+                              )}
+                            >
+                              <navItem.icon className="h-5 w-5" />
+                              <span className="hidden sm:block text-sm font-medium">
+                                {navItem.name}
+                              </span>
+                            </Link>
+                          </motion.div>
+                        )}
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{navItem.name}</p>
+                      </TooltipContent>
+                    </Tooltip>
 
-                       return (
-                          <div
-                             key={subItem.toolId}
-                             className="flex items-center justify-between px-3 py-2 text-sm hover:bg-muted rounded-md mx-1 cursor-default"
-                           >
-                             <div className="flex items-center gap-2">
-                               <subItem.icon className="w-4 h-4 text-muted-foreground" />
-                               <span className="text-foreground">{subItem.name}</span>
-                             </div>
-                             <Switch
-                               checked={isToolOpen}
-                               onCheckedChange={() => handleToggleTool(subItem.toolId)}
-                               aria-label={`Enable ${subItem.name}`}
-                               size="sm"
-                             />
-                          </div>
-                       );
-                     })}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          ))}
+                    <AnimatePresence>
+                      {hoveredItem === navItem.name && navItem.subItems && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                          transition={{ duration: 0.15, ease: 'easeOut' }}
+                          className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-56 rounded-lg bg-card border border-border shadow-lg py-1 z-50"
+                        >
+                          {navItem.subItems.map((subItem) => {
+                            const isToolOpen = openTools[subItem.toolId] || false;
+                            return (
+                              <div
+                                key={subItem.toolId}
+                                className="flex items-center justify-between px-3 py-2 text-sm hover:bg-muted rounded-md mx-1 cursor-default"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <subItem.icon className="w-4 h-4 text-muted-foreground" />
+                                  <span className="text-foreground">{subItem.name}</span>
+                                </div>
+                                <Switch
+                                  checked={isToolOpen}
+                                  onCheckedChange={() => handleToggleTool(subItem.toolId)}
+                                  aria-label={`Enable ${subItem.name}`}
+                                  size="sm"
+                                />
+                              </div>
+                            );
+                          })}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+          {isMinimized && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <motion.button
+                  onClick={() => setIsMinimized(false)} /* Clicking the menu icon when minimized should enlarge it */
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="p-1.5 rounded-full hover:bg-muted transition-colors"
+                  aria-label="Open navigation"
+                >
+                  <Menu className="h-5 w-5 text-foreground" />
+                </motion.button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Open Tools</p>
+              </TooltipContent>
+            </Tooltip>
+          )}
         </TooltipProvider>
       </motion.div>
       <AnimatePresence>

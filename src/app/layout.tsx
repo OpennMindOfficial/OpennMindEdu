@@ -4,9 +4,9 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
-import { Toaster } from "@/components/ui/toaster"; // Import Toaster
-import Script from "next/script"; // Import Script
-import { FloatingNav } from "@/components/layout/floating-nav"; // Import FloatingNav
+import { Toaster } from "@/components/ui/toaster";
+import Script from "next/script";
+import { FloatingNav } from "@/components/layout/floating-nav";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -23,15 +23,14 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning >
       <head>
-         {/* Desmos API Script - ensure it loads before interactive */}
          <Script
            src="https://www.desmos.com/api/v1.10/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"
-           strategy="beforeInteractive" // Load before page becomes interactive
+           strategy="beforeInteractive"
          />
       </head>
       <body
         className={cn(
-          "min-h-screen bg-background font-sans antialiased", // Removed overflow-hidden from body
+          "min-h-screen bg-background font-sans antialiased",
           inter.variable
         )}
       >
@@ -41,13 +40,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-           {/* Render FloatingNav - Ensure it's rendered here */}
            {children}
-           <FloatingNav /> {/* Moved FloatingNav to the end, but still within ThemeProvider */}
-           <Toaster /> {/* Add Toaster back */}
+           <FloatingNav /> {/* FloatingNav will internally decide if it should render based on path */}
+           <Toaster />
         </ThemeProvider>
       </body>
     </html>
   );
 }
-
