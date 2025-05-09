@@ -18,8 +18,9 @@ import {
   Layers3,
   Circle,
   CheckCircle2,
-  MinusCircle, // Using MinusCircle for in_progress for now
+  MinusCircle,
   ArrowLeft,
+  BookOpen,
 } from "lucide-react";
 import Link from 'next/link';
 import Image, { type StaticImageData } from 'next/image';
@@ -70,33 +71,32 @@ const qbSubjects: SubjectForQB[] = [
 
 const chaptersBySubject: Record<string, Chapter[]> = {
   'math-10': [
-    { id: 'm10-real-numbers', name: "Real Numbers", questionCount: 212, status: 'in_progress' },
-    { id: 'm10-polynomials', name: "Polynomials", questionCount: 154, status: 'completed' },
-    { id: 'm10-linear-equations', name: "Pair of Linear Equations in Two Variables", questionCount: 199, status: 'not_started' },
-    { id: 'm10-quadratic-equations', name: "Quadratic Equations", questionCount: 420, status: 'not_started' },
-    { id: 'm10-arithmetic-progressions', name: "Arithmetic Progressions", questionCount: 540, status: 'not_started' },
-    { id: 'm10-triangles', name: "Triangles", questionCount: 210, status: 'not_started' },
-    { id: 'm10-coordinate-geometry', name: "Coordinate Geometry", questionCount: 340, status: 'not_started' },
-    { id: 'm10-trigonometry-intro', name: "Introduction to Trigonometry", questionCount: 411, status: 'not_started' },
-    { id: 'm10-trigonometry-apps', name: "Some Applications of Trigonometry", questionCount: 269, status: 'not_started' },
+    { id: 'real-numbers', name: "Real Numbers", questionCount: 212, status: 'in_progress' },
+    { id: 'polynomials', name: "Polynomials", questionCount: 154, status: 'completed' },
+    { id: 'linear-equations', name: "Pair of Linear Equations in Two Variables", questionCount: 199, status: 'not_started' },
+    { id: 'quadratic-equations', name: "Quadratic Equations", questionCount: 420, status: 'not_started' },
+    { id: 'arithmetic-progressions', name: "Arithmetic Progressions", questionCount: 540, status: 'not_started' },
+    { id: 'triangles', name: "Triangles", questionCount: 210, status: 'not_started' },
+    { id: 'coordinate-geometry', name: "Coordinate Geometry", questionCount: 340, status: 'not_started' },
+    { id: 'trigonometry-intro', name: "Introduction to Trigonometry", questionCount: 411, status: 'not_started' },
+    { id: 'trigonometry-apps', name: "Some Applications of Trigonometry", questionCount: 269, status: 'not_started' },
   ],
   'science-10': [
-    { id: 's10-chem-reactions', name: "Chemical Reactions and Equations", questionCount: 180, status: 'completed' },
-    { id: 's10-acids-bases', name: "Acids, Bases and Salts", questionCount: 205, status: 'in_progress' },
-    { id: 's10-metals-nonmetals', name: "Metals and Non-metals", questionCount: 230, status: 'not_started' },
+    { id: 'chem-reactions', name: "Chemical Reactions and Equations", questionCount: 180, status: 'completed' },
+    { id: 'acids-bases', name: "Acids, Bases and Salts", questionCount: 205, status: 'in_progress' },
+    { id: 'metals-nonmetals', name: "Metals and Non-metals", questionCount: 230, status: 'not_started' },
   ],
-  // Add more chapters for other subjects
   'english-10': [
-     { id: 'e10-letter-god', name: "A Letter to God", questionCount: 50, status: 'completed' },
-     { id: 'e10-dust-snow', name: "Dust of Snow & Fire and Ice", questionCount: 35, status: 'in_progress' },
+     { id: 'letter-god', name: "A Letter to God", questionCount: 50, status: 'completed' },
+     { id: 'dust-snow', name: "Dust of Snow & Fire and Ice", questionCount: 35, status: 'in_progress' },
   ],
   'social-sci-10': [
-    { id: 'ss10-nationalism-india', name: "Nationalism in India", questionCount: 150, status: 'in_progress' },
-    { id: 'ss10-resources-dev', name: "Resources and Development", questionCount: 120, status: 'not_started' },
+    { id: 'nationalism-india', name: "Nationalism in India", questionCount: 150, status: 'in_progress' },
+    { id: 'resources-dev', name: "Resources and Development", questionCount: 120, status: 'not_started' },
   ],
   'hindi-10': [
-     { id: 'h10-surdas-pad', name: "सूरदास के पद", questionCount: 60, status: 'completed' },
-     { id: 'h10-ram-lakshman', name: "राम-लक्ष्मण-परशुराम संवाद", questionCount: 75, status: 'not_started' },
+     { id: 'surdas-pad', name: "सूरदास के पद", questionCount: 60, status: 'completed' },
+     { id: 'ram-lakshman', name: "राम-लक्ष्मण-परशुराम संवाद", questionCount: 75, status: 'not_started' },
   ],
 };
 
@@ -111,12 +111,19 @@ const itemVariants = {
   show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
 };
 
+const pageTransitionVariants = {
+  initial: { opacity: 0, x: -20 },
+  animate: { opacity: 1, x: 0 },
+  exit: { opacity: 0, x: 20 },
+};
+
+
 const getStatusIcon = (status: Chapter['status']) => {
   switch (status) {
     case 'completed':
       return <CheckCircle2 className="w-5 h-5 text-green-500" />;
     case 'in_progress':
-      return <MinusCircle className="w-5 h-5 text-yellow-500" />; // Or a progress icon
+      return <MinusCircle className="w-5 h-5 text-yellow-500" />; 
     case 'not_started':
     default:
       return <Circle className="w-5 h-5 text-muted-foreground/70" />;
@@ -135,7 +142,7 @@ export default function QuestionBankPage() {
       subjectName: subject.title,
       grade: subject.grade,
       chapters: chaptersBySubject[subject.id] || [],
-      imageUrl: subject.imageUrl, // Pass imageUrl for potential background use
+      imageUrl: subject.imageUrl, 
     });
   };
 
@@ -155,12 +162,18 @@ export default function QuestionBankPage() {
               animate="show"
               variants={containerVariants}
             >
-              <motion.h1
-                className="text-2xl md:text-3xl font-bold text-foreground mb-6"
+              <motion.div variants={itemVariants} className="flex items-center gap-3 mb-6">
+                 <BookOpen className="w-7 h-7 text-primary" />
+                 <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+                    Question Bank
+                 </h1>
+              </motion.div>
+              <motion.h2
+                className="text-xl md:text-2xl font-semibold text-foreground mb-6"
                 variants={itemVariants}
               >
-                Select a Subject for Question Bank
-              </motion.h1>
+                Select a Subject
+              </motion.h2>
               <motion.div
                 className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
                 variants={containerVariants}
@@ -176,7 +189,7 @@ export default function QuestionBankPage() {
                       title={subject.title}
                       imageUrl={subject.imageUrl}
                       bgColorClass={subject.bgColorClass}
-                      className="w-full h-[280px] md:h-[300px]" // Adjusted height for subject cards
+                      className="w-full h-[280px] md:h-[300px]" 
                       data-ai-hint={subject.dataAiHint || subject.title.toLowerCase().split(" ")[0]}
                     />
                   </motion.div>
@@ -195,7 +208,15 @@ export default function QuestionBankPage() {
       <Sidebar />
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header />
-        <main className="flex-1 overflow-y-auto bg-muted/20 dark:bg-zinc-900/30">
+        <motion.main 
+          className="flex-1 overflow-y-auto bg-muted/20 dark:bg-zinc-900/30"
+          key="chapter-list-view" // Add key for AnimatePresence
+          variants={pageTransitionVariants}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          transition={{ duration: 0.3 }}
+        >
           {/* Background and Header Section */}
           <motion.div
             className="relative p-6 md:p-8 pt-6 md:pt-8 bg-gradient-to-br from-primary/20 to-background dark:from-primary/10 dark:to-zinc-900/50 min-h-[200px] md:min-h-[220px] flex flex-col justify-end"
@@ -254,7 +275,7 @@ export default function QuestionBankPage() {
                 </TabsList>
               </div>
 
-              <TabsContent value="questionbank" className="mt-0"> {/* Removed top margin for direct integration */}
+              <TabsContent value="questionbank" className="mt-0"> 
                 <motion.div
                   className="bg-card dark:bg-zinc-800/80 border border-border/20 rounded-xl shadow-xl backdrop-blur-md"
                   initial="hidden"
@@ -264,19 +285,25 @@ export default function QuestionBankPage() {
                   {selectedSubject.chapters.length > 0 ? (
                     <ul className="divide-y divide-border/10 dark:divide-border/5">
                       {selectedSubject.chapters.map((chapter, index) => (
-                        <motion.li
-                          key={chapter.id}
-                          className="flex items-center justify-between p-4 hover:bg-muted/30 dark:hover:bg-muted/20 transition-colors duration-150 cursor-pointer first:rounded-t-xl last:rounded-b-xl"
-                          variants={itemVariants}
-                        >
-                          <div className="flex items-center gap-3">
-                            {getStatusIcon(chapter.status)}
-                            <span className="text-sm font-medium text-foreground">{chapter.name}</span>
-                          </div>
-                          <span className="text-xs text-muted-foreground">
-                            {chapter.questionCount} questions
-                          </span>
-                        </motion.li>
+                        <Link href={`/questionbank/${selectedSubject.id}/${chapter.id}`} key={chapter.id} passHref legacyBehavior>
+                          <motion.a
+                            className="flex items-center justify-between p-4 hover:bg-muted/30 dark:hover:bg-muted/20 transition-colors duration-150 cursor-pointer first:rounded-t-xl last:rounded-b-xl"
+                            variants={itemVariants}
+                            whileHover={{ x: 2 }}
+                            transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                          >
+                            <div className="flex items-center gap-3">
+                              {getStatusIcon(chapter.status)}
+                              <span className="text-sm font-medium text-foreground">{chapter.name}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <span className="text-xs text-muted-foreground">
+                                  {chapter.questionCount} questions
+                                </span>
+                                <ChevronRight className="w-4 h-4 text-muted-foreground/70" />
+                            </div>
+                          </motion.a>
+                        </Link>
                       ))}
                     </ul>
                   ) : (
@@ -303,9 +330,10 @@ export default function QuestionBankPage() {
               </TabsContent>
             </Tabs>
           </div>
-           <div className="pb-8"></div> {/* Padding at the bottom of the scrollable area */}
-        </main>
+           <div className="pb-8"></div> 
+        </motion.main>
       </div>
     </div>
   );
 }
+
