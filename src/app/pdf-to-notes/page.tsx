@@ -10,6 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { UploadCloud, Link as LinkIcon, Sparkles, GraduationCap, FileText, Zap } from "lucide-react";
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { useTheme } from 'next-themes'; // Import useTheme
 
 const headingOptions = [
   {
@@ -29,10 +30,10 @@ const headingOptions = [
   {
     text1: "Summarize",
     icon1: FileText,
-    text2_part1: "docs ", // "docs " with a space
-    color2_part1: "text-blue-400", // Color for "docs "
-    text2_part2: "fast", // "fast"
-    color2_part2: "text-white", // Color for "fast"
+    text2_part1: "docs ", 
+    color2_part1: "text-blue-400", 
+    text2_part2: "fast", 
+    color2_part2: "text-white", // Default for dark theme
     text3: "using",
     icon2: Sparkles,
     text4: "AI",
@@ -40,7 +41,7 @@ const headingOptions = [
     text5: "in seconds.",
     icon3: null,
     text6: "",
-    color6: "text-yellow-400", // This might be vestigial if text6 is always empty
+    color6: "text-yellow-400", 
   },
   {
     text1: "Extract",
@@ -63,11 +64,12 @@ export default function PdfToNotesPage() {
   const [file, setFile] = useState<File | null>(null);
   const [link, setLink] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const { theme } = useTheme(); // Get the current theme
 
   useEffect(() => {
     const intervalId = setInterval(() => {
       setCurrentHeadingIndex((prevIndex) => (prevIndex + 1) % headingOptions.length);
-    }, 3000); // Change heading every 3 seconds
+    }, 3000); 
 
     return () => clearInterval(intervalId);
   }, []);
@@ -78,9 +80,8 @@ export default function PdfToNotesPage() {
       if (selectedFile.type === "application/pdf" && selectedFile.size <= 25 * 1024 * 1024) {
         setFile(selectedFile);
       } else {
-        // Add toast notification for invalid file or size
         alert("Please upload a PDF file smaller than 25MB.");
-        event.target.value = ""; // Clear the input
+        event.target.value = ""; 
       }
     }
   };
@@ -110,7 +111,6 @@ export default function PdfToNotesPage() {
     }
     setIsGenerating(true);
     console.log("Generating notes from:", file ? file.name : link);
-    // Simulate API call
     setTimeout(() => {
       setIsGenerating(false);
       alert("Notes generated (simulated)!");
@@ -124,14 +124,13 @@ export default function PdfToNotesPage() {
       <Sidebar />
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header />
-        <main className="flex-1 overflow-y-auto px-6 md:px-8 pb-6 md:pb-8 pt-8 md:pt-10 flex flex-col items-center justify-start bg-gradient-to-br from-background to-zinc-900/30 dark:from-black dark:to-zinc-900/50 text-foreground">
+        <main className="flex-1 overflow-y-auto px-6 md:px-8 pb-6 md:pb-8 pt-6 md:pt-8 flex flex-col items-center justify-start bg-gradient-to-br from-background to-zinc-900/30 dark:from-black dark:to-zinc-900/50 text-foreground">
           <motion.div
-            className="w-full max-w-2xl text-center space-y-6"
+            className="w-full max-w-2xl text-center space-y-4" // Reduced space-y from 6 to 4
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            {/* Animated Heading */}
             <AnimatePresence mode="wait">
               <motion.h1
                 key={currentHeadingIndex}
@@ -154,7 +153,15 @@ export default function PdfToNotesPage() {
                   {(currentHeading as any).text2_part1 ? (
                     <>
                       <span className={(currentHeading as any).color2_part1}>{(currentHeading as any).text2_part1}</span>
-                      {(currentHeading as any).text2_part2 && <span className={(currentHeading as any).color2_part2}>{(currentHeading as any).text2_part2}</span>}
+                      {(currentHeading as any).text2_part2 && (
+                        <span className={cn(
+                          (currentHeading.text1 === "Summarize" && (currentHeading as any).text2_part2 === "fast")
+                            ? (theme === 'light' ? 'text-black' : 'text-white')
+                            : (currentHeading as any).color2_part2
+                        )}>
+                          {(currentHeading as any).text2_part2}
+                        </span>
+                      )}
                     </>
                   ) : (
                     currentHeading.text2 && <span className={currentHeading.color2}>{currentHeading.text2}</span>
@@ -172,7 +179,6 @@ export default function PdfToNotesPage() {
               </motion.h1>
             </AnimatePresence>
 
-            {/* Uploader Card */}
             <Card className="bg-card/70 dark:bg-zinc-800/60 border border-dashed border-border/50 rounded-xl shadow-xl backdrop-blur-md p-6 md:p-8">
               <CardContent className="p-0 space-y-6">
                 <div
@@ -244,7 +250,6 @@ export default function PdfToNotesPage() {
   );
 }
 
-// Loader component (can be moved to a separate file)
 const Loader2 = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
