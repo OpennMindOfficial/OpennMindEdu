@@ -33,7 +33,8 @@ export default function MockExamsPage() {
             <h1 className="text-2xl md:text-3xl font-bold text-foreground">Exam Builder</h1>
           </motion.div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+          {/* Grid container: removed items-start to allow items to stretch to the same height */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Left Panel: Exam Configuration */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
@@ -105,21 +106,22 @@ export default function MockExamsPage() {
             </motion.div>
 
             {/* Right Panel: OpennMind Logo Display */}
+            {/* Removed explicit height style, added h-full to fill grid cell height */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="lg:col-span-2 relative overflow-hidden rounded-2xl shadow-xl bg-gradient-to-br from-slate-100/50 to-zinc-200/50 dark:from-black/30 dark:to-zinc-900/60 flex justify-center items-center"
-              style={{ height: '450px' }} // Set explicit height to match selector panel level
+              className="lg:col-span-2 relative overflow-hidden rounded-2xl shadow-xl bg-gradient-to-br from-slate-100/50 to-zinc-200/50 dark:from-black/30 dark:to-zinc-900/60 flex justify-center items-center h-full"
             >
                  <Image
                     src={OpennMindLogo}
                     alt="OpennMind Logo"
-                    layout="intrinsic" // Changed from fill to intrinsic to respect image's aspect ratio
-                    width={500} // Provide a base width, height will be auto based on aspect ratio
-                    height={300} // Provide a base height
-                    objectFit="contain" // Ensure the entire logo is visible and centered
-                    className="rounded-2xl max-h-full max-w-full p-4" // Added padding and max constraints
+                    layout="intrinsic" 
+                    width={500} 
+                    height={300} 
+                    objectFit="contain" 
+                    // Image fills its parent div while maintaining aspect ratio. Reduced padding.
+                    className="rounded-2xl h-full w-full object-contain p-2" 
                     data-ai-hint="logo brand"
                     priority
                   />
