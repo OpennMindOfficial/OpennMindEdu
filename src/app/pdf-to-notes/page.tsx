@@ -43,7 +43,7 @@ const headingOptions = [
   {
     text1: "Extract",
     icon1: null,
-    text2: "key points",
+    text2: "insights", // Changed from "key points"
     color2: "text-teal-400",
     text3: "from",
     icon2: FileText,
@@ -240,3 +240,4 @@ const Loader2 = (props: React.SVGProps<SVGSVGElement>) => (
     <path d="M21 12a9 9 0 1 1-6.219-8.56" />
   </svg>
 );
+
