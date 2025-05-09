@@ -1,17 +1,16 @@
-
 'use client'; // Make Header a client component for useEffect and refs
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Bell, CircleHelp, Settings, Bug } from "lucide-react"; // Removed GraduationCap as logo is image now
+import { Search, Bell, CircleHelp, Settings, Bug } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import Link from "next/link";
 import { SparkleButton } from '@/components/common/sparkle-button';
 import { ShieldQuestion } from 'lucide-react';
 import { motion } from 'framer-motion';
 import React, { useRef, useEffect, useState } from 'react';
-import Image, { type StaticImageData } from 'next/image'; // Import next/image
-import { useTheme } from 'next-themes'; // Import useTheme
+import Image, { type StaticImageData } from 'next/image';
+import { useTheme } from 'next-themes';
 
 // Import local images for logo
 import lightThemeLogo from '@/app/lt.png';
@@ -20,7 +19,7 @@ import darkThemeLogo from '@/app/dt.png';
 export function Header() {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const { theme } = useTheme();
-  const [currentLogo, setCurrentLogo] = useState<StaticImageData>(lightThemeLogo); // Default to light theme logo
+  const [currentLogo, setCurrentLogo] = useState<StaticImageData>(lightThemeLogo);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -41,7 +40,6 @@ export function Header() {
   }, []);
 
   useEffect(() => {
-    // Update logo based on theme
     setCurrentLogo(theme === 'dark' ? darkThemeLogo : lightThemeLogo);
   }, [theme]);
 
@@ -59,9 +57,10 @@ export function Header() {
              <Image
                 src={currentLogo}
                 alt="OpennMind Logo"
-                width={24}
-                height={24}
-                quality={90} // Increased quality
+                width={32} // Increased size
+                height={32} // Increased size
+                quality={100} // Max quality
+                priority // Prioritize loading for LCP
               />
             </div>
              OpennMind
