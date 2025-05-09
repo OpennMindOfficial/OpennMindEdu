@@ -6,7 +6,7 @@ import Image, { type StaticImageData } from 'next/image';
 import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar"; // Updated Sidebar import
 import { SubjectCard } from "@/components/ui/subject-card";
-import { ExamCard } from "@/components/ui/exam-card";
+// import { ExamCard } from "@/components/ui/exam-card"; // Removed ExamCard import
 import { LearnWithCard } from "@/components/ui/learn-with-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"; // Import Card and related components
 import { Button } from "@/components/ui/button";
@@ -23,11 +23,11 @@ import {
   FileText,
   Layers,
   ChevronLeft, // Import ChevronLeft
-  Dices, // Icon for Random Exam
-  SlidersHorizontal, // Icon for Custom Exam
-  Timer, // Icon for Timed Exam
-  PenTool, // Icon for Sketchpad
-  GraduationCap, // Icon for Revision Plan
+  Dices, 
+  SlidersHorizontal, 
+  Timer, 
+  PenTool, 
+  GraduationCap, 
   type LucideIcon,
 } from "lucide-react";
 import React, { useState, useEffect, useRef } from 'react'; // Import useRef
@@ -39,16 +39,16 @@ import quotesData from './quotes.json'; // Import the quotes JSON file
 // Import local images for subjects
 import itImage from './it.png';
 import englishLitImage from './english_lit.png';
-import socialSciImage from './social_sci.png'; // Assuming file name exists
+import socialSciImage from './social_sci.png'; 
 import englishCommImage from './english_comm.png';
 import mathImage from './maths.png';
-import scienceImage from './science.png'; // Assuming this file exists
+import scienceImage from './science.png'; 
 import hindiImage from './hindi.png';
 
-// Import images for exam cards
-import i1 from './i1.png'; // Random exam
-import i2 from './i2.png'; // Custom exam
-import i3 from './i3.png'; // Timed exam
+// Import images for exam cards - These are now used in mock-exams page
+// import i1 from './i1.png'; 
+// import i2 from './i2.png'; 
+// import i3 from './i3.png';
 
 interface Quote {
     quote: string;
@@ -101,38 +101,42 @@ const subjects = [
   },
 ];
 
-// Data for Exam Cards using icons
-const examCards: {
+// Data for Exam Cards using icons - This data is now primarily for mock-exams page
+const examCardsData: {
   title: string;
   icon: LucideIcon;
   bgColorClass: string;
   textColorClass: string;
   isNew?: boolean;
   dataAiHint: string;
+  imageUrl?: StaticImageData; // Keep imageUrl if still needed for other contexts
 }[] = [
  {
     title: "Random exam",
-    icon: Dices, // Use imported icon
+    icon: Dices, 
     bgColorClass: "bg-gradient-to-br from-blue-200/50 to-white dark:from-blue-800/30 dark:to-background",
     textColorClass: "text-blue-800 dark:text-blue-300",
     isNew: false,
     dataAiHint: "random dice",
+    // imageUrl: i1, // This will be used in mock-exams page directly
   },
   {
     title: "Custom exam",
-    icon: SlidersHorizontal, // Use imported icon
+    icon: SlidersHorizontal, 
     bgColorClass: "bg-gradient-to-br from-green-200/50 to-white dark:from-green-800/30 dark:to-background",
     textColorClass: "text-green-800 dark:text-green-300",
     isNew: true,
     dataAiHint: "custom settings sliders",
+    // imageUrl: i2,
   },
   {
     title: "Timed exam",
-    icon: Timer, // Use imported icon
+    icon: Timer, 
     bgColorClass: "bg-gradient-to-br from-pink-200/50 to-white dark:from-pink-800/30 dark:to-background",
     textColorClass: "text-pink-800 dark:text-pink-300",
     isNew: true,
     dataAiHint: "timed clock stopwatch",
+    // imageUrl: i3,
   },
 ];
 
@@ -150,15 +154,12 @@ const learnWithCards = [
 ];
 
 
-// Motivational Study Quotes are now imported from JSON
-// const studyQuotes = [ ... ];
-
 const containerVariants = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1, // Stagger children animation
+      staggerChildren: 0.1, 
     },
   },
 };
@@ -169,20 +170,18 @@ const itemVariants = {
 };
 
 export default function Home() {
-  const userName = "Rudransh"; // Mock user name
+  const userName = "Rudransh"; 
   const [randomQuote, setRandomQuote] = useState<Quote | null>(null);
   const [greeting, setGreeting] = useState('');
-  const scrollContainerRef = useRef<HTMLDivElement>(null); // Ref for scroll container
+  const scrollContainerRef = useRef<HTMLDivElement>(null); 
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
 
   useEffect(() => {
-    // Select a random quote from the imported JSON data
     const allQuotes = quotesData.quotes;
     const randomIndex = Math.floor(Math.random() * allQuotes.length);
-    setRandomQuote(allQuotes[randomIndex]); // Set the entire quote object
+    setRandomQuote(allQuotes[randomIndex]); 
 
-    // Determine greeting based on local time
     const hour = new Date().getHours();
     if (hour < 12) {
       setGreeting("Good morning");
@@ -192,7 +191,6 @@ export default function Home() {
       setGreeting("Good evening");
     }
 
-    // Check scroll arrows initially and on resize/scroll
     checkScrollArrows();
     const container = scrollContainerRef.current;
     if (container) {
@@ -200,7 +198,6 @@ export default function Home() {
         window.addEventListener('resize', checkScrollArrows);
     }
 
-    // Initial check
     checkScrollArrows();
 
 
@@ -210,12 +207,11 @@ export default function Home() {
             window.removeEventListener('resize', checkScrollArrows);
         }
     };
-  }, []); // Empty dependency array ensures this runs only once on mount
+  }, []); 
 
   const checkScrollArrows = () => {
       const container = scrollContainerRef.current;
       if (!container) return;
-      // Introduce a small tolerance (e.g., 1 pixel) for floating point inaccuracies
       const tolerance = 1;
       const scrollLeft = container.scrollLeft;
       const scrollWidth = container.scrollWidth;
@@ -229,31 +225,28 @@ export default function Home() {
   const scroll = (direction: 'left' | 'right') => {
       const container = scrollContainerRef.current;
       if (!container) return;
-      const scrollAmount = container.clientWidth * 0.8; // Scroll by 80% of visible width
+      const scrollAmount = container.clientWidth * 0.8; 
       container.scrollBy({
         left: direction === 'left' ? -scrollAmount : scrollAmount,
         behavior: 'smooth',
       });
-      // Re-check arrows shortly after starting scroll to update state quickly
       setTimeout(checkScrollArrows, 150);
-      setTimeout(checkScrollArrows, 350); // Check again after smooth scroll likely finished
+      setTimeout(checkScrollArrows, 350); 
   };
 
 
 
   return (
     <div className="flex h-screen bg-background text-foreground overflow-hidden">
-      <Sidebar /> {/* Use updated Sidebar */}
+      <Sidebar /> 
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header />
-        {/* Main content area allows vertical scrolling */}
         <motion.main
           className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 bg-background"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
         >
-           {/* Greeting with animation */}
            <motion.h1
              className="text-3xl font-bold text-foreground"
              variants={itemVariants}
@@ -263,13 +256,12 @@ export default function Home() {
              {greeting}, {userName}
            </motion.h1>
 
-           {/* Top Promotional Banner (Quote) with animation */}
            <motion.div
              className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900/80 text-primary-foreground p-6 rounded-xl shadow-lg flex flex-col items-start justify-between relative overflow-hidden min-h-[120px]"
              variants={itemVariants}
              initial="hidden"
              animate="show"
-             transition={{ delay: 0.1 }} // Keep a small delay
+             transition={{ delay: 0.1 }} 
            >
              <div className="space-y-1">
                  <h2 className="text-xl md:text-2xl font-semibold mb-2">
@@ -284,13 +276,12 @@ export default function Home() {
            </motion.div>
 
 
-            {/* My Subjects Section with animation */}
            <motion.div
              className="space-y-4"
-             variants={containerVariants} // Apply container variants
+             variants={containerVariants} 
              initial="hidden"
              animate="show"
-             transition={{ delay: 0.2 }} // Adjusted delay
+             transition={{ delay: 0.2 }} 
            >
              <div className="flex justify-between items-center">
                  <div className="flex items-center space-x-2 cursor-pointer group">
@@ -306,30 +297,27 @@ export default function Home() {
                  </div>
              </div>
 
-             {/* Horizontal scroll container with arrows */}
              <div className="relative">
                  <div ref={scrollContainerRef} className="w-full overflow-x-auto scrollbar-hide whitespace-nowrap">
-                   <div className="flex w-max space-x-4 pb-4"> {/* Use flex w-max */}
+                   <div className="flex w-max space-x-4 pb-4"> 
                    {subjects.map((subject, index) => (
                      <motion.div
                         key={index}
                         variants={itemVariants}
-                        className="w-[240px] h-[340px] flex-shrink-0 group" // Added group here as well
+                        className="w-[240px] h-[340px] flex-shrink-0 group" 
                      >
                        <SubjectCard
-                         title={subject.title} // Keep title for accessibility/data
+                         title={subject.title} 
                          imageUrl={subject.imageUrl}
                          bgColorClass={subject.bgColorClass}
                          data-ai-hint={subject.dataAiHint || subject.title.split(' ')[0].toLowerCase()}
-                         className="w-full h-full" // Ensure card fills the container
+                         className="w-full h-full" 
                        />
                      </motion.div>
                    ))}
                  </div>
-                 {/* Removed scrollbar component */}
                  </div>
 
-                 {/* Left Scroll Button */}
                  <AnimatePresence>
                  {showLeftArrow && (
                      <motion.div
@@ -345,7 +333,6 @@ export default function Home() {
                  )}
                  </AnimatePresence>
 
-                 {/* Right Scroll Button */}
                  <AnimatePresence>
                  {showRightArrow && (
                      <motion.div
@@ -364,19 +351,17 @@ export default function Home() {
            </motion.div>
 
 
-           {/* Learn With Section with animation */}
            <motion.div
              className="space-y-4"
-             variants={containerVariants} // Container variants
+             variants={containerVariants} 
              initial="hidden"
              animate="show"
-             transition={{ delay: 0.3 }} // Further delay
+             transition={{ delay: 0.3 }} 
            >
              <div className="flex items-center space-x-2">
                 <Lightbulb className="w-5 h-5 text-yellow-500" />
                 <h2 className="text-xl md:text-2xl font-semibold">Learn With</h2>
              </div>
-              {/* Use LearnWithCard component */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                  {learnWithCards.map((card, index) => (
                     <motion.div key={index} variants={itemVariants}>
@@ -388,7 +373,6 @@ export default function Home() {
                       />
                     </motion.div>
                  ))}
-                 {/* Example Placeholder Card */}
                  <motion.div variants={itemVariants}>
                    <Card className="p-4 bg-muted/50 dark:bg-card/80 rounded-xl border-0 h-32 md:h-36 flex items-center justify-center">
                        <CardContent className="text-center p-0">
@@ -399,35 +383,48 @@ export default function Home() {
               </div>
            </motion.div>
 
-            {/* Mock Exams Section with animation */}
-            <motion.div
+            {/* Mock Exams Section is now replaced by Exam Builder in mock-exams page */}
+            {/* If you want to keep a link or a smaller section here, it can be added.
+                For now, it's removed to avoid redundancy with the dedicated mock-exams page.
+             */}
+             <motion.div
               className="space-y-4"
-              variants={containerVariants} // Apply container variants
+              variants={containerVariants}
               initial="hidden"
               animate="show"
-              transition={{ delay: 0.4 }} // Adjusted delay
+              transition={{ delay: 0.4 }}
             >
-               <div className="flex justify-between items-center">
-                  <div className="flex items-center space-x-2">
-                      <PlusCircle className="w-5 h-5 text-primary" />
-                      <h2 className="text-xl md:text-2xl font-semibold">Mock Exams</h2>
-                  </div>
-                  {/* Add any controls like "View All" if needed */}
-               </div>
-               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                   {examCards.map((card, index) => (
-                    <motion.div key={index} variants={itemVariants}>
-                      <ExamCard
-                        title={card.title}
-                        icon={card.icon}
-                        bgColorClass={card.bgColorClass}
-                        textColorClass={card.textColorClass}
-                        isNew={card.isNew}
-                        data-ai-hint={card.dataAiHint}
-                      />
-                    </motion.div>
-                  ))}
-               </div>
+              <div className="flex justify-between items-center">
+                <div className="flex items-center space-x-2">
+                  <PlusCircle className="w-5 h-5 text-primary" />
+                  <h2 className="text-xl md:text-2xl font-semibold">Mock Exams</h2>
+                </div>
+                <Link href="/mock-exams" passHref legacyBehavior>
+                    <a>
+                        <Button variant="ghost" className="text-muted-foreground hover:text-foreground hover:scale-105 active:scale-95">
+                            Go to Exam Builder
+                            <ArrowRight className="ml-2 h-4 w-4" />
+                        </Button>
+                    </a>
+                </Link>
+              </div>
+              <Card className="bg-muted/50 dark:bg-card/80 border-0 rounded-xl p-6">
+                <CardHeader className="p-0 mb-3">
+                    <CardTitle className="text-lg text-foreground">Ready to test your knowledge?</CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                    <p className="text-muted-foreground mb-4">
+                        Create custom mock exams, try random tests, or challenge yourself with timed sessions in our dedicated Exam Builder.
+                    </p>
+                    <Link href="/mock-exams" passHref legacyBehavior>
+                        <a>
+                            <Button className="hover:scale-105 active:scale-95">
+                                Open Exam Builder
+                            </Button>
+                        </a>
+                    </Link>
+                </CardContent>
+              </Card>
             </motion.div>
 
 
@@ -436,6 +433,3 @@ export default function Home() {
     </div>
   );
 }
-
-
-    
