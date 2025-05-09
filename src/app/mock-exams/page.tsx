@@ -1,9 +1,7 @@
-
 'use client';
 
 import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
-// Removed unused Card imports: Card, CardContent, CardHeader, CardTitle, CardDescription
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -110,26 +108,28 @@ export default function MockExamsPage() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="lg:col-span-2 flex items-center justify-center min-h-[400px] lg:min-h-[500px] relative"
+              className="lg:col-span-2 flex items-center justify-center min-h-[400px] lg:min-h-[500px] relative group" // Added group for hover effects
             >
-              <div className="relative w-full max-w-lg h-full flex items-center justify-center"> {/* Added flex for centering */}
-                {/* Background blur/glow */}
-                <div className="absolute inset-0 bg-primary/10 dark:bg-primary/5 blur-2xl rounded-full -z-10 transform scale-150"></div>
+              {/* This div takes full width of col-span-2 and centers content */}
+              <div className="w-full h-full flex items-center justify-center relative">
+                {/* Background blur - positioned relative to this centering div */}
+                <div className="absolute w-2/3 h-2/3 bg-primary/10 dark:bg-primary/20 blur-3xl rounded-full -z-10 opacity-60 dark:opacity-40"></div>
 
-                {/* Central element displaying OpennMind.png */}
+                {/* The "Screen" element that holds the logo */}
                 <motion.div
-                  className="relative w-[75%] md:w-[65%] lg:w-[60%] aspect-[3/4] z-10 rounded-xl overflow-hidden flex items-center justify-center" // Removed card-like styles: bg-card, shadow-2xl, border, border-border/30
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.7, delay: 0.5, type: "spring", stiffness: 100 }}
+                  className="relative w-[70%] sm:w-[60%] md:w-[55%] lg:w-[60%] aspect-[3/4] z-10 rounded-2xl overflow-hidden bg-card/60 dark:bg-zinc-800/60 backdrop-blur-md shadow-xl border border-border/30 transform rotate-[-2.5deg] group-hover:rotate-[-1deg] group-hover:scale-[1.02] transition-all duration-300 ease-out"
+                  initial={{ opacity: 0, scale: 0.8, rotate: -5 }}
+                  animate={{ opacity: 1, scale: 1, rotate: -2.5 }}
+                  transition={{ duration: 0.7, delay: 0.4, type: "spring", stiffness: 120, damping: 15 }}
                 >
                   <Image
                     src={OpennMindLogo}
                     alt="OpennMind Logo Screen"
                     layout="fill"
                     objectFit="contain"
-                    className="p-4 md:p-6" // Add some padding around the logo
+                    className="p-10 md:p-12" // Generous padding for the logo to appear centered
                     data-ai-hint="logo brand"
+                    priority // Prioritize logo loading
                   />
                 </motion.div>
               </div>
@@ -140,6 +140,3 @@ export default function MockExamsPage() {
     </div>
   );
 }
-// Removed extraneous JSX that was causing the syntax error.
-// The component now correctly ends with the closing brace of the function.
-
