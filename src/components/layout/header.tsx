@@ -3,14 +3,14 @@
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Bell, CircleHelp, Settings, Bug, GraduationCap } from "lucide-react"; // Added GraduationCap back
+import { Search, Bell, CircleHelp, Settings, Bug } from "lucide-react"; // Removed GraduationCap as logo is image now
 import { ThemeToggle } from "@/components/theme-toggle";
 import Link from "next/link";
 import { SparkleButton } from '@/components/common/sparkle-button';
 import { ShieldQuestion } from 'lucide-react';
 import { motion } from 'framer-motion';
 import React, { useRef, useEffect, useState } from 'react';
-import Image from 'next/image'; // Import next/image
+import Image, { type StaticImageData } from 'next/image'; // Import next/image
 import { useTheme } from 'next-themes'; // Import useTheme
 
 // Import local images for logo
@@ -20,7 +20,7 @@ import darkThemeLogo from '@/app/dt.png';
 export function Header() {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const { theme } = useTheme();
-  const [currentLogo, setCurrentLogo] = useState(lightThemeLogo); // Default to light theme logo
+  const [currentLogo, setCurrentLogo] = useState<StaticImageData>(lightThemeLogo); // Default to light theme logo
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -55,13 +55,13 @@ export function Header() {
       <div className="flex items-center gap-4">
          {/* Logo Section */}
          <div className="flex items-center gap-2 font-bold text-lg text-foreground">
-            <div className="flex items-center justify-center"> {/* Removed background and padding */}
+            <div className="flex items-center justify-center">
              <Image
                 src={currentLogo}
                 alt="OpennMind Logo"
-                width={20} 
-                height={20} 
-                className="w-5 h-5" 
+                width={24}
+                height={24}
+                quality={90} // Increased quality
               />
             </div>
              OpennMind
