@@ -109,14 +109,17 @@ export default function MockExamsPage() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="lg:col-span-2 min-h-[400px] lg:min-h-[500px] bg-gradient-to-br from-slate-100/50 to-zinc-200/50 dark:from-black/30 dark:to-zinc-900/60 rounded-2xl shadow-xl relative overflow-hidden"
+              className="lg:col-span-2 relative overflow-hidden rounded-2xl shadow-xl bg-gradient-to-br from-slate-100/50 to-zinc-200/50 dark:from-black/30 dark:to-zinc-900/60 flex justify-center items-center"
+              style={{ height: '450px' }} // Set explicit height to match selector panel level
             >
                  <Image
                     src={OpennMindLogo}
                     alt="OpennMind Logo"
-                    layout="fill"
-                    objectFit="cover" // Or "contain" if the entire logo must be visible without cropping
-                    className="rounded-2xl" // This ensures the image itself has rounded corners if needed, parent overflow-hidden clips it.
+                    layout="intrinsic" // Changed from fill to intrinsic to respect image's aspect ratio
+                    width={500} // Provide a base width, height will be auto based on aspect ratio
+                    height={300} // Provide a base height
+                    objectFit="contain" // Ensure the entire logo is visible and centered
+                    className="rounded-2xl max-h-full max-w-full p-4" // Added padding and max constraints
                     data-ai-hint="logo brand"
                     priority
                   />
