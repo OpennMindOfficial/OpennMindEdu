@@ -29,15 +29,15 @@ const headingOptions = [
   {
     text1: "Summarize",
     icon1: FileText,
-    text2: "docs", // Changed from "documents"
+    text2: "docs fast", 
     color2: "text-blue-400",
-    text3: "with", // Changed from "using"
+    text3: "with", 
     icon2: Sparkles,
     text4: "AI",
     color4: "text-purple-400",
-    text5: "quickly", // Changed from "in"
+    text5: "power",
     icon3: null,
-    text6: "", // Changed from "seconds"
+    text6: "", 
     color6: "text-yellow-400",
   },
   {
@@ -122,9 +122,9 @@ export default function PdfToNotesPage() {
       <Sidebar />
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header />
-        <main className="flex-1 overflow-y-auto px-6 md:px-8 pb-6 md:pb-8 pt-10 md:pt-20 flex flex-col items-center justify-start bg-gradient-to-br from-background to-zinc-900/30 dark:from-black dark:to-zinc-900/50 text-foreground">
+        <main className="flex-1 overflow-y-auto px-6 md:px-8 pb-6 md:pb-8 pt-10 md:pt-12 flex flex-col items-center justify-start bg-gradient-to-br from-background to-zinc-900/30 dark:from-black dark:to-zinc-900/50 text-foreground">
           <motion.div
-            className="w-full max-w-2xl text-center space-y-10"
+            className="w-full max-w-2xl text-center space-y-6" // Reduced space-y from 10 to 6
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -169,7 +169,7 @@ export default function PdfToNotesPage() {
                     Drag & drop to upload
                   </p>
                   <p className="text-xs text-muted-foreground mb-2">.pdf • Max 25MB</p>
-                  <Button variant="outline" size="sm" className="text-xs pointer-events-none">
+                  <Button variant="outline" size="sm" className="text-xs pointer-events-none hover:scale-105 active:scale-95">
                     Choose file
                   </Button>
                   <input
