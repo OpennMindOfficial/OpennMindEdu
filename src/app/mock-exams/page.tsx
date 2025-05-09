@@ -118,7 +118,7 @@ export default function MockExamsPage() {
 
                 {/* Central element displaying OpennMind.png */}
                 <motion.div
-                  className="relative w-[75%] md:w-[65%] lg:w-[60%] aspect-[3/4] z-10 rounded-xl overflow-hidden shadow-2xl border border-border/30 bg-card flex items-center justify-center"
+                  className="relative w-[75%] md:w-[65%] lg:w-[60%] aspect-[3/4] z-10 rounded-xl overflow-hidden flex items-center justify-center" // Removed card-like styles: bg-card, shadow-2xl, border, border-border/30
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.7, delay: 0.5, type: "spring", stiffness: 100 }}
