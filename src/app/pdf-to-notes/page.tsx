@@ -29,15 +29,15 @@ const headingOptions = [
   {
     text1: "Summarize",
     icon1: FileText,
-    text2: "documents", // This phrasing is concise for "Summarize documents" on one line
+    text2: "docs", // Changed from "documents"
     color2: "text-blue-400",
-    text3: "using", // "using AI in seconds" on the second line
+    text3: "with", // Changed from "using"
     icon2: Sparkles,
     text4: "AI",
     color4: "text-purple-400",
-    text5: "in",
+    text5: "quickly", // Changed from "in"
     icon3: null,
-    text6: "seconds",
+    text6: "", // Changed from "seconds"
     color6: "text-yellow-400",
   },
   {
@@ -122,7 +122,7 @@ export default function PdfToNotesPage() {
       <Sidebar />
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header />
-        <main className="flex-1 overflow-y-auto px-6 md:px-8 pb-6 md:pb-8 pt-20 flex flex-col items-center justify-start bg-gradient-to-br from-background to-zinc-900/30 dark:from-black dark:to-zinc-900/50 text-foreground">
+        <main className="flex-1 overflow-y-auto px-6 md:px-8 pb-6 md:pb-8 pt-10 md:pt-20 flex flex-col items-center justify-start bg-gradient-to-br from-background to-zinc-900/30 dark:from-black dark:to-zinc-900/50 text-foreground">
           <motion.div
             className="w-full max-w-2xl text-center space-y-10"
             initial={{ opacity: 0, y: 20 }}
