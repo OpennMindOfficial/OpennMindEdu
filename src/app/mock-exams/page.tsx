@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Header } from "@/components/layout/header";
@@ -40,7 +39,7 @@ export default function MockExamsPage() {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="lg:col-span-1 space-y-6 p-6 bg-card/80 dark:bg-card/60 border border-border/20 rounded-xl shadow-xl backdrop-blur-md"
+              className="lg:col-span-1 space-y-6 p-6 bg-card/80 dark:bg-card/70 border border-border/20 rounded-xl shadow-xl backdrop-blur-md"
             >
               <div>
                 <Label htmlFor="subject" className="text-sm font-medium text-muted-foreground mb-1.5 block">Subject</Label>
@@ -190,4 +189,3 @@ export default function MockExamsPage() {
     </div>
   );
 }
-
