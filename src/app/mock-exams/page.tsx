@@ -2,7 +2,7 @@
 
 import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+// Removed unused Card imports: Card, CardContent, CardHeader, CardTitle, CardDescription
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -115,56 +115,6 @@ export default function MockExamsPage() {
                 {/* Background blur/glow */}
                 <div className="absolute inset-0 bg-primary/10 dark:bg-primary/5 blur-2xl rounded-full -z-10 transform scale-150"></div>
 
-                {/* Exam Paper Illustrations - stacked */}
-                <motion.div
-                  className="absolute w-[70%] md:w-[60%] lg:w-[55%] aspect-[3/4] transform -rotate-[8deg] translate-x-[-15%] translate-y-[5%]"
-                  initial={{ opacity: 0, scale: 0.8, rotate: -15, y: 20 }}
-                  animate={{ opacity: 1, scale: 1, rotate: -8, y: 0 }}
-                  transition={{ duration: 0.7, delay: 0.3, type: "spring", stiffness: 100 }}
-                >
-                  <Card className="h-full w-full bg-card shadow-2xl rounded-xl overflow-hidden border border-border/30">
-                    <CardHeader className="p-3 border-b border-border/20 bg-muted/30">
-                       <div className="flex items-center gap-1.5">
-                         <Image src={OpennMindLogo} alt="OpennMind Logo" width={16} height={16} data-ai-hint="logo brand"/>
-                         <CardTitle className="text-xs font-semibold text-muted-foreground">OpennMind</CardTitle>
-                       </div>
-                    </CardHeader>
-                    <CardContent className="p-4 text-center flex flex-col items-center justify-center h-full">
-                        <p className="text-xs text-muted-foreground mt-1">Question Paper Preview</p>
-                        <p className="text-[10px] text-muted-foreground/70 mt-4" data-ai-hint="exam paper test">A fall in income leads to a fall in demand for the good between the demand for the...</p>
-                        <div className="mt-4 space-y-2 w-full">
-                            <div className="h-2 bg-muted/50 rounded-full w-full"></div>
-                            <div className="h-2 bg-muted/50 rounded-full w-3/4"></div>
-                            <div className="h-2 bg-muted/50 rounded-full w-full"></div>
-                        </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-
-                <motion.div
-                  className="absolute w-[70%] md:w-[60%] lg:w-[55%] aspect-[3/4] transform rotate-[2deg] translate-x-[5%] translate-y-[-5%]"
-                  initial={{ opacity: 0, scale: 0.8, rotate: 10, y: -20 }}
-                  animate={{ opacity: 1, scale: 1, rotate: 2, y: 0 }}
-                  transition={{ duration: 0.7, delay: 0.4, type: "spring", stiffness: 100 }}
-                >
-                  <Card className="h-full w-full bg-card shadow-2xl rounded-xl overflow-hidden border border-border/30">
-                     <CardHeader className="p-3 border-b border-border/20 bg-muted/30">
-                        <div className="flex items-center gap-1.5">
-                         <Image src={OpennMindLogo} alt="OpennMind Logo" width={16} height={16} data-ai-hint="logo brand"/>
-                         <CardTitle className="text-xs font-semibold text-muted-foreground">OpennMind</CardTitle>
-                       </div>
-                    </CardHeader>
-                    <CardContent className="p-4 text-center flex flex-col items-center justify-center h-full">
-                        <h2 className="text-sm font-bold text-foreground" data-ai-hint="physics test">Physics Test Paper</h2>
-                        <p className="text-xs text-muted-foreground mt-1">15 questions, 45 minutes</p>
-                        <div className="mt-4 space-y-2 w-full">
-                            <div className="h-2 bg-muted/50 rounded-full w-full"></div>
-                            <div className="h-2 bg-muted/50 rounded-full w-3/4"></div>
-                        </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-
                 {/* Central element displaying OpennMind.png */}
                 <motion.div
                   className="relative w-[75%] md:w-[65%] lg:w-[60%] aspect-[3/4] z-10 rounded-xl overflow-hidden shadow-2xl border border-border/30 bg-card flex items-center justify-center"
@@ -189,3 +139,5 @@ export default function MockExamsPage() {
     </div>
   );
 }
+// Removed extraneous JSX that was causing the syntax error.
+// The component now correctly ends with the closing brace of the function.
