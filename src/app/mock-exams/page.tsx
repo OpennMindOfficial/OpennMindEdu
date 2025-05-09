@@ -109,14 +109,14 @@ export default function MockExamsPage() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="lg:col-span-2 flex items-center justify-center min-h-[400px] lg:min-h-[500px] p-6 bg-gradient-to-br from-slate-800 to-zinc-900 dark:from-black/60 dark:to-zinc-900/90 rounded-2xl shadow-2xl"
+              className="lg:col-span-2 flex items-center justify-center min-h-[400px] lg:min-h-[500px] p-6 bg-gradient-to-br from-slate-100/50 to-zinc-200/50 dark:from-black/30 dark:to-zinc-900/60 rounded-2xl shadow-xl"
             >
                  <Image
                     src={OpennMindLogo}
                     alt="OpennMind Logo"
                     width={500} 
-                    height={300} // Height can be auto if width and object-contain are set, but providing an estimate helps
-                    className="rounded-xl object-contain" 
+                    height={300} 
+                    className="rounded-xl object-contain max-w-[80%] max-h-[80%]" // Adjusted size and rounding
                     data-ai-hint="logo brand"
                     priority
                   />
