@@ -29,16 +29,18 @@ const headingOptions = [
   {
     text1: "Summarize",
     icon1: FileText,
-    text2: "docs fast", 
-    color2: "text-blue-400",
-    text3: "with", 
+    text2_part1: "docs ", // "docs " with a space
+    color2_part1: "text-blue-400", // Color for "docs "
+    text2_part2: "fast", // "fast"
+    color2_part2: "text-white", // Color for "fast"
+    text3: "using",
     icon2: Sparkles,
     text4: "AI",
     color4: "text-purple-400",
-    text5: "power",
+    text5: "in seconds.",
     icon3: null,
-    text6: "", 
-    color6: "text-yellow-400",
+    text6: "",
+    color6: "text-yellow-400", // This might be vestigial if text6 is always empty
   },
   {
     text1: "Extract",
@@ -122,9 +124,9 @@ export default function PdfToNotesPage() {
       <Sidebar />
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header />
-        <main className="flex-1 overflow-y-auto px-6 md:px-8 pb-6 md:pb-8 pt-10 md:pt-12 flex flex-col items-center justify-start bg-gradient-to-br from-background to-zinc-900/30 dark:from-black dark:to-zinc-900/50 text-foreground">
+        <main className="flex-1 overflow-y-auto px-6 md:px-8 pb-6 md:pb-8 pt-8 md:pt-10 flex flex-col items-center justify-start bg-gradient-to-br from-background to-zinc-900/30 dark:from-black dark:to-zinc-900/50 text-foreground">
           <motion.div
-            className="w-full max-w-2xl text-center space-y-6" // Reduced space-y from 10 to 6
+            className="w-full max-w-2xl text-center space-y-6"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -133,7 +135,7 @@ export default function PdfToNotesPage() {
             <AnimatePresence mode="wait">
               <motion.h1
                 key={currentHeadingIndex}
-                className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight min-h-[3em] flex flex-col justify-center items-center" // Added min-height and flex for vertical centering
+                className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight min-h-[3em] flex flex-col justify-center items-center"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
@@ -141,8 +143,23 @@ export default function PdfToNotesPage() {
               >
                 <span>
                   {currentHeading.text1}{' '}
-                  {currentHeading.icon1 && <currentHeading.icon1 className={cn("inline-block w-10 h-10 mb-1 sm:w-12 sm:h-12 md:w-14 md:h-14 align-middle", currentHeading.color2 || 'text-primary')} />}
-                  <span className={currentHeading.color2}>{currentHeading.text2}</span>{' '}
+                  {currentHeading.icon1 && (
+                    <currentHeading.icon1
+                      className={cn(
+                        "inline-block w-10 h-10 mb-1 sm:w-12 sm:h-12 md:w-14 md:h-14 align-middle",
+                        (currentHeading as any).color2_part1 || currentHeading.color2 || 'text-primary'
+                      )}
+                    />
+                  )}
+                  {(currentHeading as any).text2_part1 ? (
+                    <>
+                      <span className={(currentHeading as any).color2_part1}>{(currentHeading as any).text2_part1}</span>
+                      {(currentHeading as any).text2_part2 && <span className={(currentHeading as any).color2_part2}>{(currentHeading as any).text2_part2}</span>}
+                    </>
+                  ) : (
+                    currentHeading.text2 && <span className={currentHeading.color2}>{currentHeading.text2}</span>
+                  )}
+                  {' '}
                 </span>
                 <span>
                   {currentHeading.text3}{' '}
@@ -193,8 +210,8 @@ export default function PdfToNotesPage() {
                     onChange={(e) => setLink(e.target.value)}
                     className="flex-1 bg-background/80 dark:bg-input/80 rounded-lg shadow-inner"
                   />
-                  <Button 
-                    onClick={handleGenerate} 
+                  <Button
+                    onClick={handleGenerate}
                     disabled={isGenerating || (!file && !link.trim())}
                     className="bg-purple-600 hover:bg-purple-700 text-white font-semibold hover:scale-105 active:scale-95"
                   >
