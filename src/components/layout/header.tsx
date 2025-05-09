@@ -9,16 +9,18 @@ import Link from "next/link";
 import { SparkleButton } from '@/components/common/sparkle-button';
 import { ShieldQuestion } from 'lucide-react';
 import { motion } from 'framer-motion';
-import React, { useRef, useEffect } from 'react';
-// import Image from 'next/image'; // Removed next/image import as it was causing errors with local files
-// import { useTheme } from 'next-themes'; // Removed useTheme import as it's no longer needed for logo switching
+import React, { useRef, useEffect, useState } from 'react';
+import Image from 'next/image'; // Import next/image
+import { useTheme } from 'next-themes'; // Import useTheme
 
-// Removed local image imports as they were causing issues
-// import lightThemeLogo from '@/app/lighttheme.png';
-// import darkThemeLogo from '@/app/darktheme.png';
+// Import local images for logo
+import lightThemeLogo from '@/app/lt.png';
+import darkThemeLogo from '@/app/dt.png';
 
 export function Header() {
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const { theme } = useTheme();
+  const [currentLogo, setCurrentLogo] = useState(lightThemeLogo); // Default to light theme logo
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -38,7 +40,10 @@ export function Header() {
     };
   }, []);
 
-  // Removed useEffect for theme-based logo change as local image imports were problematic
+  useEffect(() => {
+    // Update logo based on theme
+    setCurrentLogo(theme === 'dark' ? darkThemeLogo : lightThemeLogo);
+  }, [theme]);
 
   return (
     <motion.header
@@ -50,9 +55,14 @@ export function Header() {
       <div className="flex items-center gap-4">
          {/* Logo Section */}
          <div className="flex items-center gap-2 font-bold text-lg text-foreground">
-            <div className="bg-foreground text-background rounded-md p-1.5 flex items-center justify-center"> {/* Adjusted padding and bg */}
-             {/* Reverted to GraduationCap icon due to issues with local image imports */}
-             <GraduationCap className="w-5 h-5" />
+            <div className="bg-foreground text-background rounded-md p-1.5 flex items-center justify-center">
+             <Image
+                src={currentLogo}
+                alt="OpennMind Logo"
+                width={20} // Adjust width as needed (w-5 equivalent)
+                height={20} // Adjust height as needed (h-5 equivalent)
+                className="w-5 h-5" // Keep Tailwind classes for potential overrides or consistency
+              />
             </div>
              OpennMind
              <ShieldQuestion className="w-4 h-4 text-muted-foreground ml-[-4px]" />
@@ -110,3 +120,4 @@ export function Header() {
     </motion.header>
   );
 }
+
