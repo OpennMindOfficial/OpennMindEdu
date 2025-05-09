@@ -33,7 +33,6 @@ export default function MockExamsPage() {
             <h1 className="text-2xl md:text-3xl font-bold text-foreground">Exam Builder</h1>
           </motion.div>
 
-          {/* Grid container: removed items-start to allow items to stretch to the same height */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Left Panel: Exam Configuration */}
             <motion.div
@@ -45,7 +44,10 @@ export default function MockExamsPage() {
               <div>
                 <Label htmlFor="subject" className="text-sm font-medium text-muted-foreground mb-1.5 block">Subject</Label>
                 <Select>
-                  <SelectTrigger id="subject" className="w-full bg-background dark:bg-input rounded-lg shadow-sm">
+                  <SelectTrigger
+                    id="subject"
+                    className="w-full bg-background dark:bg-input rounded-lg shadow-sm hover:bg-muted dark:hover:bg-muted/70 transition-colors"
+                  >
                     <SelectValue placeholder="Select subject" />
                   </SelectTrigger>
                   <SelectContent>
@@ -61,7 +63,7 @@ export default function MockExamsPage() {
               <div>
                 <Label htmlFor="question-type" className="text-sm font-medium text-muted-foreground mb-1.5 block">Question type</Label>
                 <Select>
-                  <SelectTrigger id="question-type" className="w-full bg-background dark:bg-input rounded-lg shadow-sm">
+                  <SelectTrigger id="question-type" className="w-full bg-background dark:bg-input rounded-lg shadow-sm hover:bg-muted dark:hover:bg-muted/70 transition-colors">
                     <SelectValue placeholder="Select question type" />
                   </SelectTrigger>
                   <SelectContent>
@@ -106,22 +108,24 @@ export default function MockExamsPage() {
             </motion.div>
 
             {/* Right Panel: OpennMind Logo Display */}
-            {/* Removed explicit height style, added h-full to fill grid cell height */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="lg:col-span-2 relative overflow-hidden rounded-2xl shadow-xl bg-gradient-to-br from-slate-100/50 to-zinc-200/50 dark:from-black/30 dark:to-zinc-900/60 flex justify-center items-center h-full"
+              className="lg:col-span-2 relative overflow-hidden rounded-2xl shadow-xl bg-gradient-to-br from-slate-100/50 to-zinc-200/50 dark:from-black/30 dark:to-zinc-900/60 flex justify-center items-center h-full p-4 md:p-8"
             >
+              {/* Inner div to constrain image size */}
+              <div className="relative w-full h-auto aspect-[16/9] max-w-md max-h-[300px]">
                  <Image
                     src={OpennMindLogo}
                     alt="OpennMind Logo"
                     layout="fill" 
-                    objectFit="cover" 
-                    className="rounded-2xl" 
+                    objectFit="contain" // Changed to contain to ensure logo is fully visible
+                    className="rounded-xl" // Consistent rounding
                     data-ai-hint="logo brand"
                     priority
                   />
+              </div>
             </motion.div>
           </div>
         </main>
