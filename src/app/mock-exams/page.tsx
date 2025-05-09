@@ -166,25 +166,21 @@ export default function MockExamsPage() {
                   </Card>
                 </motion.div>
 
+                {/* Central element displaying OpennMind.png */}
                 <motion.div
-                  className="relative w-[75%] md:w-[65%] lg:w-[60%] aspect-[3/4] z-10" // Main card on top
+                  className="relative w-[75%] md:w-[65%] lg:w-[60%] aspect-[3/4] z-10 rounded-xl overflow-hidden shadow-2xl border border-border/30 bg-card flex items-center justify-center"
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.7, delay: 0.5, type: "spring", stiffness: 100 }}
                 >
-                  <Card className="h-full w-full bg-card shadow-2xl rounded-xl overflow-hidden border border-border/30">
-                     <CardHeader className="p-4 border-b border-border/20 bg-muted/30">
-                       <div className="flex items-center gap-2">
-                         <Image src={OpennMindLogo} alt="OpennMind Logo" width={20} height={20} data-ai-hint="logo brand" />
-                         <CardTitle className="text-sm font-bold text-foreground">OpennMind</CardTitle>
-                       </div>
-                    </CardHeader>
-                    <CardContent className="p-6 text-center flex flex-col items-center justify-center h-full">
-                      <h2 className="text-lg font-bold text-foreground mb-1" data-ai-hint="economics test">Economics Test Paper</h2>
-                      <p className="text-xs text-muted-foreground mb-6">10 questions, 1 hour</p>
-                      <Button className="hover:scale-105 active:scale-95">Start Exam</Button>
-                    </CardContent>
-                  </Card>
+                  <Image
+                    src={OpennMindLogo}
+                    alt="OpennMind Logo Screen"
+                    layout="fill"
+                    objectFit="contain"
+                    className="p-4 md:p-6" // Add some padding around the logo
+                    data-ai-hint="logo brand"
+                  />
                 </motion.div>
               </div>
             </motion.div>
