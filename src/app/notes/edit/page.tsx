@@ -57,6 +57,7 @@ import { cn } from '@/lib/utils';
 import { Sidebar } from '@/components/layout/sidebar'; // Import standard Sidebar
 import { Header } from '@/components/layout/header'; // Import standard Header
 import { motion, AnimatePresence } from 'framer-motion'; // Import motion
+import Link from 'next/link'; // Import Link for navigation
 
 // Demo note data structure (expanded slightly) - Consider moving this to a data source or state management
 interface Note {
@@ -501,10 +502,12 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
         >
            <div className="max-w-3xl mx-auto">
                {/* Back Button */}
-               <Button variant="ghost" className="text-muted-foreground hover:text-foreground mb-4 px-0 h-auto hover:scale-110 active:scale-95">
-                  <ArrowLeft className="w-4 h-4 mr-1.5" />
-                  Back to notes {/* Or dynamic based on context */}
-               </Button>
+              <Link href="/notes" passHref legacyBehavior>
+                <Button variant="ghost" className="text-muted-foreground hover:text-foreground mb-4 px-0 h-auto hover:scale-105 active:scale-95">
+                    <ArrowLeft className="w-4 h-4 mr-1.5" />
+                    Back to notes
+                </Button>
+              </Link>
 
               {/* Title Textarea */}
               <Textarea
@@ -701,3 +704,4 @@ As the company grew, Bezos expanded Amazon's product offerings to include a wide
     </div>
   );
 }
+
