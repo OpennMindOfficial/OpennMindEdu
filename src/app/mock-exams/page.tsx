@@ -109,15 +109,14 @@ export default function MockExamsPage() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="lg:col-span-2 flex items-center justify-center min-h-[400px] lg:min-h-[500px] p-6 bg-gradient-to-br from-slate-100/50 to-zinc-200/50 dark:from-black/30 dark:to-zinc-900/60 rounded-2xl shadow-xl"
+              className="lg:col-span-2 min-h-[400px] lg:min-h-[500px] bg-gradient-to-br from-slate-100/50 to-zinc-200/50 dark:from-black/30 dark:to-zinc-900/60 rounded-2xl shadow-xl relative overflow-hidden"
             >
-                 {/* The Card component has been removed. The Image itself is the content of this panel. */}
                  <Image
                     src={OpennMindLogo}
                     alt="OpennMind Logo"
-                    width={500} // Adjust width as needed, example value
-                    height={300} // Adjust height as needed, example value
-                    className="rounded-xl object-contain max-w-[80%] max-h-[80%]" // Apply rounded-xl and sizing directly
+                    layout="fill"
+                    objectFit="cover" // Or "contain" if the entire logo must be visible without cropping
+                    className="rounded-2xl" // This ensures the image itself has rounded corners if needed, parent overflow-hidden clips it.
                     data-ai-hint="logo brand"
                     priority
                   />
