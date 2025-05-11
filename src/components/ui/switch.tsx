@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -39,15 +40,20 @@ const thumbVariants = cva(
 
 export interface SwitchProps
   extends React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>,
-    VariantProps<typeof switchVariants> {}
+    VariantProps<typeof switchVariants> {
+      id?: string; // Add id prop
+      defaultChecked?: boolean; // Add defaultChecked prop
+    }
 
 
 const Switch = React.forwardRef<
   React.ElementRef<typeof SwitchPrimitives.Root>,
   SwitchProps // Use the extended interface
->(({ className, size, ...props }, ref) => {
+>(({ className, size, id, defaultChecked, ...props }, ref) => {
   return (
     <SwitchPrimitives.Root
+      id={id} // Pass id to the primitive
+      defaultChecked={defaultChecked} // Pass defaultChecked to the primitive
       className={cn(switchVariants({ size }), className)} // Apply root variants
       {...props}
       ref={ref}
@@ -61,3 +67,4 @@ const Switch = React.forwardRef<
 Switch.displayName = SwitchPrimitives.Root.displayName
 
 export { Switch };
+
