@@ -5,7 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50", // Changed rounded-md to rounded-lg
+  "inline-flex items-center justify-center whitespace-nowrap rounded-full text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50", // Changed to rounded-full for bubble buttons
   {
     variants: {
       variant: {
@@ -16,16 +16,17 @@ const buttonVariants = cva(
           "border border-input bg-background hover:bg-muted hover:text-foreground",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-muted/50 hover:text-foreground", // Adjusted ghost hover for sidebar
+        ghost: "hover:bg-muted/50 hover:text-foreground",
         link: "text-primary underline-offset-4 hover:underline",
         primary: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm",
         accent: "bg-accent text-accent-foreground hover:bg-accent/90",
+        beige: "bg-orange-100 text-orange-700 border border-orange-200 hover:bg-orange-200/80 dark:bg-orange-800/30 dark:text-orange-300 dark:border-orange-700 dark:hover:bg-orange-800/50", // Specific beige button
       },
       size: {
-        default: "h-10 px-4 py-2", // Reverted to standard padding
-        sm: "h-9 rounded-lg px-3", // Use rounded-lg for most sidebar buttons
-        lg: "h-11 rounded-lg px-8",
-        icon: "h-10 w-10 rounded-lg", // Icons also use rounded-lg
+        default: "h-10 px-6 py-2", // Increased padding for bubble feel
+        sm: "h-9 rounded-full px-4", 
+        lg: "h-11 rounded-full px-8",
+        icon: "h-10 w-10 rounded-full", 
       },
     },
     defaultVariants: {
