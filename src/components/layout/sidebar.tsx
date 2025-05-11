@@ -3,11 +3,44 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import {
+  LayoutDashboard,
+  BookOpen,
+  HelpCircle,
+  BarChart2,
+  Settings,
+  PlusCircle,
+  FileText,
+  Users,
+  ChevronDown,
+  Clock, 
+  Lightbulb, 
+  FlaskConical, 
+  Type, 
+  Layers, 
+  Pocket, 
+  FileStack, 
+  GraduationCap, 
+  type LucideIcon,
+  Star,
+  Search,
+  Menu,
+  Home,
+  FolderOpen,
+  Grid,
+  MessageSquareHeart,
+  Target,
+  Smile,
+  BookMarked,
+  Folder,
+  BookCopy,
+  BookHeadphones,
+  Sparkles,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import {
   Dialog,
   DialogContent,
@@ -17,267 +50,383 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Settings,
-  Home,
-  FileText, // Used for Notes, Predicted Papers
-  Lightbulb, // Used for Ask Doubt, Predict Grade
-  PlusCircle, // Used for Mock Exams
-  HelpCircle, // Used for Questionbank
-  BookOpen, // Used for All Subjects, NCERT Explanations
-  FileStack, // Used for PDF to Notes
-  Bookmark, // Used for Saved
-  ChevronDown,
-  Clock, // Used for Timed Exams
-  GraduationCap, // Used for Board Selector
-  CalendarCheck, // Used for Study Plan
-  TrendingUp, // Used for Performance Tracking
-  Gamepad2, // Used for Fun Shun
-  Layers, // Used for Extra Courses
-  BookOpenCheck, // Replaced BookOpen for NCERT Explanations for distinction
-  Target, // Used for Exam Mode
-  Send,
-  Brain, // Added for Mascot placeholder
-  type LucideIcon,
-} from 'lucide-react';
-import * as React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import Image, { type StaticImageData } from 'next/image';
+import MascotImage from '@/app/m.png'; 
+import OpennMindLogoLight from '@/app/lt.png';
+import OpennMindLogoDark from '@/app/dt.png';
+import { useTheme } from 'next-themes';
+
 
 interface NavItemProps {
   href: string;
   icon: LucideIcon;
   label: string;
-  badgeCount?: number;
-  secondaryText?: string;
-  isSubItem?: boolean;
-  isActive?: boolean;
-  isDropdown?: boolean;
+  isActive: boolean;
+  isExpanded: boolean;
+  hasSubmenu?: boolean;
+  isSubmenuOpen?: boolean;
+  onSubmenuToggle?: () => void;
+  subItems?: NavItemProps[];
+  level?: number;
 }
 
-function NavItem({
+const NavItem: React.FC<NavItemProps> = ({
   href,
   icon: Icon,
   label,
-  badgeCount,
-  secondaryText,
-  isSubItem,
   isActive,
-  isDropdown,
-}: NavItemProps) {
-  const [isHovered, setIsHovered] = React.useState(false);
+  isExpanded,
+  hasSubmenu,
+  isSubmenuOpen,
+  onSubmenuToggle,
+  subItems,
+  level = 0,
+}) => {
+  const itemPaddingLeft = `${1 + level * 1}rem`; 
+
+  const itemVariants = {
+    hidden: { opacity: 0, x: -10 },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.2 } },
+  };
+
+  const iconVariants = {
+    initial: { scale: 1, rotate: 0 },
+    hover: { scale: 1.2, rotate: 10, transition: { type: 'spring', stiffness: 300, damping: 10 } },
+    active: { scale: 1.1, transition: { type: 'spring', stiffness: 200 } },
+  };
 
   return (
-    <Link href={href} legacyBehavior passHref>
-      <motion.a
-        className={cn(
-          'relative flex items-center justify-between text-sm font-medium transition-colors h-9 px-3 rounded-md group',
-          isSubItem ? 'pl-9' : '',
-          isActive
-            ? 'text-foreground bg-muted dark:bg-muted/50'
-            : 'text-muted-foreground hover:text-foreground hover:bg-muted/50 dark:hover:bg-muted/30',
-        )}
-        onHoverStart={() => setIsHovered(true)}
-        onHoverEnd={() => setIsHovered(false)}
-        whileHover={{ x: 2 }}
-        transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-      >
-        <div className="relative z-10 flex items-center overflow-hidden flex-grow">
-             <motion.div
-                whileHover={{ scale: 1.1, rotate: -5 }}
-                transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-                className="flex-shrink-0 mr-3"
-             >
-                <Icon className={cn("h-4 w-4", isActive ? "text-primary" : "")} />
-             </motion.div>
-            <span className="truncate">{label}</span>
-            {isDropdown && <ChevronDown className="h-4 w-4 ml-1 text-muted-foreground" />}
-        </div>
-        <div className="relative z-10 flex items-center ml-2 flex-shrink-0">
-            {badgeCount && (
-                <Badge
-                 variant="count"
-                 className="ml-auto flex h-5 w-5 shrink-0 items-center justify-center rounded-full p-0 text-xs font-semibold"
-                 >
-                 {badgeCount}
-                </Badge>
+    <motion.li variants={itemVariants} className="flex flex-col">
+      <Link href={href} passHref legacyBehavior>
+        <a
+          onClick={(e) => {
+            if (hasSubmenu) {
+              e.preventDefault();
+              onSubmenuToggle?.();
+            }
+          }}
+          className={cn(
+            "flex items-center py-2.5 rounded-lg transition-all duration-200 ease-in-out group relative",
+            "hover:bg-primary/10 dark:hover:bg-primary/15",
+            isActive ? "bg-primary/10 dark:bg-primary/20 text-primary font-semibold" : "text-muted-foreground hover:text-foreground dark:hover:text-primary-foreground/90",
+            isExpanded ? "px-3 justify-start" : "px-3 justify-center", 
+          )}
+          style={{ paddingLeft: isExpanded ? itemPaddingLeft : '0.75rem' }}
+        >
+          <motion.div variants={iconVariants} initial="initial" whileHover="hover" whileTap={isActive ? "active" : "initial"}>
+            <Icon className={cn("h-5 w-5 flex-shrink-0", isActive ? "text-primary" : "")} />
+          </motion.div>
+          <AnimatePresence>
+            {isExpanded && (
+              <motion.span
+                initial={{ opacity: 0, width: 0, marginLeft: 0 }}
+                animate={{ opacity: 1, width: 'auto', marginLeft: '0.75rem' }}
+                exit={{ opacity: 0, width: 0, marginLeft: 0 }}
+                transition={{ duration: 0.2, ease: 'easeInOut' }}
+                className="truncate"
+              >
+                {label}
+              </motion.span>
             )}
-            {secondaryText && (
-                <span className="text-xs text-muted-foreground">{secondaryText}</span>
-            )}
-        </div>
-      </motion.a>
-    </Link>
+          </AnimatePresence>
+          {isExpanded && hasSubmenu && (
+            <ChevronDown
+              className={cn(
+                "ml-auto h-4 w-4 text-muted-foreground transition-transform duration-200",
+                isSubmenuOpen ? "rotate-180" : ""
+              )}
+            />
+          )}
+          {!isExpanded && (
+            <span className="absolute left-full ml-2 px-2 py-1 bg-card text-card-foreground text-xs rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-50">
+              {label}
+            </span>
+          )}
+        </a>
+      </Link>
+      {hasSubmenu && isSubmenuOpen && isExpanded && subItems && (
+        <motion.ul
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: 'auto', opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          transition={{ duration: 0.2, ease: 'easeInOut' }}
+          className="ml-4 overflow-hidden" 
+        >
+          {subItems.map((subItem) => (
+            <NavItem key={subItem.href} {...subItem} level={level + 1} isExpanded={isExpanded} />
+          ))}
+        </motion.ul>
+      )}
+    </motion.li>
   );
-}
+};
 
-interface NavSectionProps {
-  title: string;
-  children: React.ReactNode;
-}
-
-function NavSection({ title, children }: NavSectionProps) {
-  return (
-    <motion.div
-       className="px-3 py-2"
-       initial={{ opacity: 0, y: 10 }}
-       animate={{ opacity: 1, y: 0 }}
-       transition={{ delay: 0.1 }}
-     >
-      <h2 className="mb-2 px-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
-        {title}
-      </h2>
-      <div className="grid items-start gap-0.5">{children}</div>
-    </motion.div>
-  );
-}
 
 export function Sidebar() {
-    const pathname = usePathname();
-    const [suggestion, setSuggestion] = React.useState("");
-    const [isPopupOpen, setIsPopupOpen] = React.useState(false);
+  const pathname = usePathname();
+  const [isExpanded, setIsExpanded] = useState(true);
+  const [openSubmenus, setOpenSubmenus] = useState<Record<string, boolean>>({});
+  const [showMascotPopup, setShowMascotPopup] = useState(false);
+  const [mascotMessage, setMascotMessage] = useState('');
+  const mascotTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const { theme } = useTheme();
+  const [currentLogo, setCurrentLogo] = useState(OpennMindLogoLight);
 
-    const handleSuggestionSubmit = () => {
-      console.log("Board change suggestion submitted:", suggestion);
-      setSuggestion("");
-      setIsPopupOpen(false);
-    };
+  useEffect(() => {
+    setCurrentLogo(theme === 'dark' ? OpennMindLogoDark : OpennMindLogoLight);
+  }, [theme]);
 
-    const opennMindItems = [
-        { href: '/ask-doubt', icon: Lightbulb, label: 'Ask Doubt'},
-        { href: '/notes', icon: FileText, label: 'Notes'}, // Changed icon to FileText
-        { href: '/questionbank', icon: HelpCircle, label: 'Questionbank'},
-        { href: '/mock-exams', icon: PlusCircle, label: 'Mock Exams'},
-        { href: '/timed-exams', icon: Clock, label: 'Timed Exams'},
-        { href: '/study-plan', icon: CalendarCheck, label: 'Study Plan'},
-        { href: '/performance-tracking', icon: TrendingUp, label: 'Performance Tracking'},
-        { href: '/ncert-explanations', icon: BookOpenCheck, label: 'NCERT Explanations'},
-        { href: '/pdf-to-notes', icon: FileStack, label: 'PDF To Notes'},
-        { href: '/saved', icon: Bookmark, label: 'Saved'},
-        { href: '/predicted-papers', icon: FileText, label: 'Predicted Papers'}, // Changed to FileText
+
+  const toggleSubmenu = (label: string) => {
+    setOpenSubmenus(prev => ({ ...prev, [label]: !prev[label] }));
+  };
+
+  const navLinks = [
+    {
+      group: "Main",
+      items: [
+        { href: '/', icon: Home, label: 'Dashboard' },
+        { href: '/all-subjects', icon: BookCopy, label: 'All Subjects' },
+        { href: '/ask-doubt', icon: MessageSquareHeart, label: 'Ask Doubt' },
+        { href: '/notes', icon: BookOpen, label: 'Notes' },
+      ]
+    },
+    {
+      group: "Learn",
+      items: [
+        { href: '/study-plan', icon: GraduationCap, label: 'Study Plan' },
+        { href: '/ncert-explanations', icon: FlaskConical, label: 'NCERT Explanations' },
+        { href: '/pdf-to-notes', icon: FileStack, label: 'PDF To Notes' },
+        { href: '/extra-courses', icon: Layers, label: 'Extra Courses' },
+      ]
+    },
+    {
+      group: "Practice",
+      items: [
+        { href: '/mock-exams', icon: PlusCircle, label: 'Mock Exams' },
+        { href: '/timed-exams', icon: Clock, label: 'Timed Exams' },
+        { href: '/questionbank', icon: HelpCircle, label: 'Questionbank' },
+        { href: '/exam-mode', icon: Pocket, label: 'Exam Mode' },
+      ]
+    },
+    {
+      group: "Tools",
+      items: [
+        { href: '/performance-tracking', icon: BarChart2, label: 'Performance Tracking' },
         { href: '/predict-grade', icon: Lightbulb, label: 'Predict Grade' },
-        { href: '/all-subjects', icon: BookOpen, label: 'All Subjects'}, // Changed icon to BookOpen
-        { href: '/exam-mode', icon: Target, label: 'Exam Mode'},
-        { href: '/extra-courses', icon: Layers, label: 'Extra Courses'},
-        { href: '/fun-shun', icon: Gamepad2, label: 'Fun Shun'},
-    ];
+        { href: '/predicted-papers', icon: Target, label: 'Predicted Papers' },
+        { href: '/saved', icon: BookMarked, label: 'Saved' },
+
+      ]
+    },
+     {
+      group: "Other",
+      items: [
+        { href: '/fun-shun', icon: Smile, label: 'Fun Shun' },
+        { href: '/settings', icon: Settings, label: 'Settings' },
+      ]
+    }
+  ];
+
+  // Mascot messages
+  const studyTips = [
+    "Remember to take a 5-minute break every hour! Your brain will thank you. 😊",
+    "Stay hydrated! A glass of water can boost your focus. 💧",
+    "Great job on focusing! Keep up the amazing work. ✨",
+    "Feeling stuck? Try explaining the concept to a rubber duck! 🦆",
+    "Did you know? Spaced repetition is a great way to remember things long-term. 🧠"
+  ];
+
+  const showRandomMascotMessage = () => {
+    const randomIndex = Math.floor(Math.random() * studyTips.length);
+    setMascotMessage(studyTips[randomIndex]);
+    setShowMascotPopup(true);
+
+    // Hide popup after 10 seconds
+    setTimeout(() => {
+      setShowMascotPopup(false);
+    }, 10000);
+  };
+
+  useEffect(() => {
+    // Clear any existing timer
+    if (mascotTimerRef.current) {
+      clearInterval(mascotTimerRef.current);
+    }
+    // Set a new timer for random intervals (e.g., 5 to 15 minutes)
+    const randomInterval = (Math.floor(Math.random() * 10) + 5) * 60 * 1000;
+    mascotTimerRef.current = setInterval(showRandomMascotMessage, randomInterval);
+
+    // Cleanup on unmount
+    return () => {
+      if (mascotTimerRef.current) {
+        clearInterval(mascotTimerRef.current);
+      }
+    };
+  }, []); 
+
+  const sidebarVariants = {
+    expanded: { width: '16rem', transition: { duration: 0.3, ease: 'easeInOut' } }, 
+    collapsed: { width: '4.5rem', transition: { duration: 0.3, ease: 'easeInOut' } }, 
+  };
 
   return (
     <motion.aside
-      className="hidden md:flex flex-col w-64 border-r bg-card shrink-0 h-screen"
-      initial={{ x: -256, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      transition={{ duration: 0.4, ease: "easeOut" }}
+      variants={sidebarVariants}
+      initial={isExpanded ? "expanded" : "collapsed"}
+      animate={isExpanded ? "expanded" : "collapsed"}
+      className={cn(
+        "relative flex flex-col h-screen bg-card border-r border-border/50 shadow-sm z-40",
+        "transition-all duration-300 ease-in-out" 
+      )}
     >
-        <div className="flex items-center justify-between h-16 px-3 border-b">
-            <Dialog open={isPopupOpen} onOpenChange={setIsPopupOpen}>
-              <DialogTrigger asChild>
-                 <Button
-                     variant="outline"
-                     className={cn(
-                         "w-full justify-between border-muted-foreground/30 h-9 text-sm font-normal text-foreground px-3 hover:bg-muted/50 dark:hover:bg-muted/30",
-                         "hover:scale-100 active:scale-100"
-                     )}
-                 >
-                     <div className="flex items-center gap-2">
-                        <GraduationCap className="w-4 h-4 text-primary" />
-                        <span className="font-medium">CBSE</span>
-                     </div>
-                     <div className="flex items-center gap-1.5">
-                         <Badge variant="free" className="px-1.5 py-0.5 text-[10px] leading-tight">FREE</Badge>
-                         <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                     </div>
-                 </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                  <DialogTitle className="flex items-center gap-2">
-                    <Lightbulb className="w-5 h-5 text-yellow-500" />
-                    Changing Board - Under Development
-                  </DialogTitle>
-                  <DialogDescription>
-                    The ability to change your educational board is coming soon!
-                    This will allow you to access content tailored to different curricula.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                   <p className="text-sm text-muted-foreground">
-                     We appreciate your patience as we work on this feature.
-                   </p>
+      {/* Header */}
+      <div className={cn(
+        "flex items-center h-16 px-3 border-b border-border/50 shrink-0",
+        isExpanded ? "justify-between" : "justify-center"
+      )}>
+        <AnimatePresence>
+        {isExpanded && (
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.2 }}
+            className="flex items-center gap-2"
+          >
+            <Image src={currentLogo} alt="OpennMind Logo" width={28} height={28} priority />
+            <span className="font-bold text-lg text-foreground">OpennMind</span>
+          </motion.div>
+        )}
+        </AnimatePresence>
+        <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-md hover:scale-110 active:scale-95"
+            aria-label={isExpanded ? "Collapse sidebar" : "Expand sidebar"}
+          >
+            <Menu className="h-5 w-5" />
+        </Button>
+      </div>
+
+      {/* User Profile / Board Selector */}
+      <div className={cn("px-3 py-3 border-b border-border/50", isExpanded ? "" : "hidden")}>
+        <AnimatePresence>
+          {isExpanded && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.2, ease: 'easeInOut' }}
+            >
+              <Button variant="outline" className="w-full justify-between border-muted-foreground/30 h-9 text-sm font-normal text-foreground hover:bg-muted/50 dark:hover:bg-muted/30 px-3">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-yellow-500" />
+                  <span>CBSE</span>
+                </div>
+                <Badge variant="free" className="px-1.5 py-0.5 text-[10px]">FREE</Badge>
+              </Button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* Navigation */}
+      <ScrollArea className="flex-1">
+        <motion.nav
+          initial="hidden"
+          animate="visible"
+          variants={{ visible: { transition: { staggerChildren: 0.03 } } }}
+          className="py-3 space-y-1"
+        >
+          {navLinks.map((group) => (
+            <div key={group.group} className="mb-1 last:mb-0">
+              <AnimatePresence>
+                {isExpanded && (
+                  <motion.h3
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -10 }}
+                    transition={{ duration: 0.2, delay: 0.1 }}
+                    className="px-4 pt-2 pb-1 text-xs font-semibold uppercase text-muted-foreground/80 tracking-wider"
+                  >
+                    {group.group}
+                  </motion.h3>
+                )}
+              </AnimatePresence>
+              <ul className="space-y-0.5">
+                {group.items.map(item => (
+                  <NavItem
+                    key={item.href}
+                    {...item}
+                    isActive={pathname === item.href}
+                    isExpanded={isExpanded}
+                    isSubmenuOpen={openSubmenus[item.label]}
+                    onSubmenuToggle={() => toggleSubmenu(item.label)}
+                  />
+                ))}
+              </ul>
+            </div>
+          ))}
+        </motion.nav>
+      </ScrollArea>
+
+        {/* Mascot Popup */}
+        <AnimatePresence>
+          {showMascotPopup && isExpanded && (
+              <motion.div
+                initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 20, scale: 0.9 }}
+                transition={{ type: "spring", stiffness: 200, damping: 20 }}
+                className="fixed bottom-4 left-4 z-50 p-0" 
+                style={{
+                  
+                  left: isExpanded ? '17rem' : '5.5rem', 
+                  bottom: '1rem'
+                }}
+              >
+                <div className="bg-card dark:bg-zinc-800 p-3 rounded-lg shadow-xl border border-border/30 flex items-start max-w-xs">
+                  <Image src={MascotImage} alt="Mascot" width={40} height={40} className="mr-2.5 rounded-full flex-shrink-0 mt-0.5" />
                   <div>
-                    <h4 className="font-semibold mb-2 text-foreground">Suggest a Board or Feature</h4>
-                    <p className="text-xs text-muted-foreground mb-2">
-                      What board are you interested in? Or any specific features related to board selection?
-                    </p>
-                    <Textarea
-                      placeholder="E.g., ICSE Board, State Boards, specific exam patterns..."
-                      value={suggestion}
-                      onChange={(e) => setSuggestion(e.target.value)}
-                      className="mb-3 min-h-[100px] bg-background dark:bg-input"
-                    />
+                    <p className="text-xs text-foreground leading-snug">{mascotMessage}</p>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowMascotPopup(false)}
+                      className="text-xs h-auto p-1 mt-1.5 text-muted-foreground hover:text-primary hover:bg-primary/10"
+                    >
+                      Got it!
+                    </Button>
                   </div>
                 </div>
-                <DialogFooter>
-                  <Button
-                    variant="ghost"
-                    onClick={() => {
-                      setIsPopupOpen(false);
-                      setSuggestion("");
-                    }}
-                    className="hover:scale-105 active:scale-95"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="submit"
-                    onClick={handleSuggestionSubmit}
-                    disabled={!suggestion.trim()}
-                    className="hover:scale-105 active:scale-95"
-                  >
-                    <Send className="w-4 h-4 mr-2" />
-                    Submit Suggestion
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-        </div>
+              </motion.div>
+          )}
+        </AnimatePresence>
 
-        <ScrollArea className="flex-1 py-4">
-             <NavSection title="Study Tools">
-                  {opennMindItems.map((item, index) => (
-                     <motion.div
-                        key={item.href}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.1 + index * 0.03 }}
-                      >
-                       <NavItem {...item} isActive={pathname === item.href} />
-                     </motion.div>
-                  ))}
-             </NavSection>
-        </ScrollArea>
-
-        <motion.div
-          className="mt-auto p-3 border-t"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 + opennMindItems.length * 0.03 + 0.1 }} // Ensure mascot appears after items
-        >
-            {/* Mascot Placeholder */}
-            <motion.div
-              className="flex items-center gap-3 p-3 mb-3 bg-muted/30 dark:bg-card/60 rounded-lg shadow-sm"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2 + opennMindItems.length * 0.03 + 0.2, type: "spring", stiffness: 200, damping: 15 }}
+      {/* Footer / Upgrade Button */}
+      <AnimatePresence>
+        {isExpanded && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2, ease: 'easeInOut', delay: 0.1 }}
+            className="mt-auto p-3 border-t border-border/50"
+          >
+            <Button
+              variant="primary"
+              className="w-full bg-gradient-to-r from-primary to-blue-500 hover:from-primary/90 hover:to-blue-500/90 text-primary-foreground shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-transform"
             >
-              <Brain className="w-10 h-10 text-primary flex-shrink-0" data-ai-hint="friendly robot brain" />
-              <div className="overflow-hidden">
-                <p className="text-sm font-semibold text-foreground truncate">MindSpark</p>
-                <p className="text-xs text-muted-foreground truncate">Your AI study buddy!</p>
-              </div>
-            </motion.div>
-            <NavItem href="/settings" icon={Settings} label="Account settings" isActive={pathname === '/settings'} />
-        </motion.div>
+              <Star className="w-4 h-4 mr-2 fill-current" />
+              Upgrade to Pro
+            </Button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.aside>
   );
 }
