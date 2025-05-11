@@ -327,7 +327,7 @@ export default function Home() {
                          exit={{ opacity: 0 }}
                          className="absolute left-0 top-1/2 -translate-y-1/2 transform -translate-x-3 z-10"
                      >
-                        <Button variant="outline" size="icon" className="rounded-full shadow-md w-8 h-8 hover:scale-105 active:scale-95" onClick={() => scroll('left')}>
+                        <Button variant="outline" size="icon" className="rounded-full shadow-md w-8 h-8 hover:scale-105 active:scale-95">
                            <ChevronLeft className="h-4 w-4" />
                         </Button>
                      </motion.div>
@@ -424,18 +424,18 @@ export default function Home() {
 
           {/* Bottom Illustration Section */}
           <motion.div
-            className="w-full mt-12 mb-[-2rem] md:mb-[-2rem]" // Adjust margin as needed
+            className="w-full mt-12" // Removed negative bottom margin
             variants={itemVariants}
             initial="hidden"
             animate="show"
             transition={{ delay: 0.5 }}
           >
-            <div className="relative w-full h-auto max-w-4xl mx-auto aspect-[1000/300]"> {/* Adjust aspect ratio based on image */}
+            <div className="relative w-full h-auto max-w-4xl mx-auto aspect-[1000/380]"> {/* Adjusted aspect ratio for more height */}
               <Image
                 src={bottomIllustration}
                 alt="Studying illustration"
                 layout="fill"
-                objectFit="contain" // Use 'contain' to ensure the whole image is visible
+                objectFit="contain" 
                 data-ai-hint="study desk illustration"
               />
             </div>
