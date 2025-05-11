@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -13,14 +12,14 @@ import {
   FileText,
   Users,
   ChevronDown,
-  Clock, 
-  Lightbulb, 
-  FlaskConical, 
-  Type, 
-  Layers, 
-  Pocket, 
-  FileStack, 
-  GraduationCap, 
+  Clock,
+  Lightbulb,
+  FlaskConical,
+  Type,
+  Layers,
+  Pocket,
+  FileStack,
+  GraduationCap,
   type LucideIcon,
   Star,
   Search,
@@ -36,6 +35,10 @@ import {
   BookCopy,
   BookHeadphones,
   Sparkles,
+  Briefcase, // Added for "Learn" category icon
+  ListChecks, // Added for "Practice" category icon
+  Wrench, // Added for "Tools" category icon
+  Heart, // Added for "Other" category icon
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -53,7 +56,7 @@ import {
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image, { type StaticImageData } from 'next/image';
-import MascotImage from '@/app/m.png'; 
+import MascotImage from '@/app/ChatGPT_Image_May_11__2025__03_07_50_PM-removebg-preview (3).png'; 
 import OpennMindLogoLight from '@/app/lt.png';
 import OpennMindLogoDark from '@/app/dt.png';
 import { useTheme } from 'next-themes';
@@ -84,18 +87,19 @@ const NavItem: React.FC<NavItemProps> = ({
   subItems,
   level = 0,
 }) => {
-  const itemPaddingLeft = `${1 + level * 1}rem`; 
+  const itemPaddingLeft = `${1 + level * 1}rem`;
 
   const itemVariants = {
-    hidden: { opacity: 0, x: -10 },
-    visible: { opacity: 1, x: 0, transition: { duration: 0.2 } },
+    hidden: { opacity: 0, x: isExpanded ? -10 : 0 },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.2, ease: "easeInOut" } },
   };
 
   const iconVariants = {
     initial: { scale: 1, rotate: 0 },
-    hover: { scale: 1.2, rotate: 10, transition: { type: 'spring', stiffness: 300, damping: 10 } },
-    active: { scale: 1.1, transition: { type: 'spring', stiffness: 200 } },
+    hover: { scale: 1.15, rotate: 5, transition: { type: 'spring', stiffness: 300, damping: 10 } },
+    active: { scale: 1.05, transition: { type: 'spring', stiffness: 200, damping: 15 } },
   };
+
 
   return (
     <motion.li variants={itemVariants} className="flex flex-col">
@@ -109,13 +113,18 @@ const NavItem: React.FC<NavItemProps> = ({
           }}
           className={cn(
             "flex items-center py-2.5 rounded-lg transition-all duration-200 ease-in-out group relative",
-            "hover:bg-primary/10 dark:hover:bg-primary/15",
-            isActive ? "bg-primary/10 dark:bg-primary/20 text-primary font-semibold" : "text-muted-foreground hover:text-foreground dark:hover:text-primary-foreground/90",
-            isExpanded ? "px-3 justify-start" : "px-3 justify-center", 
+            "hover:bg-primary/10 dark:hover:bg-primary/20", // Adjusted hover
+            isActive ? "bg-primary/15 dark:bg-primary/25 text-primary font-medium shadow-sm" : "text-muted-foreground hover:text-foreground dark:hover:text-primary-foreground/80", // Adjusted active and default states
+            isExpanded ? "px-3 justify-start" : "px-3 justify-center",
           )}
           style={{ paddingLeft: isExpanded ? itemPaddingLeft : '0.75rem' }}
         >
-          <motion.div variants={iconVariants} initial="initial" whileHover="hover" whileTap={isActive ? "active" : "initial"}>
+          <motion.div
+             variants={iconVariants}
+             initial="initial"
+             whileHover="hover"
+             animate={isActive ? "active" : "initial"}
+          >
             <Icon className={cn("h-5 w-5 flex-shrink-0", isActive ? "text-primary" : "")} />
           </motion.div>
           <AnimatePresence>
@@ -134,13 +143,13 @@ const NavItem: React.FC<NavItemProps> = ({
           {isExpanded && hasSubmenu && (
             <ChevronDown
               className={cn(
-                "ml-auto h-4 w-4 text-muted-foreground transition-transform duration-200",
+                "ml-auto h-4 w-4 text-muted-foreground transition-transform duration-200 group-hover:text-foreground",
                 isSubmenuOpen ? "rotate-180" : ""
               )}
             />
           )}
           {!isExpanded && (
-            <span className="absolute left-full ml-2 px-2 py-1 bg-card text-card-foreground text-xs rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-50">
+            <span className="absolute left-full ml-3 px-2 py-1 bg-card text-card-foreground text-xs font-medium rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap pointer-events-none z-50 dark:bg-zinc-800 dark:text-zinc-200 border border-border/20">
               {label}
             </span>
           )}
@@ -151,8 +160,8 @@ const NavItem: React.FC<NavItemProps> = ({
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: 'auto', opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
-          transition={{ duration: 0.2, ease: 'easeInOut' }}
-          className="ml-4 overflow-hidden" 
+          transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }} // Smoother ease
+          className="ml-4 overflow-hidden"
         >
           {subItems.map((subItem) => (
             <NavItem key={subItem.href} {...subItem} level={level + 1} isExpanded={isExpanded} />
@@ -183,11 +192,12 @@ export function Sidebar() {
     setOpenSubmenus(prev => ({ ...prev, [label]: !prev[label] }));
   };
 
-  const navLinks = [
+ const navLinks = [
     {
       group: "Main",
+      icon: Home, // Icon for the main group
       items: [
-        { href: '/', icon: Home, label: 'Dashboard' },
+        { href: '/', icon: LayoutDashboard, label: 'Dashboard' },
         { href: '/all-subjects', icon: BookCopy, label: 'All Subjects' },
         { href: '/ask-doubt', icon: MessageSquareHeart, label: 'Ask Doubt' },
         { href: '/notes', icon: BookOpen, label: 'Notes' },
@@ -195,6 +205,7 @@ export function Sidebar() {
     },
     {
       group: "Learn",
+      icon: Briefcase, // Placeholder, replace with suitable icon
       items: [
         { href: '/study-plan', icon: GraduationCap, label: 'Study Plan' },
         { href: '/ncert-explanations', icon: FlaskConical, label: 'NCERT Explanations' },
@@ -204,6 +215,7 @@ export function Sidebar() {
     },
     {
       group: "Practice",
+      icon: ListChecks, // Placeholder
       items: [
         { href: '/mock-exams', icon: PlusCircle, label: 'Mock Exams' },
         { href: '/timed-exams', icon: Clock, label: 'Timed Exams' },
@@ -213,16 +225,17 @@ export function Sidebar() {
     },
     {
       group: "Tools",
+      icon: Wrench, // Placeholder
       items: [
         { href: '/performance-tracking', icon: BarChart2, label: 'Performance Tracking' },
         { href: '/predict-grade', icon: Lightbulb, label: 'Predict Grade' },
         { href: '/predicted-papers', icon: Target, label: 'Predicted Papers' },
         { href: '/saved', icon: BookMarked, label: 'Saved' },
-
       ]
     },
      {
       group: "Other",
+      icon: Heart, // Placeholder
       items: [
         { href: '/fun-shun', icon: Smile, label: 'Fun Shun' },
         { href: '/settings', icon: Settings, label: 'Settings' },
@@ -265,12 +278,18 @@ export function Sidebar() {
         clearInterval(mascotTimerRef.current);
       }
     };
-  }, []); 
+  }, []);
 
   const sidebarVariants = {
-    expanded: { width: '16rem', transition: { duration: 0.3, ease: 'easeInOut' } }, 
-    collapsed: { width: '4.5rem', transition: { duration: 0.3, ease: 'easeInOut' } }, 
+    expanded: { width: '16rem', transition: { duration: 0.3, ease: 'easeInOut' } },
+    collapsed: { width: '4.5rem', transition: { duration: 0.3, ease: 'easeInOut' } },
   };
+
+  const groupHeaderVariants = {
+    hidden: { opacity: 0, x: -20 },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.25, delay: 0.05 } }
+  };
+
 
   return (
     <motion.aside
@@ -278,39 +297,39 @@ export function Sidebar() {
       initial={isExpanded ? "expanded" : "collapsed"}
       animate={isExpanded ? "expanded" : "collapsed"}
       className={cn(
-        "relative flex flex-col h-screen bg-card border-r border-border/50 shadow-sm z-40",
-        "transition-all duration-300 ease-in-out" 
+        "relative flex flex-col h-screen bg-card border-r border-border/50 shadow-lg z-40", // Added shadow-lg
+        "transition-all duration-300 ease-in-out"
       )}
     >
       {/* Header */}
-      <div className={cn(
+       <div className={cn(
         "flex items-center h-16 px-3 border-b border-border/50 shrink-0",
         isExpanded ? "justify-between" : "justify-center"
       )}>
-        <AnimatePresence>
-        {isExpanded && (
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.2 }}
-            className="flex items-center gap-2"
-          >
-            <Image src={currentLogo} alt="OpennMind Logo" width={28} height={28} priority />
-            <span className="font-bold text-lg text-foreground">OpennMind</span>
-          </motion.div>
-        )}
-        </AnimatePresence>
+         <AnimatePresence>
+           {isExpanded && (
+             <motion.div
+               initial={{ opacity: 0, x: -20, scale: 0.9 }}
+               animate={{ opacity: 1, x: 0, scale: 1 }}
+               exit={{ opacity: 0, x: -20, scale: 0.9 }}
+               transition={{ duration: 0.25, ease: "circOut" }}
+               className="flex items-center gap-2"
+             >
+               <Image src={currentLogo} alt="OpennMind Logo" width={28} height={28} priority className="rounded-sm"/>
+             </motion.div>
+           )}
+         </AnimatePresence>
         <Button
             variant="ghost"
             size="icon"
             onClick={() => setIsExpanded(!isExpanded)}
-            className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-md hover:scale-110 active:scale-95"
+            className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted/50 dark:hover:bg-primary/15 rounded-md hover:scale-110 active:scale-95"
             aria-label={isExpanded ? "Collapse sidebar" : "Expand sidebar"}
           >
             <Menu className="h-5 w-5" />
         </Button>
       </div>
+
 
       {/* User Profile / Board Selector */}
       <div className={cn("px-3 py-3 border-b border-border/50", isExpanded ? "" : "hidden")}>
@@ -322,7 +341,7 @@ export function Sidebar() {
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.2, ease: 'easeInOut' }}
             >
-              <Button variant="outline" className="w-full justify-between border-muted-foreground/30 h-9 text-sm font-normal text-foreground hover:bg-muted/50 dark:hover:bg-muted/30 px-3">
+              <Button variant="outline" className="w-full justify-between border-muted-foreground/30 h-9 text-sm font-normal text-foreground hover:bg-muted/50 dark:hover:bg-muted/30 px-3 hover:border-primary/50 dark:hover:border-primary/50 hover:scale-[1.02] active:scale-[0.98] transition-all">
                 <div className="flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-yellow-500" />
                   <span>CBSE</span>
@@ -345,14 +364,12 @@ export function Sidebar() {
           {navLinks.map((group) => (
             <div key={group.group} className="mb-1 last:mb-0">
               <AnimatePresence>
-                {isExpanded && (
+                 {isExpanded && (
                   <motion.h3
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -10 }}
-                    transition={{ duration: 0.2, delay: 0.1 }}
-                    className="px-4 pt-2 pb-1 text-xs font-semibold uppercase text-muted-foreground/80 tracking-wider"
+                    variants={groupHeaderVariants}
+                    className="px-4 pt-2 pb-1 text-xs font-semibold uppercase text-muted-foreground/80 tracking-wider flex items-center gap-2"
                   >
+                     <group.icon className="w-3.5 h-3.5" />
                     {group.group}
                   </motion.h3>
                 )}
@@ -382,10 +399,9 @@ export function Sidebar() {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 20, scale: 0.9 }}
                 transition={{ type: "spring", stiffness: 200, damping: 20 }}
-                className="fixed bottom-4 left-4 z-50 p-0" 
+                className="fixed bottom-4 left-4 z-50 p-0"
                 style={{
-                  
-                  left: isExpanded ? '17rem' : '5.5rem', 
+                  left: isExpanded ? '17rem' : '5.5rem',
                   bottom: '1rem'
                 }}
               >
