@@ -6,7 +6,7 @@ import Image, { type StaticImageData } from 'next/image';
 import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar"; // Updated Sidebar import
 import { SubjectCard } from "@/components/ui/subject-card";
-// import { ExamCard } from "@/components/ui/exam-card"; // Removed ExamCard import
+import { ExamCard } from "@/components/ui/exam-card";
 import { LearnWithCard } from "@/components/ui/learn-with-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"; // Import Card and related components
 import { Button } from "@/components/ui/button";
@@ -45,10 +45,11 @@ import mathImage from './maths.png';
 import scienceImage from './science.png'; 
 import hindiImage from './hindi.png';
 
-// Import images for exam cards - These are now used in mock-exams page
-// import i1 from './i1.png'; 
-// import i2 from './i2.png'; 
-// import i3 from './i3.png';
+// Import images for exam cards
+import i1 from './i1.png'; 
+import i2 from './i2.png'; 
+import i3 from './i3.png';
+import bottomIllustration from './illu.png'; // Import the bottom illustration
 
 interface Quote {
     quote: string;
@@ -101,7 +102,7 @@ const subjects = [
   },
 ];
 
-// Data for Exam Cards using icons - This data is now primarily for mock-exams page
+// Data for Exam Cards using icons
 const examCardsData: {
   title: string;
   icon: LucideIcon;
@@ -109,7 +110,7 @@ const examCardsData: {
   textColorClass: string;
   isNew?: boolean;
   dataAiHint: string;
-  imageUrl?: StaticImageData; // Keep imageUrl if still needed for other contexts
+  imageUrl?: StaticImageData; // Keep imageUrl for image based cards
 }[] = [
  {
     title: "Random exam",
@@ -118,7 +119,7 @@ const examCardsData: {
     textColorClass: "text-blue-800 dark:text-blue-300",
     isNew: false,
     dataAiHint: "random dice",
-    // imageUrl: i1, // This will be used in mock-exams page directly
+    imageUrl: i1,
   },
   {
     title: "Custom exam",
@@ -127,7 +128,7 @@ const examCardsData: {
     textColorClass: "text-green-800 dark:text-green-300",
     isNew: true,
     dataAiHint: "custom settings sliders",
-    // imageUrl: i2,
+    imageUrl: i2,
   },
   {
     title: "Timed exam",
@@ -136,7 +137,7 @@ const examCardsData: {
     textColorClass: "text-pink-800 dark:text-pink-300",
     isNew: true,
     dataAiHint: "timed clock stopwatch",
-    // imageUrl: i3,
+    imageUrl: i3,
   },
 ];
 
@@ -242,7 +243,7 @@ export default function Home() {
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header />
         <motion.main
-          className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 bg-background"
+          className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 bg-background relative" // Added relative positioning
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
@@ -383,10 +384,6 @@ export default function Home() {
               </div>
            </motion.div>
 
-            {/* Mock Exams Section is now replaced by Exam Builder in mock-exams page */}
-            {/* If you want to keep a link or a smaller section here, it can be added.
-                For now, it's removed to avoid redundancy with the dedicated mock-exams page.
-             */}
              <motion.div
               className="space-y-4"
               variants={containerVariants}
@@ -408,24 +405,41 @@ export default function Home() {
                     </a>
                 </Link>
               </div>
-              <Card className="bg-muted/50 dark:bg-card/80 border-0 rounded-xl p-6">
-                <CardHeader className="p-0 mb-3">
-                    <CardTitle className="text-lg text-foreground">Ready to test your knowledge?</CardTitle>
-                </CardHeader>
-                <CardContent className="p-0">
-                    <p className="text-muted-foreground mb-4">
-                        Create custom mock exams, try random tests, or challenge yourself with timed sessions in our dedicated Exam Builder.
-                    </p>
-                    <Link href="/mock-exams" passHref legacyBehavior>
-                        <a>
-                            <Button className="hover:scale-105 active:scale-95">
-                                Open Exam Builder
-                            </Button>
-                        </a>
-                    </Link>
-                </CardContent>
-              </Card>
+               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                 {examCardsData.map((card, index) => (
+                   <motion.div key={index} variants={itemVariants}>
+                     <ExamCard
+                       title={card.title}
+                       icon={card.icon}
+                       bgColorClass={card.bgColorClass}
+                       textColorClass={card.textColorClass}
+                       isNew={card.isNew}
+                       data-ai-hint={card.dataAiHint}
+                       imageUrl={card.imageUrl}
+                     />
+                   </motion.div>
+                 ))}
+               </div>
             </motion.div>
+
+          {/* Bottom Illustration Section */}
+          <motion.div
+            className="w-full mt-12 mb-[-2rem] md:mb-[-2rem]" // Adjust margin as needed
+            variants={itemVariants}
+            initial="hidden"
+            animate="show"
+            transition={{ delay: 0.5 }}
+          >
+            <div className="relative w-full h-auto max-w-4xl mx-auto aspect-[1000/300]"> {/* Adjust aspect ratio based on image */}
+              <Image
+                src={bottomIllustration}
+                alt="Studying illustration"
+                layout="fill"
+                objectFit="contain" // Use 'contain' to ensure the whole image is visible
+                data-ai-hint="study desk illustration"
+              />
+            </div>
+          </motion.div>
 
 
         </motion.main>
@@ -433,3 +447,4 @@ export default function Home() {
     </div>
   );
 }
+
