@@ -4,34 +4,44 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Play, ThumbsUp, ThumbsDown, MoreVertical, Info } from 'lucide-react';
+import { Video, ThumbsUp, ThumbsDown, MoreVertical, Info } from 'lucide-react'; // Changed Play to Video icon
 import { motion } from 'framer-motion';
 
-interface AudioOverviewProps {
+interface VideoOverviewProps {
   title: string;
   currentTime: string;
   totalTime: string;
 }
 
-export function AudioOverview({ title, currentTime, totalTime }: AudioOverviewProps) {
-  const progressPercentage = (141 / (3 * 60 + 1)) * 100; // Example: 1:41 / 3:01
+export function VideoOverview({ title, currentTime, totalTime }: VideoOverviewProps) {
+  // Calculate progress based on example times for visual representation
+  const parseTimeToSeconds = (time: string) => {
+    const parts = time.split(':').map(Number);
+    if (parts.length === 2) return parts[0] * 60 + parts[1];
+    if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+    return 0;
+  };
+
+  const currentSeconds = parseTimeToSeconds(currentTime);
+  const totalSeconds = parseTimeToSeconds(totalTime);
+  const progressPercentage = totalSeconds > 0 ? (currentSeconds / totalSeconds) * 100 : 0;
 
   return (
     <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.3 }}
+        transition={{ duration: 0.3, delay: 0.35 }} // Slightly later delay
     >
         <Card className="bg-card dark:bg-zinc-800/70 border border-border/20 rounded-xl shadow-lg">
         <CardHeader className="flex flex-row items-center justify-between p-4 pb-2">
-            <CardTitle className="text-sm font-semibold text-foreground">Audio Overview</CardTitle>
+            <CardTitle className="text-sm font-semibold text-foreground">Video Overview</CardTitle>
             <Info className="w-4 h-4 text-muted-foreground cursor-pointer hover:text-primary" />
         </CardHeader>
         <CardContent className="p-4 pt-2 space-y-3">
             <p className="text-sm font-medium text-foreground truncate" title={title}>{title}</p>
             <div className="flex items-center gap-3">
             <Button variant="ghost" size="icon" className="h-8 w-8 text-primary hover:bg-primary/10 rounded-full hover:scale-105 active:scale-95">
-                <Play className="w-4 h-4 fill-primary" />
+                <Video className="w-4 h-4 fill-primary" /> {/* Changed icon to Video */}
             </Button>
             <div className="flex-1 relative h-1.5 bg-muted rounded-full overflow-hidden">
                 <div

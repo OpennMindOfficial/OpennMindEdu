@@ -6,10 +6,11 @@ import React, { useState } from 'react';
 import { SourcesSidebar, type SourceItem } from "@/components/ncert/sources-sidebar";
 import { NotebookGuide } from "@/components/ncert/notebook-guide";
 import { AudioOverview } from "@/components/ncert/audio-overview";
+import { VideoOverview } from "@/components/ncert/video-overview"; // Import VideoOverview
 import { HelpUnderstand } from "@/components/ncert/help-understand";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Settings, Share2, StickyNote, ArrowLeft, Info, Play, ThumbsUp, ThumbsDown, MoreVertical } from "lucide-react";
+import { Settings, Share2, StickyNote, ArrowLeft, Info, Play, ThumbsUp, ThumbsDown, MoreVertical, Video } from "lucide-react";
 import { Input } from '@/components/ui/input';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
@@ -138,7 +139,8 @@ export default function NcertExplanationsPage() {
               transition={{ duration: 0.4, delay: 0.2 }}
               className="space-y-6"
             >
-              <AudioOverview title="Science in Motion" currentTime="1:41" totalTime="3:01" />
+              <AudioOverview title="Science in Motion - Audio Summary" currentTime="1:41" totalTime="3:01" />
+              <VideoOverview title="Newton's Laws Explained - Video" currentTime="5:23" totalTime="12:45" />
               <HelpUnderstand questions={helpUnderstandQuestions} />
             </motion.div>
           </div>
