@@ -54,7 +54,7 @@ export function SourcesSidebar({ sources, onSourceToggle }: SourcesSidebarProps)
         transition={{ duration: 0.3 }}
         className={cn(
             "flex flex-col h-full border-r border-border bg-card dark:bg-zinc-800/30 shadow-md",
-            isExpanded ? "w-72" : "w-20" // Example width change
+            isExpanded ? "w-72" : "w-20" 
         )}
     >
       {/* Header */}
@@ -64,7 +64,6 @@ export function SourcesSidebar({ sources, onSourceToggle }: SourcesSidebarProps)
           {isExpanded && <span className="font-semibold text-sm text-foreground">OpennMind</span>}
           {isExpanded && <Badge variant="outline" className="text-xs border-orange-400 text-orange-500 bg-orange-500/10">EXPERIMENTAL</Badge>}
         </div>
-        {/* Toggle button can be added here if needed */}
       </div>
 
       {/* Sources Section Header */}
@@ -90,6 +89,7 @@ export function SourcesSidebar({ sources, onSourceToggle }: SourcesSidebarProps)
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.2, delay: sources.indexOf(source) * 0.03 }}
+              className="overflow-hidden" // Ensure li itself doesn't cause overflow if text is very long
             >
               <label
                 htmlFor={`source-${source.id}`}
@@ -100,12 +100,17 @@ export function SourcesSidebar({ sources, onSourceToggle }: SourcesSidebarProps)
                 )}
               >
                 {getIconForType(source.type)}
-                {isExpanded && <span className="text-xs font-medium text-foreground truncate flex-1">{source.title}</span>}
+                {isExpanded && (
+                    <span className="text-xs font-medium text-foreground truncate flex-1 min-w-0"> 
+                      {/* min-w-0 is important for truncate to work in flex child */}
+                      {source.title}
+                    </span>
+                )}
                 <Checkbox
                   id={`source-${source.id}`}
                   checked={source.checked}
                   onCheckedChange={() => onSourceToggle(source.id)}
-                  className="ml-auto"
+                  className="ml-auto flex-shrink-0" // Ensure checkbox does not shrink
                 />
               </label>
             </motion.li>
@@ -123,3 +128,4 @@ export function SourcesSidebar({ sources, onSourceToggle }: SourcesSidebarProps)
     </motion.aside>
   );
 }
+

@@ -5,6 +5,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 interface HelpUnderstandProps {
   questions: string[];
@@ -26,7 +27,10 @@ export function HelpUnderstand({ questions }: HelpUnderstandProps) {
             <Button
                 key={index}
                 variant="outline"
-                className="w-full justify-start text-left h-auto py-2 px-3 text-xs text-foreground/90 dark:text-foreground/80 bg-muted/30 dark:bg-zinc-700/60 border-border/50 hover:bg-muted/70 dark:hover:bg-zinc-700 hover:border-primary/30 dark:hover:border-primary/50"
+                className={cn(
+                    "w-full justify-start text-left h-auto py-2 px-3 text-xs text-foreground/90 dark:text-foreground/80 bg-muted/30 dark:bg-zinc-700/60 border-border/50 hover:bg-muted/70 dark:hover:bg-zinc-700 hover:border-primary/30 dark:hover:border-primary/50",
+                    "truncate" // Added truncate class
+                )}
             >
                 {question}
             </Button>
@@ -36,3 +40,4 @@ export function HelpUnderstand({ questions }: HelpUnderstandProps) {
     </motion.div>
   );
 }
+
