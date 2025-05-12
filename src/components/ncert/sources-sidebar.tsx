@@ -46,6 +46,13 @@ export function SourcesSidebar({ sources, onSourceToggle }: SourcesSidebarProps)
     }
   };
 
+  const truncateText = (text: string, maxLength: number) => {
+    if (text.length > maxLength) {
+      return text.substring(0, maxLength) + "...";
+    }
+    return text;
+  };
+
 
   return (
     <motion.aside 
@@ -98,11 +105,12 @@ export function SourcesSidebar({ sources, onSourceToggle }: SourcesSidebarProps)
                   "hover:bg-muted/50 dark:hover:bg-zinc-700/40",
                   source.checked ? "bg-primary/10 dark:bg-primary/20" : ""
                 )}
+                title={source.title} // Show full title on hover
               >
                 {getIconForType(source.type)}
                 {isExpanded && (
                     <span className="text-[11px] font-medium text-foreground truncate flex-1 min-w-0 leading-tight"> {/* Custom smaller font, leading-tight */}
-                      {source.title}
+                      {truncateText(source.title, 20)}
                     </span>
                 )}
                 <Checkbox
