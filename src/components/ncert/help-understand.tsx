@@ -12,6 +12,13 @@ interface HelpUnderstandProps {
 }
 
 export function HelpUnderstand({ questions }: HelpUnderstandProps) {
+  const truncateText = (text: string, maxLength: number) => {
+    if (text.length > maxLength) {
+      return text.substring(0, maxLength) + "...";
+    }
+    return text;
+  };
+
   return (
     <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -31,8 +38,9 @@ export function HelpUnderstand({ questions }: HelpUnderstandProps) {
                     "w-full justify-start text-left h-auto py-1.5 px-2.5 text-xs text-foreground/90 dark:text-foreground/80 bg-muted/30 dark:bg-zinc-700/60 border-border/50 hover:bg-muted/70 dark:hover:bg-zinc-700 hover:border-primary/30 dark:hover:border-primary/50", // Adjusted padding and font size
                     "truncate" 
                 )}
+                title={question} // Show full question on hover
             >
-                {question}
+                {truncateText(question, 20)}
             </Button>
             ))}
         </CardContent>

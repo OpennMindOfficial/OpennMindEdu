@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Header } from "@/components/layout/header";
@@ -88,6 +89,9 @@ const itemVariants = {
 
 
 export default function PerformanceTrackingPage() {
+  const pageDescription = "Monitor your learning journey and track your progress.";
+  const truncatedDescription = pageDescription.length > 20 ? pageDescription.substring(0, 20) + '...' : pageDescription;
+
   return (
     <div className="flex h-screen bg-background text-foreground overflow-hidden">
       <Sidebar />
@@ -104,7 +108,7 @@ export default function PerformanceTrackingPage() {
             <motion.div variants={itemVariants} className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
                 <h1 className="text-2xl md:text-3xl font-bold text-foreground">Performance Insights</h1>
-                <p className="text-sm text-muted-foreground">Monitor your learning journey and track your progress.</p>
+                <p className="text-sm text-muted-foreground">{truncatedDescription}</p>
               </div>
               <div className="flex items-center gap-2">
                 <Select defaultValue="this-month">
@@ -289,3 +293,4 @@ export default function PerformanceTrackingPage() {
     </div>
   );
 }
+
