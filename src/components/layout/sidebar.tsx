@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -9,25 +10,23 @@ import {
   BarChart2,
   Settings,
   PlusCircle,
-  FileText,
   ChevronDown,
   Menu,
-  Home,
   MessageSquareHeart, 
   Target, 
   Smile, 
   BookMarked, 
   BookCopy, 
   BookHeadphones, 
-  SparklesIcon, 
+  Sparkles as SparklesIcon, 
   ListChecks, 
   Pocket,
   Layers,
   FileStack,
   GraduationCap,
   ClipboardCheck,
-  Timer, // Keep if used, or remove (used in Test Prep)
-  Lightbulb, // Keep if used, or remove (used in Test Prep)
+  Timer,
+  Lightbulb,
   type LucideIcon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -421,7 +420,7 @@ export function Sidebar() {
             </div>
           ))}
            
-           <div className="mt-2 mx-2 border-t border-border/50 pt-2">
+           <div className="mt-2 border-t border-border/50 pt-2"> {/* Removed mx-2 */}
              <NavItem
                 key={accountSettingsLink.href}
                 {...accountSettingsLink}
