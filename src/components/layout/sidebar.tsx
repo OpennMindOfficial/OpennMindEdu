@@ -11,8 +11,6 @@ import {
   PlusCircle,
   FileText,
   ChevronDown,
-  Clock,
-  Lightbulb,
   Menu,
   Home,
   MessageSquareHeart, 
@@ -28,6 +26,8 @@ import {
   FileStack,
   GraduationCap,
   ClipboardCheck,
+  Timer, // Keep if used, or remove (used in Test Prep)
+  Lightbulb, // Keep if used, or remove (used in Test Prep)
   type LucideIcon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -44,7 +44,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Textarea } from '@/components/ui/textarea'; 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image, { type StaticImageData } from 'next/image';
 import MascotImage from '@/app/ChatGPT_Image_May_11__2025__03_07_50_PM-removebg-preview (3).png'; 
@@ -177,6 +177,8 @@ export function Sidebar() {
   const [currentLogo, setCurrentLogo] = useState(OpennMindLogoLight);
   const [suggestion, setSuggestion] = useState("");
   const [isSuggestionDialogOpen, setIsSuggestionDialogOpen] = useState(false);
+  const [currentStudyTipIndex, setCurrentStudyTipIndex] = useState(0);
+
 
   useEffect(() => {
     setCurrentLogo(theme === 'dark' ? OpennMindLogoDark : OpennMindLogoLight);
@@ -207,7 +209,7 @@ export function Sidebar() {
       icon: ClipboardCheck,
       items: [
         { href: '/mock-exams', icon: PlusCircle, label: 'Mock Exams' },
-        { href: '/timed-exams', icon: Clock, label: 'Timed Exams' },
+        { href: '/timed-exams', icon: Timer, label: 'Timed Exams' },
         { href: '/questionbank', icon: HelpCircle, label: 'Questionbank' },
         { href: '/predicted-papers', icon: Target, label: 'Predicted Papers' },
         { href: '/predict-grade', icon: Lightbulb, label: 'Predict Grade' },
@@ -219,7 +221,7 @@ export function Sidebar() {
         group: "RESOURCES & MORE",
         icon: Layers,
         items: [
-            { href: '/extra-courses', icon: GraduationCap, label: 'Extra Courses' }, // Changed icon
+            { href: '/extra-courses', icon: GraduationCap, label: 'Extra Courses' }, 
             { href: '/fun-shun', icon: Smile, label: 'Fun Shun' },
         ]
     }
@@ -236,29 +238,48 @@ export function Sidebar() {
     "Did you know? Spaced repetition is a great way to remember things long-term. 🧠"
   ];
 
-  const showRandomMascotMessage = () => {
-    const randomIndex = Math.floor(Math.random() * studyTips.length);
-    setMascotMessage(studyTips[randomIndex]);
+  const showSpecificMascotMessage = useCallback((message: string) => {
+    setMascotMessage(message);
     setShowMascotPopup(true);
-
     setTimeout(() => {
       setShowMascotPopup(false);
-    }, 10000);
-  };
+    }, 10000); // Hides after 10 seconds
+  }, [setMascotMessage, setShowMascotPopup]);
+
+
+  const showRandomMascotMessage = useCallback(() => {
+    const randomIndex = Math.floor(Math.random() * studyTips.length);
+    showSpecificMascotMessage(studyTips[randomIndex]);
+  }, [studyTips, showSpecificMascotMessage]);
+
+  const cycleToNextMascotMessage = useCallback(() => {
+    showSpecificMascotMessage(studyTips[currentStudyTipIndex]);
+    setCurrentStudyTipIndex((prevIndex) => (prevIndex + 1) % studyTips.length);
+  }, [studyTips, currentStudyTipIndex, showSpecificMascotMessage, setCurrentStudyTipIndex]);
+
 
   useEffect(() => {
+    const handleTriggerCyclePopup = () => {
+      cycleToNextMascotMessage();
+    };
+  
+    window.addEventListener('cycleMascotPopup', handleTriggerCyclePopup);
+  
+    // Random interval logic for mascot popup
     if (mascotTimerRef.current) {
       clearInterval(mascotTimerRef.current);
     }
     const randomInterval = (Math.floor(Math.random() * 10) + 5) * 60 * 1000; 
     mascotTimerRef.current = setInterval(showRandomMascotMessage, randomInterval);
-
+  
     return () => {
+      window.removeEventListener('cycleMascotPopup', handleTriggerCyclePopup);
       if (mascotTimerRef.current) {
         clearInterval(mascotTimerRef.current);
       }
     };
-  }, []);
+  }, [cycleToNextMascotMessage, showRandomMascotMessage]);
+
 
   const handleSuggestionSubmit = () => {
     console.log("Suggestion submitted:", suggestion);
@@ -455,7 +476,6 @@ export function Sidebar() {
               variant="primary"
               className="w-full bg-gradient-to-r from-primary to-blue-500 hover:from-primary/90 hover:to-blue-500/90 text-primary-foreground shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-transform"
             >
-               {/* Using SparklesIcon instead of Star for Upgrade button */}
               <SparklesIcon className="w-4 h-4 mr-2 fill-current" />
               Upgrade to Pro
             </Button>

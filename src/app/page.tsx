@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -15,21 +14,18 @@ import {
   ArrowRight,
   BookOpen,
   PenTool,
-  Calculator, // Keep for other tools if any
   FlaskConical,
   Timer,
   FileText,
   PlusCircle,
-  Lightbulb, // Keep for other uses
-  Search, // Keep for other uses
   ChevronLeft,
   ChevronRight as ChevronRightIcon,
   GraduationCap as GraduationCapIcon,
   FileQuestion,
-  ClipboardCheck,
   BookUser,
-  Layers3, // Existing learn with
-  FileStack, // For PDF to Notes
+  Layers3, 
+  FileStack,
+  Lightbulb, // Added for quote card
 } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -119,9 +115,14 @@ export default function HomePage() {
 
   const scrollSubjects = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
-      const scrollAmount = direction === 'left' ? -300 : 300; // Adjust scroll amount as needed
+      const scrollAmount = direction === 'left' ? -300 : 300; 
       scrollContainerRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
+  };
+
+  const handleCyclePopupClick = () => {
+    const event = new CustomEvent('cycleMascotPopup');
+    window.dispatchEvent(event);
   };
 
 
@@ -132,17 +133,34 @@ export default function HomePage() {
         <Header />
         <main className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 bg-background">
           <motion.div initial="hidden" animate="show" variants={containerVariants}>
-            {/* Greeting */}
-            <motion.h1
-              className="text-3xl font-bold text-foreground mb-6"
-              variants={itemVariants}
-            >
-              {greeting}, {userName}!
-            </motion.h1>
+            {/* Greeting and Temporary Button */}
+            <div className="flex items-center mb-6">
+              <motion.h1
+                className="text-3xl font-bold text-foreground"
+                variants={itemVariants}
+              >
+                {greeting}, {userName}!
+              </motion.h1>
+              {/* Temporary button to trigger mascot popups */}
+              <Button 
+                onClick={handleCyclePopupClick} 
+                variant="outline" 
+                size="sm" 
+                className="ml-4 hover:scale-105 active:scale-95"
+              >
+                Show Mascot Tip
+              </Button>
+            </div>
 
             {/* Motivational Quote Card */}
             <motion.div variants={itemVariants} className="mb-8">
               <Card className="bg-[hsl(var(--quote-card-bg))] rounded-xl shadow-lg p-5 text-center">
+                <CardHeader className="p-0 mb-2">
+                  <CardTitle className="flex items-center justify-center text-[hsl(var(--quote-card-text))] text-lg">
+                    <Lightbulb className="w-5 h-5 mr-2 text-[hsl(var(--quote-card-author-text))]" />
+                    Quote of the day
+                  </CardTitle>
+                </CardHeader>
                 <CardContent className="p-0">
                   <p className="text-lg font-medium text-[hsl(var(--quote-card-text))] mb-1.5">
                     &ldquo;{quote.text}&rdquo;
@@ -194,7 +212,7 @@ export default function HomePage() {
                         title={subject.title}
                         imageUrl={subject.imageUrl}
                         bgColorClass={subject.bgColorClass}
-                        className="w-[240px] h-[320px]"
+                        className="w-[240px] h-[320px]" // Updated size
                         data-ai-hint={subject.dataAiHint}
                       />
                     </motion.div>
@@ -240,6 +258,7 @@ export default function HomePage() {
                     <ExamCard
                       title={exam.title}
                       icon={exam.icon} 
+                      illustration={exam.illustration}
                       bgColorClass={exam.bgColorClass}
                       textColorClass={exam.textColorClass}
                       isNew={exam.isNew}
@@ -256,4 +275,3 @@ export default function HomePage() {
     </div>
   );
 }
-
