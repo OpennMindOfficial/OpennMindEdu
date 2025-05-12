@@ -89,7 +89,7 @@ export function SourcesSidebar({ sources, onSourceToggle }: SourcesSidebarProps)
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.2, delay: sources.indexOf(source) * 0.03 }}
-              className="overflow-hidden" // Ensure li itself doesn't cause overflow if text is very long
+              className="overflow-hidden" 
             >
               <label
                 htmlFor={`source-${source.id}`}
@@ -102,7 +102,6 @@ export function SourcesSidebar({ sources, onSourceToggle }: SourcesSidebarProps)
                 {getIconForType(source.type)}
                 {isExpanded && (
                     <span className="text-xs font-medium text-foreground truncate flex-1 min-w-0"> 
-                      {/* min-w-0 is important for truncate to work in flex child */}
                       {source.title}
                     </span>
                 )}
@@ -110,7 +109,7 @@ export function SourcesSidebar({ sources, onSourceToggle }: SourcesSidebarProps)
                   id={`source-${source.id}`}
                   checked={source.checked}
                   onCheckedChange={() => onSourceToggle(source.id)}
-                  className="ml-auto flex-shrink-0" // Ensure checkbox does not shrink
+                  className="ml-auto flex-shrink-0" 
                 />
               </label>
             </motion.li>

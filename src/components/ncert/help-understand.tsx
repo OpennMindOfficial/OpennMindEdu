@@ -29,7 +29,7 @@ export function HelpUnderstand({ questions }: HelpUnderstandProps) {
                 variant="outline"
                 className={cn(
                     "w-full justify-start text-left h-auto py-2 px-3 text-xs text-foreground/90 dark:text-foreground/80 bg-muted/30 dark:bg-zinc-700/60 border-border/50 hover:bg-muted/70 dark:hover:bg-zinc-700 hover:border-primary/30 dark:hover:border-primary/50",
-                    "truncate" // Added truncate class
+                    "truncate" 
                 )}
             >
                 {question}
