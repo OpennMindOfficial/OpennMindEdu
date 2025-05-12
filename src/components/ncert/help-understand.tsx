@@ -22,13 +22,13 @@ export function HelpUnderstand({ questions }: HelpUnderstandProps) {
         <CardHeader className="p-4 pb-2">
             <CardTitle className="text-sm font-semibold text-foreground">Help me understand</CardTitle>
         </CardHeader>
-        <CardContent className="p-4 pt-2 space-y-2.5">
+        <CardContent className="p-4 pt-2 space-y-2"> {/* Reduced space-y */}
             {questions.map((question, index) => (
             <Button
                 key={index}
                 variant="outline"
                 className={cn(
-                    "w-full justify-start text-left h-auto py-2 px-3 text-xs text-foreground/90 dark:text-foreground/80 bg-muted/30 dark:bg-zinc-700/60 border-border/50 hover:bg-muted/70 dark:hover:bg-zinc-700 hover:border-primary/30 dark:hover:border-primary/50",
+                    "w-full justify-start text-left h-auto py-1.5 px-2.5 text-xs text-foreground/90 dark:text-foreground/80 bg-muted/30 dark:bg-zinc-700/60 border-border/50 hover:bg-muted/70 dark:hover:bg-zinc-700 hover:border-primary/30 dark:hover:border-primary/50", // Adjusted padding and font size
                     "truncate" 
                 )}
             >
