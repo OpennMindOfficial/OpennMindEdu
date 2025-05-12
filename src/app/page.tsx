@@ -33,11 +33,31 @@ import {
   ClipboardCheck,
   BookUser,
   GraduationCap as GraduationCapIcon,
+  Layers3,
+  CircleHelp,
+  Settings as SettingsIcon, // Renamed to avoid conflict with component
+  Bug,
+  Menu,
+  Home,
+  FolderOpen,
+  Grid,
+  MessageSquareHeart,
+  Target,
+  Smile,
+  BookMarked,
+  Folder,
+  BookCopy,
+  BookHeadphones,
+  Sparkles,
+  Briefcase, 
+  ListChecks, 
+  Wrench, 
+  Heart, 
 } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import quotesData from '@/app/quotes.json'; // Import quotes
+import quotesData from '@/app/quotes.json'; 
 
 // Import local images for subjects
 import itImage from './it.png';
@@ -52,8 +72,10 @@ import hindiImage from './hindi.png';
 import randomExamImage from './i1.png';
 import customExamImage from './i2.png';
 import timedExamImage from './i3.png';
-import illuImage from './illu.png'; // Illustration for "Keep Going" section
+import illuImage from './illu.png'; 
 import Image from 'next/image';
+
+console.log('src/app/page.tsx module loaded');
 
 
 const subjects = [
@@ -67,10 +89,10 @@ const subjects = [
 ];
 
 const learnWithItems = [
-  { title: "Ask a doubt", icon: FileQuestion, bgColorClass: "bg-learn-purple", textColorClass: "text-learn-purple-foreground", dataAiHint: "doubt question" },
-  { title: "Mock Exams", icon: ClipboardCheck, bgColorClass: "bg-learn-blue", textColorClass: "text-learn-blue-foreground", dataAiHint: "mock exam test" },
-  { title: "Revision Plan", icon: BookUser, bgColorClass: "bg-learn-teal", textColorClass: "text-learn-teal-foreground", dataAiHint: "revision plan study" },
-  { title: "Sketchpad", icon: PenTool, bgColorClass: "bg-learn-orange", textColorClass: "text-learn-orange-foreground", dataAiHint: "sketchpad draw" },
+  { title: "Ask a doubt", icon: FileQuestion, href: "/ask-doubt", bgColorClass: "bg-learn-purple", textColorClass: "text-learn-purple-foreground", dataAiHint: "doubt question" },
+  { title: "Mock Exams", icon: ClipboardCheck, href: "/mock-exams", bgColorClass: "bg-learn-blue", textColorClass: "text-learn-blue-foreground", dataAiHint: "mock exam test" },
+  { title: "Revision Plan", icon: BookUser, href: "/study-plan", bgColorClass: "bg-learn-teal", textColorClass: "text-learn-teal-foreground", dataAiHint: "revision plan study" },
+  { title: "Sketchpad", icon: PenTool, href: "/sketchpad", bgColorClass: "bg-learn-orange", textColorClass: "text-learn-orange-foreground", dataAiHint: "sketchpad draw" },
 ];
 
 const mockExams = [
@@ -85,24 +107,25 @@ const containerVariants = {
   show: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1,
+      staggerChildren: 0.07, // Slightly faster stagger
     },
   },
 };
 
 const itemVariants = {
   hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+  show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } }, // Slightly faster item animation
 };
 
 
 export default function HomePage() {
-  const [greeting, setGreeting] = useState("Good morning");
-  const [userName, setUserName] = useState("Rudransh"); // Placeholder, replace with actual user name
+  const [greeting, setGreeting] = useState("Good day");
+  const [userName, setUserName] = useState("Rudransh"); 
   const [quote, setQuote] = useState({ text: "", author: "" });
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    console.log('HomePage component mounted');
     const updateGreeting = () => {
       const hour = new Date().getHours();
       if (hour < 12) setGreeting("Good morning");
@@ -113,11 +136,16 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    const randomIndex = Math.floor(Math.random() * quotesData.quotes.length);
-    setQuote({
-      text: quotesData.quotes[randomIndex].quote,
-      author: quotesData.quotes[randomIndex].author,
-    });
+    if (quotesData && quotesData.quotes && quotesData.quotes.length > 0) {
+      const randomIndex = Math.floor(Math.random() * quotesData.quotes.length);
+      setQuote({
+        text: quotesData.quotes[randomIndex].quote,
+        author: quotesData.quotes[randomIndex].author,
+      });
+    } else {
+      // Fallback quote if quotesData is not as expected
+      setQuote({ text: "The journey of a thousand miles begins with a single step.", author: "Lao Tzu" });
+    }
   }, []);
 
   const scrollSubjects = (direction: 'left' | 'right') => {
@@ -135,14 +163,6 @@ export default function HomePage() {
         <Header />
         <main className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 bg-background">
           <motion.div initial="hidden" animate="show" variants={containerVariants}>
-            {/* Greeting */}
-            <motion.h1
-              className="text-3xl font-bold text-foreground mb-6"
-              variants={itemVariants}
-            >
-              {greeting}, {userName}
-            </motion.h1>
-
             {/* Motivational Quote Card */}
             <motion.div variants={itemVariants} className="mb-8">
               <Card className="bg-gradient-to-r from-primary/10 to-blue-500/10 dark:from-primary/5 dark:to-blue-500/5 border-primary/20 dark:border-primary/15 rounded-xl shadow-lg p-5 text-center">
@@ -154,6 +174,14 @@ export default function HomePage() {
                 </CardContent>
               </Card>
             </motion.div>
+            
+            {/* Greeting */}
+            <motion.h1
+              className="text-3xl font-bold text-foreground mb-6"
+              variants={itemVariants}
+            >
+              {greeting}, {userName}!
+            </motion.h1>
 
             {/* My Subjects Section */}
             <motion.div className="space-y-4 mb-8" variants={itemVariants}>
@@ -162,7 +190,7 @@ export default function HomePage() {
                   <Bookmark className="w-5 h-5 text-primary" />
                   <h2 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">My subjects</h2>
                   <Link href="/all-subjects" passHref legacyBehavior>
-                    <ChevronRightIcon className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform cursor-pointer" />
+                    <a><ChevronRightIcon className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-transform cursor-pointer" /></a>
                   </Link>
                 </div>
                 <div className="flex items-center space-x-2">
@@ -170,7 +198,7 @@ export default function HomePage() {
                       variant="ghost"
                       size="icon"
                       onClick={() => scrollSubjects('left')}
-                      className="rounded-full h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                      className="rounded-full h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted/50 active:scale-95"
                       aria-label="Scroll left"
                     >
                       <ChevronLeft className="h-5 w-5" />
@@ -179,7 +207,7 @@ export default function HomePage() {
                       variant="ghost"
                       size="icon"
                       onClick={() => scrollSubjects('right')}
-                      className="rounded-full h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                      className="rounded-full h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted/50 active:scale-95"
                       aria-label="Scroll right"
                     >
                       <ChevronRightIcon className="h-5 w-5" />
@@ -191,14 +219,14 @@ export default function HomePage() {
               </div>
               <div className="relative">
                 <ScrollArea ref={scrollContainerRef} className="w-full whitespace-nowrap rounded-md scrollbar-hide">
-                  <div className="flex w-max space-x-[25px] pb-4"> {/* Adjusted space-x */}
+                  <div className="flex w-max space-x-[25px] pb-4"> 
                     {subjects.map((subject, index) => (
-                       <motion.div key={index} variants={itemVariants} className="flex-shrink-0">
+                       <motion.div key={index} variants={itemVariants} className="flex-shrink-0 group">
                         <SubjectCard
                           title={subject.title}
                           imageUrl={subject.imageUrl}
                           bgColorClass={subject.bgColorClass}
-                          className="w-[220px] h-[290px] md:w-[220px] md:h-[290px]" // Adjusted width and height
+                          className="w-[240px] h-[320px]"
                           data-ai-hint={subject.dataAiHint}
                         />
                       </motion.div>
@@ -218,13 +246,17 @@ export default function HomePage() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {learnWithItems.map((item, index) => (
                   <motion.div key={index} variants={itemVariants}>
-                    <LearnWithCard
-                      title={item.title}
-                      icon={item.icon}
-                      bgColorClass={item.bgColorClass}
-                      textColorClass={item.textColorClass}
-                      data-ai-hint={item.dataAiHint}
-                    />
+                     <Link href={item.href} passHref legacyBehavior>
+                        <a>
+                            <LearnWithCard
+                            title={item.title}
+                            icon={item.icon}
+                            bgColorClass={item.bgColorClass}
+                            textColorClass={item.textColorClass}
+                            data-ai-hint={item.dataAiHint}
+                            />
+                        </a>
+                    </Link>
                   </motion.div>
                 ))}
               </div>
@@ -241,11 +273,11 @@ export default function HomePage() {
                    <motion.div key={index} variants={itemVariants}>
                     <ExamCard
                       title={exam.title}
-                      icon={exam.icon}
+                      icon={exam.icon} // Pass the icon component itself
                       bgColorClass={exam.bgColorClass}
                       textColorClass={exam.textColorClass}
                       isNew={exam.isNew}
-                      illustration={exam.illustration}
+                      illustration={exam.illustration} // This prop seems unused in ExamCard, but kept for consistency
                       data-ai-hint={exam.dataAiHint}
                     />
                   </motion.div>
@@ -262,7 +294,7 @@ export default function HomePage() {
                             <p className="text-muted-foreground mb-5">
                                 Every study session, every solved problem, every new concept learned is a step towards your goal. Stay focused and keep learning!
                             </p>
-                            <Button size="lg" className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-full shadow-lg hover:scale-105 active:scale-98 transition-all">
+                            <Button size="lg" className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-full shadow-lg hover:scale-105 active:scale-98 transition-all group">
                                 Continue Learning <RefreshCw className="ml-2 h-4 w-4 animate-spin group-hover:animate-none" />
                             </Button>
                         </div>
@@ -271,22 +303,19 @@ export default function HomePage() {
                                 src={illuImage}
                                 alt="Keep Going Illustration"
                                 layout="fill"
-                                objectFit="contain" // Changed to contain
-                                objectPosition="center" // Center the image
+                                objectFit="contain" 
+                                objectPosition="center" 
                                 className="opacity-90"
                                 data-ai-hint="motivation study"
+                                priority
                             />
                         </div>
                     </CardContent>
                 </Card>
             </motion.div>
-
-
           </motion.div>
         </main>
       </div>
     </div>
   );
 }
-
-    
