@@ -20,7 +20,7 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
         primary: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm",
         accent: "bg-accent text-accent-foreground hover:bg-accent/90",
-        beige: "bg-orange-100 text-orange-700 border border-orange-200 hover:bg-orange-200/80 dark:bg-orange-800/30 dark:text-orange-300 dark:border-orange-700 dark:hover:bg-orange-800/50", // Specific beige button
+        // beige variant removed as it was landing page specific
       },
       size: {
         default: "h-10 px-6 py-2", // Increased padding for bubble feel
@@ -57,3 +57,5 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 Button.displayName = "Button"
 
 export { Button, buttonVariants }
+
+    

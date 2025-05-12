@@ -6,12 +6,13 @@ import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import Script from "next/script";
+import { FloatingNav } from "@/components/layout/floating-nav"; // Keep if used on specific pages
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
-  title: "OpennMind Clone", // Will be overridden by landing page, but good default
-  description: "A clone of the OpennMind UI", // Will be overridden
+  title: "OpennMind Clone", 
+  description: "An AI-powered learning platform.", 
 };
 
 export default function RootLayout({
@@ -22,11 +23,11 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning >
       <head>
-         {/* Desmos script is not needed for heexo landing page, can be removed if only landing page exists */}
-         {/* <Script
+         {/* Desmos script is loaded here for calculator tools */}
+         <Script
            src="https://www.desmos.com/api/v1.10/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"
            strategy="beforeInteractive"
-         /> */}
+         />
       </head>
       <body
         className={cn(
@@ -36,15 +37,17 @@ export default function RootLayout({
       >
         <ThemeProvider
           attribute="class"
-          defaultTheme="light" // Set light theme as default for heexo landing
+          defaultTheme="dark" // Set dark theme as default for dashboard
           enableSystem
           disableTransitionOnChange
         >
            {children}
-           {/* <FloatingNav /> Removed as not part of heexo landing page specific request */}
+           {/* FloatingNav is not globally in root layout, will be added to specific pages if needed */}
            <Toaster />
         </ThemeProvider>
       </body>
     </html>
   );
 }
+
+    
