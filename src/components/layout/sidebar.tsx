@@ -178,6 +178,11 @@ export function Sidebar() {
   const [isSuggestionDialogOpen, setIsSuggestionDialogOpen] = useState(false);
   const [currentStudyTipIndex, setCurrentStudyTipIndex] = useState(0);
 
+  // Hide sidebar on NCERT explanations page
+  if (pathname.startsWith('/ncert-explanations')) {
+    return null;
+  }
+
 
   useEffect(() => {
     setCurrentLogo(theme === 'dark' ? OpennMindLogoDark : OpennMindLogoLight);
@@ -484,3 +489,4 @@ export function Sidebar() {
     </motion.aside>
   );
 }
+

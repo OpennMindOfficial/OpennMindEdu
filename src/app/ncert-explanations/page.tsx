@@ -1,55 +1,152 @@
 
-'use client'; // Add use client for motion
+'use client';
 
+import React, { useState } from 'react';
 import { Header } from "@/components/layout/header";
-import { Sidebar } from "@/components/layout/sidebar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { motion } from 'framer-motion'; // Import motion
+import { SourcesSidebar, type SourceItem } from "@/components/ncert/sources-sidebar";
+import { NotebookGuide } from "@/components/ncert/notebook-guide";
+import { AudioOverview } from "@/components/ncert/audio-overview";
+import { HelpUnderstand } from "@/components/ncert/help-understand";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Settings, Share2, StickyNote, ArrowLeft, Info, Play, ThumbsUp, ThumbsDown, MoreVertical } from "lucide-react";
+import { Input } from '@/components/ui/input';
+import { motion } from 'framer-motion';
+import Link from 'next/link';
+import { Sparkles } from "lucide-react";
+
+
+const initialSources: SourceItem[] = [
+  { id: '1', title: 'Action and Reaction', type: 'document', checked: true },
+  { id: '2', title: 'Balanced and Unbalanced Forces', type: 'document', checked: true },
+  { id: '3', title: 'Elemental Physics, Third Edition', type: 'pdf', checked: true },
+  { id: '4', title: 'Forces At Play', type: 'document', checked: false },
+  { id: '5', title: 'Friction Frenzy: Exploring Surface Interactions', type: 'document', checked: true },
+  { id: '6', title: 'Gravity\'s Grip: The Force That Shapes Worlds', type: 'pdf', checked: false },
+  { id: '7', title: 'Inertia In Action: Understanding Motion\'s Resistance', type: 'document', checked: true },
+  { id: '8', title: 'Momentum Mania: Investigating Collisions', type: 'document', checked: false },
+  { id: '9', title: 'Newton\'s Three Laws of Motion', type: 'pdf', checked: true },
+  { id: '10', title: 'Simple Machines Make Work Easier', type: 'document', checked: false },
+  { id: '11', title: 'Understanding Speed, Velocity, and Acceleration', type: 'document', checked: true },
+];
+
+const helpUnderstandQuestions = [
+  "How do Newton's three laws of motion explain how objects move and interact?",
+  "What are the different types of forces, and how do they affect objects?",
+  "What is the relationship between speed, velocity, acceleration, and momentum?"
+];
 
 export default function NcertExplanationsPage() {
+  const [sources, setSources] = useState<SourceItem[]>(initialSources);
+  const [chatInput, setChatInput] = useState('');
+
+  const handleSourceToggle = (id: string) => {
+    setSources(prevSources =>
+      prevSources.map(source =>
+        source.id === id ? { ...source, checked: !source.checked } : source
+      )
+    );
+  };
+
+  const selectedSourcesCount = sources.filter(s => s.checked).length;
+
   return (
-    <div className="flex h-screen bg-background text-foreground overflow-hidden">
-      <Sidebar />
-      <div className="flex flex-col flex-1 overflow-hidden">
-        <Header />
-        <main className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 bg-background">
-          <motion.h1
-            className="text-3xl font-bold text-foreground"
+    <div className="flex h-screen flex-col bg-muted/30 dark:bg-background">
+      <Header />
+      <div className="flex flex-1 overflow-hidden">
+        <SourcesSidebar sources={sources} onSourceToggle={handleSourceToggle} />
+
+        <div className="flex flex-1 flex-col overflow-hidden">
+          {/* Page-specific Header */}
+          <motion.div 
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.3 }}
+            className="flex items-center justify-between p-4 border-b border-border bg-card dark:bg-zinc-800/50 shadow-sm"
           >
-            NCERT Explanations
-          </motion.h1>
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-          >
-            <Card className="bg-muted/50 dark:bg-card/80 border-0 rounded-xl">
-              <CardHeader>
-                <CardTitle className="text-lg text-muted-foreground">Understand NCERT Concepts</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Access detailed explanations for NCERT textbooks to strengthen
-                  your understanding of fundamental concepts.
-                </p>
-                {/* Example NCERT topics */}
-                <div className="mt-4">
-                  <h4 className="font-semibold">Available Topics</h4>
-                  <ul className="list-disc list-inside text-sm text-muted-foreground">
-                    <li>Mathematics: Chapter 1 - Real Numbers</li>
-                    <li>Science: Chapter 2 - Acids, Bases and Salts</li>
-                    <li>Social Science: Chapter 3 - Nationalism in India</li>
-                    <li>English: Chapter 4 - From the Diary of Anne Frank</li>
-                  </ul>
-                </div>
-              </CardContent>
-            </Card>
+            <div className="flex items-center gap-3">
+                <Link href="/" passHref legacyBehavior>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground rounded-full hover:scale-105 active:scale-95">
+                        <ArrowLeft className="w-4 h-4" />
+                    </Button>
+                </Link>
+                <h1 className="text-lg font-semibold text-foreground">Science in motion</h1>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" className="h-8 text-xs hover:scale-105 active:scale-95">
+                <StickyNote className="w-3.5 h-3.5 mr-1.5" /> Add note
+              </Button>
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground rounded-full hover:scale-105 active:scale-95">
+                <Settings className="w-4 h-4" />
+              </Button>
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground rounded-full hover:scale-105 active:scale-95">
+                <Share2 className="w-4 h-4" />
+              </Button>
+              <Avatar className="h-8 w-8">
+                <AvatarImage src="https://picsum.photos/seed/user1/40/40" alt="User Avatar" data-ai-hint="person user"/>
+                <AvatarFallback>U</AvatarFallback>
+              </Avatar>
+            </div>
           </motion.div>
-        </main>
+
+          {/* Main Content Grid */}
+          <div className="flex-1 overflow-y-auto p-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
+              {/* Center Column (Notebook Guide & Chat) */}
+              <motion.div 
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.4, delay: 0.1 }}
+                className="lg:col-span-2 flex flex-col space-y-6 bg-card dark:bg-zinc-800/70 p-6 rounded-xl shadow-lg border border-border/20"
+              >
+                <NotebookGuide />
+                
+                {/* Chat Input Area */}
+                <div className="mt-auto pt-4 border-t border-border/20">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Button variant="ghost" size="sm" className="text-xs text-primary hover:bg-primary/10 hover:scale-105 active:scale-95">View chat</Button>
+                    <span className="text-xs text-muted-foreground">{selectedSourcesCount} sources</span>
+                  </div>
+                  <div className="relative flex items-center">
+                    <Input
+                      type="text"
+                      placeholder="Start typing..."
+                      value={chatInput}
+                      onChange={(e) => setChatInput(e.target.value)}
+                      className="flex-1 pr-20 bg-muted/50 dark:bg-zinc-700/50 rounded-lg shadow-inner h-10"
+                    />
+                    <Button size="icon" className="absolute right-11 top-1/2 -translate-y-1/2 h-8 w-8 bg-transparent hover:bg-primary/10 text-primary hover:scale-105 active:scale-95">
+                        <Sparkles className="w-4 h-4"/>
+                        <span className="sr-only">AI suggestions</span>
+                    </Button>
+                    <Button type="submit" size="icon" className="absolute right-1.5 top-1/2 -translate-y-1/2 h-8 w-8 hover:scale-105 active:scale-95">
+                      <ArrowLeft className="w-4 h-4 rotate-180" /> {/* Using ArrowLeft and rotating for send icon */}
+                       <span className="sr-only">Send</span>
+                    </Button>
+                  </div>
+                   <div className="flex items-center justify-end mt-2">
+                        <Button variant="link" size="sm" className="text-xs text-primary hover:scale-105 active:scale-95 px-1">
+                            * Notebook guide
+                        </Button>
+                    </div>
+                </div>
+              </motion.div>
+
+              {/* Right Column (Audio Overview & Help) */}
+              <motion.div 
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.4, delay: 0.2 }}
+                className="space-y-6"
+              >
+                <AudioOverview title="Science in Motion" currentTime="1:41" totalTime="3:01" />
+                <HelpUnderstand questions={helpUnderstandQuestions} />
+              </motion.div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
+
