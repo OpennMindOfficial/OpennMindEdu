@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import Script from "next/script";
-import { FloatingNav } from "@/components/layout/floating-nav"; // Keep if used on specific pages
+// FloatingNav removed from here as it's not global
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -37,12 +37,11 @@ export default function RootLayout({
       >
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark" // Set dark theme as default for dashboard
+          defaultTheme="dark" 
           enableSystem
           disableTransitionOnChange
         >
            {children}
-           {/* FloatingNav is not globally in root layout, will be added to specific pages if needed */}
            <Toaster />
         </ThemeProvider>
       </body>

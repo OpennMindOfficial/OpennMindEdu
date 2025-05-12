@@ -18,7 +18,7 @@ const badgeVariants = cva(
         outline: "text-foreground",
         new: "border-transparent bg-blue-500 text-white text-[10px] h-5 px-1.5 rounded-full", 
         count: "border-border/50 bg-muted text-foreground text-[10px] h-5 w-5 p-0 items-center justify-center rounded-full", 
-        free: "border-transparent bg-green-600/90 dark:bg-green-700/90 text-white font-bold rounded", // Changed to 'rounded' for less roundness
+        free: "border-transparent bg-green-600/90 dark:bg-green-700/90 text-white font-bold rounded-sm", // Changed to rounded-sm for less roundness
       },
     },
     defaultVariants: {

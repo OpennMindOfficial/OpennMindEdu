@@ -1,4 +1,5 @@
-'use client'; // Make Header a client component for useEffect and refs
+
+'use client'; 
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -6,20 +7,16 @@ import { Search, Bell, CircleHelp, Settings, Bug } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import Link from "next/link";
 import { SparkleButton } from '@/components/common/sparkle-button';
-import { ShieldQuestion } from 'lucide-react';
 import { motion } from 'framer-motion';
 import React, { useRef, useEffect, useState } from 'react';
 import Image, { type StaticImageData } from 'next/image';
 import { useTheme } from 'next-themes';
 
-// Import local images for logo
-import lightThemeLogo from '@/app/lt.png';
-import darkThemeLogo from '@/app/dt.png';
 
 export function Header() {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const { theme } = useTheme();
-  const [currentLogo, setCurrentLogo] = useState<StaticImageData>(lightThemeLogo);
+  // Logo related state removed as logo is now in sidebar
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -39,9 +36,6 @@ export function Header() {
     };
   }, []);
 
-  useEffect(() => {
-    setCurrentLogo(theme === 'dark' ? darkThemeLogo : lightThemeLogo);
-  }, [theme]);
 
   return (
     <motion.header
@@ -50,33 +44,20 @@ export function Header() {
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
     >
+      {/* Left side of header is now empty or can have a menu toggle if sidebar is collapsible by header button */}
       <div className="flex items-center gap-4">
-         {/* Logo Section */}
-         <div className="flex items-center gap-2 font-bold text-lg text-foreground">
-            <div className="flex items-center justify-center">
-             <Image
-                src={currentLogo}
-                alt="OpennMind Logo"
-                width={32} // Increased size
-                height={32} // Increased size
-                quality={100} // Max quality
-                priority // Prioritize loading for LCP
-              />
-            </div>
-             OpennMind
-             <ShieldQuestion className="w-4 h-4 text-muted-foreground ml-[-4px]" />
-         </div>
+         {/* Placeholder for potential future use or can be removed if sidebar toggle is solely in sidebar */}
       </div>
 
       {/* Search Bar - Centered and Max Width */}
       <div className="flex-1 flex justify-center px-4">
-        <div className="relative w-full max-w-xl">
+        <div className="relative w-full max-w-2xl"> {/* Increased max-width for search bar */}
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             ref={searchInputRef}
             type="search"
             placeholder="Search for anything... (Press '/' to focus)"
-            className="pl-10 w-full bg-background md:bg-muted dark:bg-input rounded-lg"
+            className="pl-10 w-full bg-background md:bg-muted dark:bg-input rounded-lg h-10" // Increased height if needed
           />
         </div>
       </div>
@@ -109,7 +90,7 @@ export function Header() {
 
         <Link href="/bug-report" passHref legacyBehavior>
            <a>
-             <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 hover:scale-105 active:scale-95 group">
+             <Button variant="ghost" size="icon" className="text-muted-foreground hover:bg-destructive/10 hover:scale-105 active:scale-95 group">
                  <Bug className="h-5 w-5 text-red-400 dark:text-red-500 group-hover:text-destructive" />
                  <span className="sr-only">Report a Bug</span>
              </Button>
