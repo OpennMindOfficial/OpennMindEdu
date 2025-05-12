@@ -12,13 +12,6 @@ interface HelpUnderstandProps {
 }
 
 export function HelpUnderstand({ questions }: HelpUnderstandProps) {
-  const truncateText = (text: string, maxLength: number) => {
-    if (text.length > maxLength) {
-      return text.substring(0, maxLength) + "...";
-    }
-    return text;
-  };
-
   return (
     <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -40,7 +33,7 @@ export function HelpUnderstand({ questions }: HelpUnderstandProps) {
                 )}
                 title={question} // Show full question on hover
             >
-                <span className="truncate block">{truncateText(question, 20)}</span>
+                <span className="truncate block">{question}</span>
             </Button>
             ))}
         </CardContent>

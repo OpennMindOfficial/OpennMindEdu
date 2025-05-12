@@ -46,14 +46,6 @@ export function SourcesSidebar({ sources, onSourceToggle }: SourcesSidebarProps)
     }
   };
 
-  const truncateText = (text: string, maxLength: number) => {
-    if (text.length > maxLength) {
-      return text.substring(0, maxLength) + "...";
-    }
-    return text;
-  };
-
-
   return (
     <motion.aside 
         initial={{ opacity: 0, x: -50 }}
@@ -109,8 +101,8 @@ export function SourcesSidebar({ sources, onSourceToggle }: SourcesSidebarProps)
               >
                 {getIconForType(source.type)}
                 {isExpanded && (
-                    <span className="text-[11px] font-medium text-foreground truncate flex-1 min-w-0 leading-tight"> {/* Custom smaller font, leading-tight */}
-                      {truncateText(source.title, 20)}
+                    <span className="text-[11px] font-medium text-foreground truncate flex-1 min-w-0 leading-tight">
+                      {source.title}
                     </span>
                 )}
                 <Checkbox
