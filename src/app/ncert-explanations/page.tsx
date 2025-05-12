@@ -132,15 +132,15 @@ export default function NcertExplanationsPage() {
               </div>
             </motion.div>
 
-            {/* Right Column (Audio Overview & Help) */}
+            {/* Right Column (Video Overview, Audio Overview & Help) */}
             <motion.div 
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.4, delay: 0.2 }}
               className="space-y-6"
             >
-              <AudioOverview title="Science in Motion - Audio Summary" currentTime="1:41" totalTime="3:01" />
               <VideoOverview title="Newton's Laws Explained - Video" currentTime="5:23" totalTime="12:45" />
+              <AudioOverview title="Science in Motion - Audio Summary" currentTime="1:41" totalTime="3:01" />
               <HelpUnderstand questions={helpUnderstandQuestions} />
             </motion.div>
           </div>

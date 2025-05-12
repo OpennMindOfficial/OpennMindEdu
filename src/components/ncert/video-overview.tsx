@@ -4,7 +4,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Video, ThumbsUp, ThumbsDown, MoreVertical, Info } from 'lucide-react'; // Changed Play to Video icon
+import { Video, ThumbsUp, ThumbsDown, MoreVertical, Info, Youtube } from 'lucide-react'; // Changed Play to Video icon, added Youtube
 import { motion } from 'framer-motion';
 
 interface VideoOverviewProps {
@@ -30,7 +30,7 @@ export function VideoOverview({ title, currentTime, totalTime }: VideoOverviewPr
     <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.35 }} // Slightly later delay
+        transition={{ duration: 0.3, delay: 0.25 }} // Adjusted delay
     >
         <Card className="bg-card dark:bg-zinc-800/70 border border-border/20 rounded-xl shadow-lg">
         <CardHeader className="flex flex-row items-center justify-between p-4 pb-2">
@@ -38,10 +38,14 @@ export function VideoOverview({ title, currentTime, totalTime }: VideoOverviewPr
             <Info className="w-4 h-4 text-muted-foreground cursor-pointer hover:text-primary" />
         </CardHeader>
         <CardContent className="p-4 pt-2 space-y-3">
+            {/* Video Placeholder */}
+            <div className="aspect-video bg-muted dark:bg-zinc-700 rounded-lg flex items-center justify-center">
+                <Youtube className="w-12 h-12 text-muted-foreground/50" />
+            </div>
             <p className="text-sm font-medium text-foreground truncate" title={title}>{title}</p>
             <div className="flex items-center gap-3">
             <Button variant="ghost" size="icon" className="h-8 w-8 text-primary hover:bg-primary/10 rounded-full hover:scale-105 active:scale-95">
-                <Video className="w-4 h-4 fill-primary" /> {/* Changed icon to Video */}
+                <Video className="w-4 h-4 fill-primary" />
             </Button>
             <div className="flex-1 relative h-1.5 bg-muted rounded-full overflow-hidden">
                 <div
@@ -67,3 +71,4 @@ export function VideoOverview({ title, currentTime, totalTime }: VideoOverviewPr
     </motion.div>
   );
 }
+
