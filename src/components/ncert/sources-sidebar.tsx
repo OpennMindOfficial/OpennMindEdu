@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -93,7 +92,7 @@ export function SourcesSidebar({ sources, onSourceToggle }: SourcesSidebarProps)
               <label
                 htmlFor={`source-${source.id}`}
                 className={cn(
-                  "flex items-center gap-2.5 p-2 rounded-md cursor-pointer transition-colors duration-150", // Adjusted padding and gap
+                  "flex items-center gap-2.5 p-2 rounded-md cursor-pointer transition-colors duration-150 overflow-hidden", // Added overflow-hidden
                   "hover:bg-muted/50 dark:hover:bg-zinc-700/40",
                   source.checked ? "bg-primary/10 dark:bg-primary/20" : ""
                 )}
@@ -127,4 +126,3 @@ export function SourcesSidebar({ sources, onSourceToggle }: SourcesSidebarProps)
     </motion.aside>
   );
 }
-

@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -29,7 +28,7 @@ export function HelpUnderstand({ questions }: HelpUnderstandProps) {
                 variant="outline"
                 className={cn(
                     "w-full justify-start text-left h-auto py-1.5 px-2.5 text-xs text-foreground/90 dark:text-foreground/80 bg-muted/30 dark:bg-zinc-700/60 border-border/50 hover:bg-muted/70 dark:hover:bg-zinc-700 hover:border-primary/30 dark:hover:border-primary/50", // Adjusted padding and font size
-                    "block" // Ensure button takes full width to allow text-overflow to work
+                    "block overflow-hidden" // Ensure button takes full width and clips content
                 )}
                 title={question} // Show full question on hover
             >
@@ -41,4 +40,3 @@ export function HelpUnderstand({ questions }: HelpUnderstandProps) {
     </motion.div>
   );
 }
-
