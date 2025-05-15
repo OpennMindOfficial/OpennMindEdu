@@ -381,11 +381,22 @@ export default function AskDoubtPage() {
                                  <AvatarFallback className="bg-primary/20 text-primary"><Bot size={16}/></AvatarFallback>
                                </Avatar>
                              )}
-                             <div className={cn("rounded-xl py-2.5 px-4 max-w-[75%] md:max-w-[65%] break-words shadow-md",
-                                message.sender === 'user'
+                             <div className={cn(
+                                "rounded-xl py-2.5 px-4 max-w-[75%] md:max-w-[65%] break-words shadow-md", // Common styles
+                                message.id === 'initial-ai-message'
+                                  ? "bg-primary rounded-bl-none" // Initial AI message background
+                                  : message.sender === 'user'
                                     ? "bg-primary text-primary-foreground rounded-br-none" // User bubble style
-                                    : "bg-secondary dark:bg-muted/70 text-secondary-foreground rounded-bl-none")}> {/* AI bubble style */}
-                               {message.text && <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>}
+                                    : "bg-secondary dark:bg-muted/70 text-secondary-foreground rounded-bl-none" // Regular AI bubble style
+                             )}>
+                               {message.text && (
+                                 <p className={cn(
+                                   "text-sm leading-relaxed whitespace-pre-wrap",
+                                   message.id === 'initial-ai-message' ? "text-foreground dark:text-white" : "" // Specific text color for initial AI
+                                 )}>
+                                   {message.text}
+                                 </p>
+                               )}
                                {message.image && (
                                  <div className="mt-2 rounded-lg overflow-hidden border border-border/20">
                                    <Image
