@@ -36,7 +36,7 @@ import { useToast } from '@/components/ui/use-toast';
 import Image from 'next/image';
 import MascotImage from '@/app/ChatGPT_Image_May_11__2025__03_07_50_PM-removebg-preview (3).png';
 import { gsap } from 'gsap';
-import ThreeScene from '@/components/common/three-scene';
+// ThreeScene import removed
 
 
 // Import local images for subjects
@@ -116,7 +116,7 @@ export default function HomePage() {
   const learnWithSectionRef = useRef<HTMLDivElement>(null);
   const mockExamsSectionRef = useRef<HTMLDivElement>(null);
   const mascotButtonRef = useRef<HTMLButtonElement>(null);
-  const threeSceneSectionRef = useRef<HTMLDivElement>(null);
+  // threeSceneSectionRef removed
 
 
   useEffect(() => {
@@ -173,8 +173,8 @@ export default function HomePage() {
         .from(learnWithSectionRef.current?.querySelectorAll('.learn-with-card-item'), { ...cardItemAnimationProps, scale: 0.9, delay: 0.1 }, "<0.2")
 
         .from(mockExamsSectionRef.current?.querySelector('.section-title'), { ...sectionTitleAnimationProps, delay: 0.1 }, "-=0.3")
-        .from(mockExamsSectionRef.current?.querySelectorAll('.exam-card-item'), { ...cardItemAnimationProps, scale: 0.9, delay: 0.1 }, "<0.2")
-        .from(threeSceneSectionRef.current, { ...commonAnimationProps, delay: 0.2 }, "-=0.2");
+        .from(mockExamsSectionRef.current?.querySelectorAll('.exam-card-item'), { ...cardItemAnimationProps, scale: 0.9, delay: 0.1 }, "<0.2");
+        // Removed animation for threeSceneSectionRef
     }
   }, [isMounted, isAuthenticated]);
 
@@ -248,7 +248,7 @@ export default function HomePage() {
             showAuthPopup && !isAuthenticated ? "blur-sm pointer-events-none" : ""
           )}
         >
-          {/* Wrapper for scrollable content excluding the ThreeScene */}
+          {/* Wrapper for scrollable content */}
           <div className="space-y-8">
             <div>
               <div className="flex items-center mb-6">
@@ -329,7 +329,7 @@ export default function HomePage() {
                         title={subject.title}
                         imageUrl={subject.imageUrl}
                         bgColorClass={subject.bgColorClass}
-                        className="w-[240px] h-[320px]" // Maintained original size
+                        className="w-[240px] h-[320px]" 
                         data-ai-hint={subject.dataAiHint}
                       />
                     </div>
@@ -384,18 +384,7 @@ export default function HomePage() {
             </div>
           </div> {/* End of space-y-8 wrapper for scrollable content */}
 
-          {/* Three.js Scene Section - Placed outside the main content scrolling div if it needs to be fixed or fill remaining space */}
-          {isAuthenticated && (
-            <div 
-              ref={threeSceneSectionRef} 
-              className="mt-8 w-full h-[60vh] md:h-[calc(100vh-var(--header-height,64px)-var(--page-padding-y,64px)-var(--content-above-height,800px))] min-h-[300px] relative" 
-              // The calc for height is an example, you'd need to accurately determine content-above-height or use flex-grow
-              // For now, using a simpler vh or fixed pixel height is more robust for this step.
-              // Example: className="mt-12 w-full h-[500px] relative"
-            >
-              <ThreeScene />
-            </div>
-          )}
+          {/* Removed the Three.js Scene Section */}
           <div className="h-8 md:h-12"></div> {/* Ensures some space at the very bottom of the scroll */}
 
         </main>
@@ -432,3 +421,4 @@ export default function HomePage() {
   );
 }
 
+    
