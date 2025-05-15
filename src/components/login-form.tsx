@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState } from 'react';
@@ -13,13 +14,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import Link from 'next/link';
+// Link import removed as it's handled by a button click now
 
 interface LoginFormProps extends React.HTMLAttributes<HTMLDivElement> {
   onLoginSuccess?: () => void;
+  onSwitchToSignup?: () => void; // Callback to switch to signup view
 }
 
-export function LoginForm({ className, onLoginSuccess, ...props }: LoginFormProps) {
+export function LoginForm({ className, onLoginSuccess, onSwitchToSignup, ...props }: LoginFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { toast } = useToast();
@@ -72,9 +74,14 @@ export function LoginForm({ className, onLoginSuccess, ...props }: LoginFormProp
               <div className="grid gap-2">
                 <div className="flex items-center">
                   <Label htmlFor="password">Password</Label>
-                  <Link href="#" className="ml-auto inline-block text-sm underline-offset-4 hover:underline">
+                  <Button 
+                    type="button" 
+                    variant="link" 
+                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline h-auto p-0"
+                    onClick={() => toast({ title: "Feature Coming Soon", description: "Password recovery will be available soon."})}
+                  >
                     Forgot your password?
-                  </Link>
+                  </Button>
                 </div>
                 <Input
                   id="password"
@@ -94,9 +101,14 @@ export function LoginForm({ className, onLoginSuccess, ...props }: LoginFormProp
             </div>
             <div className="mt-4 text-center text-sm">
               Don&apos;t have an account?{" "}
-              <Link href="/signup" className="underline underline-offset-4">
+              <Button 
+                type="button" 
+                variant="link" 
+                onClick={onSwitchToSignup} 
+                className="underline underline-offset-4 h-auto p-0 text-sm"
+              >
                 Sign up
-              </Link>
+              </Button>
             </div>
           </form>
         </CardContent>

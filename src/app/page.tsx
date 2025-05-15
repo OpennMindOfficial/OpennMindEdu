@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -32,6 +33,7 @@ import {
   Pocket,
   Layers,
   Smile,
+  Brain, // Added Brain for mascot
 } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -39,7 +41,10 @@ import { cn } from "@/lib/utils";
 import quotesData from '@/app/quotes.json';
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { LoginForm } from "@/components/login-form";
+import { SignupForm } from "@/components/signup-form"; // Import SignupForm
 import { useToast } from '@/components/ui/use-toast';
+import Image, { type StaticImageData } from 'next/image';
+import MascotImage from '@/app/ChatGPT_Image_May_11__2025__03_07_50_PM-removebg-preview (3).png';
 
 
 // Import local images for subjects
@@ -105,6 +110,7 @@ export default function HomePage() {
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [showAuthPopup, setShowAuthPopup] = useState(false);
+  const [authView, setAuthView] = useState<'login' | 'signup'>('login'); // 'login' or 'signup'
   const [isMounted, setIsMounted] = useState(false);
   const { toast } = useToast();
 
@@ -145,6 +151,19 @@ export default function HomePage() {
     setIsAuthenticated(true);
     setShowAuthPopup(false);
   };
+
+  const handleSignupSuccess = () => {
+    if (typeof window !== "undefined") {
+        localStorage.setItem('isAuthenticated', 'true'); // Auto-login after signup
+    }
+    setIsAuthenticated(true);
+    setShowAuthPopup(false);
+    toast({
+        title: "Signup Successful!",
+        description: "Welcome to OpennMind!",
+    });
+  };
+
 
   const scrollSubjects = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
@@ -187,6 +206,7 @@ export default function HomePage() {
                 size="sm"
                 className="ml-4 hover:scale-105 active:scale-95 rounded-full"
               >
+                <Brain className="w-4 h-4 mr-2"/>
                 Show Mascot Tip
               </Button>
             </div>
@@ -293,7 +313,7 @@ export default function HomePage() {
                     <ExamCard
                       title={exam.title}
                       icon={exam.icon}
-                      illustration={exam.illustration}
+                      illustration={exam.illustration} // Keep this prop
                       isNew={exam.isNew}
                       data-ai-hint={exam.dataAiHint}
                     />
@@ -306,21 +326,27 @@ export default function HomePage() {
         <AnimatePresence>
         {showAuthPopup && !isAuthenticated && (
           <Dialog open={showAuthPopup && !isAuthenticated} onOpenChange={(open) => {
-            // Prevent closing if not authenticated
             if (!open && !isAuthenticated) {
-              setShowAuthPopup(true);
-            } else {
-              setShowAuthPopup(open);
+              setShowAuthPopup(true); // Keep popup open if not authenticated
             }
           }}>
             <DialogContent 
               className="sm:max-w-md p-0" 
               onInteractOutside={(e) => e.preventDefault()} 
               onEscapeKeyDown={(e) => e.preventDefault()}
-              hideCloseButton={true} // Assumes DialogContent supports this
+              hideCloseButton={true}
             >
-              {/* LoginForm will be rendered here */}
-              <LoginForm onLoginSuccess={handleLoginSuccess} />
+              {authView === 'login' ? (
+                <LoginForm 
+                  onLoginSuccess={handleLoginSuccess} 
+                  onSwitchToSignup={() => setAuthView('signup')} 
+                />
+              ) : (
+                <SignupForm 
+                  onSignupSuccess={handleSignupSuccess} 
+                  onSwitchToLogin={() => setAuthView('login')} 
+                />
+              )}
             </DialogContent>
           </Dialog>
         )}
