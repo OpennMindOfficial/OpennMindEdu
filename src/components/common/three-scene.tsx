@@ -3,9 +3,7 @@
 
 import React, { useEffect, useRef, useCallback } from 'react';
 import * as THREE from 'three';
-import { SimplexNoise } from 'simplex-noise';
-// OrbitControls can be added if mouse interaction is desired later
-// import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import * as SimplexNoiseNS from 'simplex-noise'; // Use namespace import
 
 const ThreeScene: React.FC = () => {
   const mountRef = useRef<HTMLDivElement>(null);
@@ -18,7 +16,7 @@ const ThreeScene: React.FC = () => {
   const moonLightRef = useRef<THREE.PointLight | null>(null);
   const starsRef = useRef<THREE.Group | null>(null);
   const starsLightsRef = useRef<THREE.Group | null>(null);
-  const noiseRef = useRef<SimplexNoise | null>(null);
+  const noiseInstanceRef = useRef<any | null>(null); // Store the instance of SimplexNoise
 
   const starsAmount = 20;
 
@@ -44,6 +42,7 @@ const ThreeScene: React.FC = () => {
     rendererRef.current = null;
     sceneRef.current = null;
     cameraRef.current = null;
+    noiseInstanceRef.current = null;
   }, []);
 
   useEffect(() => {
@@ -52,8 +51,32 @@ const ThreeScene: React.FC = () => {
     }
 
     const currentMount = mountRef.current;
-    noiseRef.current = new SimplexNoise();
-    const noise = noiseRef.current;
+
+    // Attempt to instantiate SimplexNoise
+    let NoiseConstructor: any = null;
+    if (SimplexNoiseNS && typeof SimplexNoiseNS.SimplexNoise === 'function') {
+      NoiseConstructor = SimplexNoiseNS.SimplexNoise;
+    } else if (SimplexNoiseNS && typeof (SimplexNoiseNS as any).default === 'function') {
+      // Fallback if the constructor is on the default export of the namespace
+      NoiseConstructor = (SimplexNoiseNS as any).default;
+    } else {
+      console.error("SimplexNoise constructor not found in module:", SimplexNoiseNS);
+      return; // Cannot proceed without noise
+    }
+
+    try {
+      noiseInstanceRef.current = new NoiseConstructor();
+    } catch (e) {
+      console.error("Error instantiating SimplexNoise:", e, "Constructor was:", NoiseConstructor);
+      return;
+    }
+    
+    const noise = noiseInstanceRef.current;
+    if (!noise || typeof noise.noise3D !== 'function') {
+        console.error("SimplexNoise instance is invalid or does not have noise3D method.");
+        return;
+    }
+
 
     const scene = new THREE.Scene();
     sceneRef.current = scene;
@@ -64,13 +87,12 @@ const ThreeScene: React.FC = () => {
     camera.position.set(70, 30, 5);
     camera.lookAt(new THREE.Vector3(0, 0, 0));
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false }); // alpha: false for custom clear color
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
     rendererRef.current = renderer;
     renderer.setSize(currentMount.clientWidth, currentMount.clientHeight);
-    renderer.setClearColor(0x001a2d); // Background color from codepen
+    renderer.setClearColor(0x001a2d);
     currentMount.appendChild(renderer.domElement);
     
-    // Lights
     const localMoonLight = new THREE.PointLight(0xffffff, 2, 150);
     moonLightRef.current = localMoonLight;
     scene.add(localMoonLight);
@@ -79,7 +101,6 @@ const ThreeScene: React.FC = () => {
     scene.add(moonLight2);
     moonLight2.position.set(20, -20, -25);
     
-    // Moon
     const createMoon = () => {
       const geometry = new THREE.SphereGeometry(8, 32, 32);
       const material = new THREE.MeshPhongMaterial({
@@ -97,12 +118,11 @@ const ThreeScene: React.FC = () => {
       localMoonLight.position.y += 4;
     };
 
-    // Terrain
     const createTerrain = () => {
       const geometry = new THREE.PlaneGeometry(150, 150, 120, 120);
       const m = new THREE.Matrix4();
       m.makeRotationX(Math.PI * -0.5);
-      geometry.applyMatrix4(m);
+      geometry.applyMatrix4(m); // Use applyMatrix4 for modern THREE
       const positions = geometry.attributes.position;
       for (let i = 0; i < positions.count; i++) {
         const x = positions.getX(i);
@@ -119,7 +139,6 @@ const ThreeScene: React.FC = () => {
       scene.add(plane);
     };
 
-    // Stars
     const localStars = new THREE.Group();
     starsRef.current = localStars;
     scene.add(localStars);
@@ -176,18 +195,20 @@ const ThreeScene: React.FC = () => {
           }
         }
       }
-      renderer.render(scene, camera);
+      if (rendererRef.current && sceneRef.current && cameraRef.current) {
+        rendererRef.current.render(sceneRef.current, cameraRef.current);
+      }
     };
     animate();
 
     const handleResize = () => {
-      if (currentMount) {
+      if (currentMount && rendererRef.current && cameraRef.current) {
         const ww = currentMount.clientWidth;
         const wh = currentMount.clientHeight;
-        if (wh > 0) { // Ensure height is not zero to avoid NaN aspect ratio
-            renderer.setSize(ww, wh);
-            camera.aspect = ww / wh;
-            camera.updateProjectionMatrix();
+        if (wh > 0) {
+            rendererRef.current.setSize(ww, wh);
+            cameraRef.current.aspect = ww / wh;
+            cameraRef.current.updateProjectionMatrix();
         }
       }
     };
@@ -197,12 +218,12 @@ const ThreeScene: React.FC = () => {
 
     return () => {
       resizeObserver.unobserve(currentMount);
-      if (renderer.domElement.parentNode === currentMount) {
-        currentMount.removeChild(renderer.domElement);
+      if (rendererRef.current && rendererRef.current.domElement.parentNode === currentMount) { // Check if still child
+        currentMount.removeChild(rendererRef.current.domElement);
       }
       cleanupScene();
     };
-  }, [cleanupScene]);
+  }, [cleanupScene]); // Added cleanupScene to dependency array
 
   return <div ref={mountRef} style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden' }} />;
 };
