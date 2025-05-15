@@ -16,8 +16,8 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 
 interface SignupFormProps extends React.HTMLAttributes<HTMLDivElement> {
-  onSignupSuccess?: () => void;
-  onSwitchToLogin?: () => void; // Callback to switch to login view
+  onSignupSuccess?: (name: string) => void; // Updated to accept name
+  onSwitchToLogin?: () => void; 
 }
 
 export function SignupForm({ className, onSignupSuccess, onSwitchToLogin, ...props }: SignupFormProps) {
@@ -39,8 +39,7 @@ export function SignupForm({ className, onSignupSuccess, onSwitchToLogin, ...pro
     // Simulate successful signup
     console.log("Simulating signup for:", name, email);
     if (onSignupSuccess) {
-      onSignupSuccess(); 
-      // Toast for success is handled in page.tsx to ensure popup closes first
+      onSignupSuccess(name); // Pass the entered name
     }
   };
 

@@ -26,7 +26,7 @@ import {
   Brain,
 } from "lucide-react";
 import Link from "next/link";
-import { AnimatePresence } from "framer-motion"; // Keep for Dialog animation
+import { AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import quotesData from '@/app/quotes.json';
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -99,7 +99,7 @@ const mockExams = [
 
 export default function HomePage() {
   const [greeting, setGreeting] = useState("Good day");
-  const [userName, setUserName] = useState("Rudransh");
+  const [userName, setUserName] = useState("Rudransh"); // Default name
   const [quote, setQuote] = useState({ text: "", author: "" });
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -125,6 +125,14 @@ export default function HomePage() {
         setIsAuthenticated(authStatus);
         if (!authStatus) {
             setShowAuthPopup(true);
+        } else {
+            // User is authenticated, try to get their name
+            const storedUserName = localStorage.getItem('userName');
+            if (storedUserName) {
+                setUserName(storedUserName);
+            } else {
+                setUserName("Learner"); // Default if authenticated but no name stored
+            }
         }
     }
 
@@ -155,7 +163,6 @@ export default function HomePage() {
         .from(mascotButtonRef.current, { opacity: 0, x: -20, duration: 0.5 }, "-=0.4")
         .from(quoteCardRef.current, { opacity: 0, y: 30, duration: 0.7 }, "-=0.5")
         
-        // Animate sections sequentially
         .from(subjectsSectionRef.current?.querySelector('.section-title'), { opacity: 0, x: -20, duration: 0.5 }, "-=0.4")
         .from(subjectsSectionRef.current?.querySelectorAll('.subject-card-item'), { opacity: 0, y: 20, stagger: 0.1, duration: 0.4 }, "<0.2")
         
@@ -171,20 +178,33 @@ export default function HomePage() {
   const handleLoginSuccess = () => {
     if (typeof window !== "undefined") {
         localStorage.setItem('isAuthenticated', 'true');
+        // Attempt to retrieve userName, could have been set by a previous signup
+        const storedUserName = localStorage.getItem('userName');
+        if (storedUserName) {
+            setUserName(storedUserName);
+        } else {
+            setUserName("Learner"); // Default if no name was previously stored
+        }
     }
     setIsAuthenticated(true);
     setShowAuthPopup(false);
+    toast({
+        title: "Login Successful",
+        description: "Welcome back!",
+    });
   };
 
-  const handleSignupSuccess = () => {
+  const handleSignupSuccess = (signedUpName: string) => {
     if (typeof window !== "undefined") {
         localStorage.setItem('isAuthenticated', 'true');
+        localStorage.setItem('userName', signedUpName); // Store the new name
+        setUserName(signedUpName); // Update state immediately
     }
     setIsAuthenticated(true);
     setShowAuthPopup(false);
     toast({
         title: "Signup Successful!",
-        description: "Welcome to OpennMind!",
+        description: `Welcome to OpennMind, ${signedUpName}!`,
     });
   };
 
@@ -216,7 +236,7 @@ export default function HomePage() {
             showAuthPopup && !isAuthenticated ? "blur-sm pointer-events-none" : ""
           )}
         >
-          <div> {/* Removed Framer Motion containerVariants wrapper */}
+          <div>
             <div className="flex items-center mb-6">
               <h1
                 ref={greetingRef}
