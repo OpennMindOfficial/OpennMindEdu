@@ -36,6 +36,7 @@ import { useToast } from '@/components/ui/use-toast';
 import Image from 'next/image';
 import MascotImage from '@/app/ChatGPT_Image_May_11__2025__03_07_50_PM-removebg-preview (3).png';
 import { gsap } from 'gsap';
+import ThreeScene from '@/components/common/three-scene';
 
 
 // Import local images for subjects
@@ -99,7 +100,7 @@ const mockExams = [
 
 export default function HomePage() {
   const [greeting, setGreeting] = useState("Good day");
-  const [userName, setUserName] = useState("Rudransh"); // Default name
+  const [userName, setUserName] = useState("Rudransh"); 
   const [quote, setQuote] = useState({ text: "", author: "" });
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -109,13 +110,13 @@ export default function HomePage() {
   const [isMounted, setIsMounted] = useState(false);
   const { toast } = useToast();
 
-  // Refs for GSAP animations
   const greetingRef = useRef<HTMLHeadingElement>(null);
   const quoteCardRef = useRef<HTMLDivElement>(null);
   const subjectsSectionRef = useRef<HTMLDivElement>(null);
   const learnWithSectionRef = useRef<HTMLDivElement>(null);
   const mockExamsSectionRef = useRef<HTMLDivElement>(null);
   const mascotButtonRef = useRef<HTMLButtonElement>(null);
+  const threeSceneSectionRef = useRef<HTMLDivElement>(null);
 
 
   useEffect(() => {
@@ -126,12 +127,11 @@ export default function HomePage() {
         if (!authStatus) {
             setShowAuthPopup(true);
         } else {
-            // User is authenticated, try to get their name
             const storedUserName = localStorage.getItem('userName');
             if (storedUserName) {
                 setUserName(storedUserName);
             } else {
-                setUserName("Learner"); // Default if authenticated but no name stored
+                setUserName("Learner"); 
             }
         }
     }
@@ -156,21 +156,25 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    if (isMounted && isAuthenticated) { // Only animate if authenticated and mounted
+    if (isMounted && isAuthenticated) { 
       const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+      const commonAnimationProps = { opacity: 0, y: 30, duration: 0.7 };
+      const sectionTitleAnimationProps = { opacity: 0, x: -20, duration: 0.5 };
+      const cardItemAnimationProps = { opacity: 0, y: 20, stagger: 0.1, duration: 0.4 };
 
-      tl.from(greetingRef.current, { opacity: 0, y: -30, duration: 0.7 })
+      tl.from(greetingRef.current, { ...commonAnimationProps, y: -30, delay: 0.1 })
         .from(mascotButtonRef.current, { opacity: 0, x: -20, duration: 0.5 }, "-=0.4")
-        .from(quoteCardRef.current, { opacity: 0, y: 30, duration: 0.7 }, "-=0.5")
+        .from(quoteCardRef.current, { ...commonAnimationProps, delay: 0.1}, "-=0.5")
         
-        .from(subjectsSectionRef.current?.querySelector('.section-title'), { opacity: 0, x: -20, duration: 0.5 }, "-=0.4")
-        .from(subjectsSectionRef.current?.querySelectorAll('.subject-card-item'), { opacity: 0, y: 20, stagger: 0.1, duration: 0.4 }, "<0.2")
+        .from(subjectsSectionRef.current?.querySelector('.section-title'), { ...sectionTitleAnimationProps, delay: 0.1 }, "-=0.4")
+        .from(subjectsSectionRef.current?.querySelectorAll('.subject-card-item'), { ...cardItemAnimationProps, delay: 0.1 }, "<0.2")
         
-        .from(learnWithSectionRef.current?.querySelector('.section-title'), { opacity: 0, x: -20, duration: 0.5 }, "-=0.3")
-        .from(learnWithSectionRef.current?.querySelectorAll('.learn-with-card-item'), { opacity: 0, scale: 0.9, y: 20, stagger: 0.1, duration: 0.4 }, "<0.2")
+        .from(learnWithSectionRef.current?.querySelector('.section-title'), { ...sectionTitleAnimationProps, delay: 0.1 }, "-=0.3")
+        .from(learnWithSectionRef.current?.querySelectorAll('.learn-with-card-item'), { ...cardItemAnimationProps, scale: 0.9, delay: 0.1 }, "<0.2")
 
-        .from(mockExamsSectionRef.current?.querySelector('.section-title'), { opacity: 0, x: -20, duration: 0.5 }, "-=0.3")
-        .from(mockExamsSectionRef.current?.querySelectorAll('.exam-card-item'), { opacity: 0, scale: 0.9, y: 20, stagger: 0.1, duration: 0.4 }, "<0.2");
+        .from(mockExamsSectionRef.current?.querySelector('.section-title'), { ...sectionTitleAnimationProps, delay: 0.1 }, "-=0.3")
+        .from(mockExamsSectionRef.current?.querySelectorAll('.exam-card-item'), { ...cardItemAnimationProps, scale: 0.9, delay: 0.1 }, "<0.2")
+        .from(threeSceneSectionRef.current, { ...commonAnimationProps, delay: 0.2 }, "-=0.2");
     }
   }, [isMounted, isAuthenticated]);
 
@@ -178,12 +182,11 @@ export default function HomePage() {
   const handleLoginSuccess = () => {
     if (typeof window !== "undefined") {
         localStorage.setItem('isAuthenticated', 'true');
-        // Attempt to retrieve userName, could have been set by a previous signup
         const storedUserName = localStorage.getItem('userName');
         if (storedUserName) {
             setUserName(storedUserName);
         } else {
-            setUserName("Learner"); // Default if no name was previously stored
+            setUserName("Learner"); 
         }
     }
     setIsAuthenticated(true);
@@ -195,16 +198,25 @@ export default function HomePage() {
   };
 
   const handleSignupSuccess = (signedUpName: string) => {
+    const trimmedName = signedUpName.trim();
+    if (!trimmedName) {
+      toast({
+        variant: "destructive",
+        title: "Signup Failed",
+        description: "Name cannot be empty.",
+      });
+      return;
+    }
     if (typeof window !== "undefined") {
         localStorage.setItem('isAuthenticated', 'true');
-        localStorage.setItem('userName', signedUpName); // Store the new name
-        setUserName(signedUpName); // Update state immediately
+        localStorage.setItem('userName', trimmedName); 
+        setUserName(trimmedName); 
     }
     setIsAuthenticated(true);
     setShowAuthPopup(false);
     toast({
         title: "Signup Successful!",
-        description: `Welcome to OpennMind, ${signedUpName}!`,
+        description: `Welcome to OpennMind, ${trimmedName}!`,
     });
   };
 
@@ -226,51 +238,54 @@ export default function HomePage() {
   }
 
   return (
-    <div className="flex h-screen bg-background text-foreground overflow-hidden">
+    <div className="flex h-screen bg-background text-foreground">
       <Sidebar />
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header />
         <main
           className={cn(
-            "flex-1 overflow-y-auto p-6 md:p-8 space-y-8 bg-background",
+            "flex-1 overflow-y-auto p-6 md:p-8 bg-background", 
             showAuthPopup && !isAuthenticated ? "blur-sm pointer-events-none" : ""
           )}
         >
-          <div>
-            <div className="flex items-center mb-6">
-              <h1
-                ref={greetingRef}
-                className="text-3xl font-bold text-foreground"
-              >
-                {greeting}, {userName}!
-              </h1>
-               <Button
-                ref={mascotButtonRef}
-                onClick={handleCyclePopupClick}
-                variant="outline"
-                size="sm"
-                className="ml-4 hover:scale-105 active:scale-95 rounded-full"
-              >
-                <Brain className="w-4 h-4 mr-2"/>
-                Show Mascot Tip
-              </Button>
-            </div>
+          {/* Wrapper for scrollable content excluding the ThreeScene */}
+          <div className="space-y-8">
+            <div>
+              <div className="flex items-center mb-6">
+                <h1
+                  ref={greetingRef}
+                  className="text-3xl font-bold text-foreground"
+                >
+                  {greeting}, {userName}!
+                </h1>
+                 <Button
+                  ref={mascotButtonRef}
+                  onClick={handleCyclePopupClick}
+                  variant="outline"
+                  size="sm"
+                  className="ml-4 hover:scale-105 active:scale-95 rounded-full"
+                >
+                  <Brain className="w-4 h-4 mr-2"/>
+                  Show Mascot Tip
+                </Button>
+              </div>
 
-            <div ref={quoteCardRef} className="mb-8">
-              <Card className="bg-[hsl(var(--quote-card-bg))] rounded-xl shadow-lg p-5 text-center">
-                <CardHeader className="p-0 mb-2">
-                  <CardTitle className="flex items-center justify-center text-[hsl(var(--quote-card-text))] text-lg">
-                    <Lightbulb className="w-5 h-5 mr-2 text-[hsl(var(--quote-card-author-text))]" />
-                    Quote of the day
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-0">
-                  <p className="text-lg font-medium text-[hsl(var(--quote-card-text))] mb-1.5">
-                    &ldquo;{quote.text}&rdquo;
-                  </p>
-                  <p className="text-sm text-[hsl(var(--quote-card-author-text))]">- {quote.author}</p>
-                </CardContent>
-              </Card>
+              <div ref={quoteCardRef} className="mb-8">
+                <Card className="bg-[hsl(var(--quote-card-bg))] rounded-xl shadow-lg p-5 text-center">
+                  <CardHeader className="p-0 mb-2">
+                    <CardTitle className="flex items-center justify-center text-[hsl(var(--quote-card-text))] text-lg">
+                      <Lightbulb className="w-5 h-5 mr-2 text-[hsl(var(--quote-card-author-text))]" />
+                      Quote of the day
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    <p className="text-lg font-medium text-[hsl(var(--quote-card-text))] mb-1.5">
+                      &ldquo;{quote.text}&rdquo;
+                    </p>
+                    <p className="text-sm text-[hsl(var(--quote-card-author-text))]">- {quote.author}</p>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
 
             <div ref={subjectsSectionRef} className="space-y-4 mb-8">
@@ -314,7 +329,7 @@ export default function HomePage() {
                         title={subject.title}
                         imageUrl={subject.imageUrl}
                         bgColorClass={subject.bgColorClass}
-                        className="w-[240px] h-[320px]"
+                        className="w-[240px] h-[320px]" // Maintained original size
                         data-ai-hint={subject.dataAiHint}
                       />
                     </div>
@@ -367,7 +382,22 @@ export default function HomePage() {
                 ))}
               </div>
             </div>
-          </div>
+          </div> {/* End of space-y-8 wrapper for scrollable content */}
+
+          {/* Three.js Scene Section - Placed outside the main content scrolling div if it needs to be fixed or fill remaining space */}
+          {isAuthenticated && (
+            <div 
+              ref={threeSceneSectionRef} 
+              className="mt-8 w-full h-[60vh] md:h-[calc(100vh-var(--header-height,64px)-var(--page-padding-y,64px)-var(--content-above-height,800px))] min-h-[300px] relative" 
+              // The calc for height is an example, you'd need to accurately determine content-above-height or use flex-grow
+              // For now, using a simpler vh or fixed pixel height is more robust for this step.
+              // Example: className="mt-12 w-full h-[500px] relative"
+            >
+              <ThreeScene />
+            </div>
+          )}
+          <div className="h-8 md:h-12"></div> {/* Ensures some space at the very bottom of the scroll */}
+
         </main>
         <AnimatePresence>
         {showAuthPopup && !isAuthenticated && (
@@ -401,3 +431,4 @@ export default function HomePage() {
     </div>
   );
 }
+
