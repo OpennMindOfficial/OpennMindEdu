@@ -13,7 +13,6 @@ const ThreeScene: React.FC = () => {
   const animationFrameIdRef = useRef<number | null>(null);
 
   const moonRef = useRef<THREE.Mesh | null>(null);
-  // moonLightRef was unused, removed.
   const starsRef = useRef<THREE.Group | null>(null);
   const starsLightsRef = useRef<THREE.Group | null>(null);
   const noiseInstanceRef = useRef<any | null>(null); // Store the instance of SimplexNoise
@@ -21,34 +20,47 @@ const ThreeScene: React.FC = () => {
   const starsAmount = 20;
 
   const cleanupScene = useCallback(() => {
+    console.log("ThreeScene: Starting cleanup...");
     if (animationFrameIdRef.current) {
       cancelAnimationFrame(animationFrameIdRef.current);
       animationFrameIdRef.current = null;
+      console.log("ThreeScene: Cancelled animation frame.");
     }
+
+    if (sceneRef.current) {
+      sceneRef.current.traverse((object) => {
+        if (object instanceof THREE.Mesh) {
+          object.geometry?.dispose();
+          if (Array.isArray(object.material)) {
+            object.material.forEach(material => material.dispose());
+          } else {
+            object.material?.dispose();
+          }
+        }
+      });
+      sceneRef.current.clear(); // Removes all children
+      sceneRef.current = null;
+      console.log("ThreeScene: Disposed scene objects and cleared scene.");
+    }
+    
+    // Dispose of renderer and remove its DOM element
     if (rendererRef.current) {
+      if (mountRef.current && rendererRef.current.domElement && mountRef.current.contains(rendererRef.current.domElement)) {
+        mountRef.current.removeChild(rendererRef.current.domElement);
+        console.log("ThreeScene: Removed renderer DOM element.");
+      }
       rendererRef.current.dispose();
       rendererRef.current = null;
+      console.log("ThreeScene: Disposed renderer.");
     }
-    sceneRef.current?.traverse((object) => {
-      if (object instanceof THREE.Mesh) {
-        object.geometry?.dispose();
-        if (Array.isArray(object.material)) {
-          object.material.forEach(material => material.dispose());
-        } else {
-          object.material?.dispose();
-        }
-      }
-    });
-    sceneRef.current?.clear();
-    sceneRef.current = null;
+
     cameraRef.current = null;
-    noiseInstanceRef.current = null; // Clear noise instance
-    if (mountRef.current && rendererRef.current?.domElement) {
-        // Check if domElement exists and is a child before trying to remove
-        if (mountRef.current.contains(rendererRef.current.domElement)) {
-            mountRef.current.removeChild(rendererRef.current.domElement);
-        }
-    }
+    moonRef.current = null;
+    starsRef.current = null;
+    starsLightsRef.current = null;
+    noiseInstanceRef.current = null;
+    console.log("ThreeScene: Cleared refs.");
+    console.log("ThreeScene: Cleanup complete.");
   }, []);
 
   useEffect(() => {
@@ -59,7 +71,7 @@ const ThreeScene: React.FC = () => {
 
     const currentMount = mountRef.current;
 
-    // Robust SimplexNoise Instantiation
+    // --- Robust SimplexNoise Instantiation ---
     let NoiseConstructor: any = null;
     if (SimplexNoiseNS && typeof SimplexNoiseNS.SimplexNoise === 'function') {
       NoiseConstructor = SimplexNoiseNS.SimplexNoise;
@@ -74,7 +86,7 @@ const ThreeScene: React.FC = () => {
       }
     } else {
       console.error("ThreeScene: SimplexNoise constructor not found in module:", SimplexNoiseNS);
-      return; 
+      return; // Stop if constructor not found
     }
 
     try {
@@ -82,14 +94,15 @@ const ThreeScene: React.FC = () => {
       console.log("ThreeScene: SimplexNoise instantiated successfully.");
     } catch (e) {
       console.error("ThreeScene: Error instantiating SimplexNoise:", e, "Attempted Constructor:", NoiseConstructor);
-      return;
+      return; // Stop if instantiation fails
     }
     
     const noise = noiseInstanceRef.current;
     if (!noise || typeof noise.noise3D !== 'function') {
         console.error("ThreeScene: SimplexNoise instance is invalid or does not have noise3D method. Instance:", noise);
-        return;
+        return; // Stop if instance is not valid
     }
+    // --- End SimplexNoise Instantiation ---
 
     console.log("ThreeScene: Initializing scene...");
     const scene = new THREE.Scene();
@@ -101,11 +114,19 @@ const ThreeScene: React.FC = () => {
     camera.position.set(70, 30, 5);
     camera.lookAt(new THREE.Vector3(0, 0, 0));
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+    const renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      canvas: document.createElement('canvas') // Create canvas element if not directly providing one
+    });
     rendererRef.current = renderer;
     renderer.setSize(currentMount.clientWidth, currentMount.clientHeight);
-    renderer.setClearColor(0x001a2d);
-    currentMount.appendChild(renderer.domElement);
+    renderer.setClearColor(0x001a2d); // Original background color
+    
+    // Append renderer's DOM element only if it's not already there
+    if (!currentMount.contains(renderer.domElement)) {
+      currentMount.appendChild(renderer.domElement);
+      console.log("ThreeScene: Appended renderer DOM element.");
+    }
     
     const localMoonLight = new THREE.PointLight(0xffffff, 2, 150);
     scene.add(localMoonLight);
@@ -135,13 +156,18 @@ const ThreeScene: React.FC = () => {
       const geometry = new THREE.PlaneGeometry(150,150,120,120);
       const m = new THREE.Matrix4();
       m.makeRotationX(Math.PI * -0.5);
-      geometry.applyMatrix4(m); 
+      geometry.applyMatrix4(m); // Use applyMatrix4
       const positions = geometry.attributes.position;
       for(let i=0;i<positions.count;i++) {
         const x = positions.getX(i);
         const z = positions.getZ(i);
-        const ratio = noise.noise3D(x*0.03, z*0.03, 0);
-        positions.setY(i, ratio * 10);
+        // Ensure noise.noise3D exists and is callable
+        if (noise && typeof noise.noise3D === 'function') {
+            const ratio = noise.noise3D(x*0.03, z*0.03, 0);
+            positions.setY(i, ratio * 10);
+        } else {
+            positions.setY(i, 0); // Fallback if noise is not available
+        }
       }
       geometry.computeVertexNormals();
       const material = new THREE.MeshPhongMaterial({  
@@ -166,12 +192,16 @@ const ThreeScene: React.FC = () => {
         const star = new THREE.Mesh(geometry, material);
         star.position.x = (Math.random() - 0.5) * 150;
         star.position.z = (Math.random() - 0.5) * 150;
-        const ratio = noise.noise3D(star.position.x*0.03, star.position.z*0.03, 0);
-        star.position.y = ratio * 10 + 0.3;
+        if (noise && typeof noise.noise3D === 'function') {
+            const ratio = noise.noise3D(star.position.x*0.03, star.position.z*0.03, 0);
+            star.position.y = ratio * 10 + 0.3;
+        } else {
+            star.position.y = Math.random() * 10 + 0.3; // Fallback
+        }
         localStars.add(star);
         const velX = (Math.random() + 0.1) * 0.1 * (Math.random()<0.5?-1:1);
         const velZ = (Math.random() + 0.1) * 0.1 * (Math.random()<0.5?-1:1);
-        (star as any).vel = new THREE.Vector2(velX, velZ);
+        (star as any).vel = new THREE.Vector2(velX, velZ); // Type assertion for custom property
 
         const starLight = new THREE.PointLight(0xffffff, 0.8, 3);
         starLight.position.copy(star.position);
@@ -187,10 +217,10 @@ const ThreeScene: React.FC = () => {
 
     const animate = () => {
       animationFrameIdRef.current = requestAnimationFrame(animate);
-      const currentNoise = noiseInstanceRef.current;
+      const currentNoise = noiseInstanceRef.current; // Use the stored instance
       if (starsRef.current && starsLightsRef.current && currentNoise && typeof currentNoise.noise3D === 'function') {
         for (let i = 0; i < starsAmount; i++) {
-          const star = starsRef.current.children[i] as THREE.Mesh & { vel: THREE.Vector2 };
+          const star = starsRef.current.children[i] as THREE.Mesh & { vel: THREE.Vector2 }; // Type assertion
           if (!star || !star.vel) continue;
 
           if (star.position.x < -75) star.position.x = 75;
@@ -239,11 +269,11 @@ const ThreeScene: React.FC = () => {
     handleResize(); 
 
     return () => {
-      console.log("ThreeScene: Cleaning up...");
+      console.log("ThreeScene: Component unmounting, starting cleanup...");
       resizeObserver.unobserve(currentMount);
       cleanupScene();
     };
-  }, [cleanupScene]); 
+  }, [cleanupScene]); // Added cleanupScene to dependencies
 
   return <div ref={mountRef} style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden' }} />;
 };
