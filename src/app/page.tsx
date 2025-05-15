@@ -12,28 +12,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Bookmark,
   ChevronRight as ChevronRightIcon,
-  BookOpen,
   PenTool,
-  Timer,
-  FileText,
-  PlusCircle,
-  ChevronLeft,
-  GraduationCap as GraduationCapIcon,
-  FileQuestion,
-  BookUser,
   Layers3,
   FileStack,
   Lightbulb,
   MessageSquareHeart,
-  BookHeadphones,
-  BarChart2,
   ListChecks as ListChecksIcon,
+  ChevronLeft,
+  GraduationCap as GraduationCapIcon,
+  PlusCircle,
+  Timer,
   ClipboardCheck,
-  HelpCircle,
-  Pocket,
-  Layers,
-  Smile,
-  Brain, // Added Brain for mascot
+  Brain,
 } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -41,9 +31,9 @@ import { cn } from "@/lib/utils";
 import quotesData from '@/app/quotes.json';
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { LoginForm } from "@/components/login-form";
-import { SignupForm } from "@/components/signup-form"; // Import SignupForm
+import { SignupForm } from "@/components/signup-form";
 import { useToast } from '@/components/ui/use-toast';
-import Image, { type StaticImageData } from 'next/image';
+import Image from 'next/image';
 import MascotImage from '@/app/ChatGPT_Image_May_11__2025__03_07_50_PM-removebg-preview (3).png';
 
 
@@ -80,9 +70,30 @@ const learnWithItems = [
 ];
 
 const mockExams = [
-  { title: "Random exam", icon: Layers3, illustration: randomExamImage, isNew: false, dataAiHint:"random exam" },
-  { title: "Custom exam", icon: PlusCircle, illustration: customExamImage, isNew: true, dataAiHint: "custom exam" },
-  { title: "Timed exam", icon: Timer, illustration: timedExamImage, isNew: true, dataAiHint: "timed exam clock" },
+  {
+    title: "Random exam",
+    icon: Layers3,
+    illustration: randomExamImage,
+    isNew: false,
+    dataAiHint:"random exam",
+    bgColorClass: "bg-sky-100 dark:bg-sky-800/40"
+  },
+  {
+    title: "Custom exam",
+    icon: PlusCircle,
+    illustration: customExamImage,
+    isNew: true,
+    dataAiHint: "custom exam",
+    bgColorClass: "bg-emerald-100 dark:bg-emerald-800/40"
+  },
+  {
+    title: "Timed exam",
+    icon: Timer,
+    illustration: timedExamImage,
+    isNew: true,
+    dataAiHint: "timed exam clock",
+    bgColorClass: "bg-pink-100 dark:bg-pink-800/40"
+  },
 ];
 
 
@@ -110,7 +121,7 @@ export default function HomePage() {
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [showAuthPopup, setShowAuthPopup] = useState(false);
-  const [authView, setAuthView] = useState<'login' | 'signup'>('login'); // 'login' or 'signup'
+  const [authView, setAuthView] = useState<'login' | 'signup'>('login');
   const [isMounted, setIsMounted] = useState(false);
   const { toast } = useToast();
 
@@ -154,7 +165,7 @@ export default function HomePage() {
 
   const handleSignupSuccess = () => {
     if (typeof window !== "undefined") {
-        localStorage.setItem('isAuthenticated', 'true'); // Auto-login after signup
+        localStorage.setItem('isAuthenticated', 'true');
     }
     setIsAuthenticated(true);
     setShowAuthPopup(false);
@@ -178,7 +189,7 @@ export default function HomePage() {
   };
 
   if (!isMounted) {
-    return null; // Or a loading spinner, to prevent flash of unauthenticated content
+    return null;
   }
 
   return (
@@ -200,7 +211,7 @@ export default function HomePage() {
               >
                 {greeting}, {userName}!
               </motion.h1>
-              <Button
+               <Button
                 onClick={handleCyclePopupClick}
                 variant="outline"
                 size="sm"
@@ -313,9 +324,10 @@ export default function HomePage() {
                     <ExamCard
                       title={exam.title}
                       icon={exam.icon}
-                      illustration={exam.illustration} // Keep this prop
+                      illustration={exam.illustration}
                       isNew={exam.isNew}
                       data-ai-hint={exam.dataAiHint}
+                      bgColorClass={exam.bgColorClass}
                     />
                   </motion.div>
                 ))}
@@ -327,7 +339,7 @@ export default function HomePage() {
         {showAuthPopup && !isAuthenticated && (
           <Dialog open={showAuthPopup && !isAuthenticated} onOpenChange={(open) => {
             if (!open && !isAuthenticated) {
-              setShowAuthPopup(true); // Keep popup open if not authenticated
+              setShowAuthPopup(true);
             }
           }}>
             <DialogContent 
@@ -355,3 +367,4 @@ export default function HomePage() {
     </div>
   );
 }
+
