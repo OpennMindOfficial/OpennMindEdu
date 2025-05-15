@@ -2,7 +2,23 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import { CssBaseline, ThemeProvider, experimental_extendTheme as extendTheme, Container, Typography, Grid, Card, CardContent, CardMedia, Button as MuiButton, Paper, Box, SvgIcon } from '@mui/material';
+import {
+  experimental_extendTheme as extendTheme,
+  Experimental_CssVarsProvider as CssVarsProvider,
+} from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import Container from '@mui/material/Container';
+import Typography from '@mui/material/Typography';
+import Grid from '@mui/material/Grid';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+// CardMedia is not used in the current version of the page, so it can be removed if not planned for future use.
+// import CardMedia from '@mui/material/CardMedia'; 
+import Button, { ButtonProps as MuiButtonProps } from '@mui/material/Button'; // Use Button directly
+import Paper from '@mui/material/Paper';
+import Box from '@mui/material/Box';
+import SvgIcon from '@mui/material/SvgIcon';
+
 import { Bookmark, ArrowRight, BookOpen, PenTool, FlaskConical, Timer, FileText, PlusCircle, Layers3, Lightbulb, ChevronLeft, ChevronRight as ChevronRightIcon, GraduationCap, FileQuestion, BookUser, FileStack } from 'lucide-react';
 import Link from 'next/link';
 import Image, { type StaticImageData } from 'next/image';
@@ -22,14 +38,14 @@ import timedExamImage from '@/app/i3.png';
 
 import quotesData from '@/app/quotes.json';
 
-// Define a basic Material 3 theme
+// Define a basic Material 3 theme using experimental_extendTheme
 const m3Theme = extendTheme({
   colorSchemes: {
     light: {
       palette: {
         primary: { main: '#6750A4' }, // M3 Primary
         secondary: { main: '#625B71' }, // M3 Secondary
-        tertiary: { main: '#7D5260' }, // M3 Tertiary for 'New' badge
+        tertiary: { main: '#7D5260' }, // M3 Tertiary
         background: {
           default: '#FFFBFE', // M3 Surface
           paper: '#FFFBFE',   // M3 Surface
@@ -39,27 +55,25 @@ const m3Theme = extendTheme({
           secondary: '#49454F', // M3 On Surface Variant
         },
         error: { main: '#B3261E' }, // M3 Error
-        primaryContainer: '#EADDFF', // M3 Primary Container
-        onPrimaryContainer: '#21005D', // M3 On Primary Container
-        secondaryContainer: '#E8DEF8', // M3 Secondary Container
-        onSecondaryContainer: '#1D192B', // M3 On Secondary Container
+        primaryContainer: { main: '#EADDFF' }, // M3 Primary Container
+        onPrimaryContainer: { main: '#21005D' }, // M3 On Primary Container
+        secondaryContainer: { main: '#E8DEF8' }, // M3 Secondary Container
+        onSecondaryContainer: { main: '#1D192B' }, // M3 On Secondary Container
+        tertiaryContainer: { main: '#FFD8E4' },   // M3 Tertiary Container
+        onTertiaryContainer: { main: '#31111D' }, // M3 On Tertiary Container
         surface: { // Explicitly defining surface colors for M3 like structure
             main: '#FFFBFE', // General surface
-            // could add variants like surfaceVariant if needed by components like filled button
         },
         onSurface: {
             main: '#1C1B1F',
         },
-        onTertiaryContainer: '#FFFFFF', // For text on tertiary.main
-        tertiaryContainer: '#FFD8E4',   // For New badge background (example)
-
       },
     },
     dark: {
       palette: {
         primary: { main: '#D0BCFF' }, // M3 Primary Dark
         secondary: { main: '#CCC2DC' }, // M3 Secondary Dark
-        tertiary: { main: '#EFB8C8' }, // M3 Tertiary Dark for 'New' badge
+        tertiary: { main: '#EFB8C8' }, // M3 Tertiary Dark
         background: {
           default: '#1C1B1F', // M3 Surface Dark
           paper: '#1C1B1F',   // M3 Surface Dark
@@ -69,18 +83,18 @@ const m3Theme = extendTheme({
           secondary: '#CAC4D0', // M3 On Surface Variant Dark
         },
         error: { main: '#F2B8B5' }, // M3 Error Dark
-        primaryContainer: '#4F378B', // M3 Primary Container Dark
-        onPrimaryContainer: '#EADDFF', // M3 On Primary Container Dark
-        secondaryContainer: '#4A4458', // M3 Secondary Container Dark
-        onSecondaryContainer: '#E8DEF8', // M3 On Secondary Container Dark
+        primaryContainer: { main: '#4F378B' }, // M3 Primary Container Dark
+        onPrimaryContainer: { main: '#EADDFF' }, // M3 On Primary Container Dark
+        secondaryContainer: { main: '#4A4458' }, // M3 Secondary Container Dark
+        onSecondaryContainer: { main: '#E8DEF8' }, // M3 On Secondary Container Dark
+        tertiaryContainer: { main: '#633B48' },   // M3 Tertiary Container Dark
+        onTertiaryContainer: { main: '#FFD8E4' }, // M3 On Tertiary Container Dark
         surface: {
             main: '#1C1B1F',
         },
         onSurface: {
             main: '#E6E1E5',
         },
-        onTertiaryContainer: '#31111D', // For text on tertiary.main (dark)
-        tertiaryContainer: '#633B48',   // For New badge background (dark example)
       },
     },
   },
@@ -107,40 +121,35 @@ const m3Theme = extendTheme({
           '&:hover': {
             boxShadow: theme.shadows[3], 
           },
-           // Example: Using explicit surface colors for filled cards based on mode
-           // This part needs careful M3 role mapping if you want true M3 filled cards
-           // For now, a simple mode-based color, or rely on theme.vars if set up
-           backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[50],
-           // For M3 filled cards, you'd typically use something like:
-           // backgroundColor: theme.vars ? theme.vars.palette.surfaceContainerLow : (theme.palette.mode === 'dark' ? '#2B2930': '#F3EDF7'), // Example M3 Surface Container Low
+           backgroundColor: theme.vars.palette.surface.main, // Use CSS var
         }),
       },
     },
     MuiButton: {
         defaultProps: {
-            disableElevation: true, // Common for M3 buttons
+            disableElevation: true,
         },
         styleOverrides: {
-            root: ({ ownerState, theme }) => ({
+            root: ({ ownerState, theme }: { ownerState: MuiButtonProps, theme: any }) => ({
                 borderRadius: '20px', 
                 padding: '10px 24px',
                 fontWeight: 500,
-                 // Filled buttons in M3 have specific container colors
                 ...(ownerState.variant === 'contained' && ownerState.color === 'primary' && {
-                    backgroundColor: theme.vars ? theme.vars.palette.primary.main : theme.palette.primary.main, // Use CSS var if available
-                    color: theme.vars ? theme.vars.palette.onPrimary.main : theme.palette.common.white, // Example, adjust for onPrimary
+                    backgroundColor: theme.vars.palette.primary.main,
+                    color: theme.vars.palette.onPrimary.main,
                     '&:hover': {
-                        backgroundColor: theme.vars ? theme.vars.palette.primary.dark : theme.palette.primary.dark, // Example hover
+                        backgroundColor: theme.vars.palette.primary.dark, // Example, or a state layer
                         boxShadow: theme.shadows[1],
                     }
                 }),
-                 // For M3 "Filled" tonal buttons (often secondary action)
-                ...(ownerState.variant === 'filled' && { // Assuming 'filled' is a custom prop or refers to a tonal style
-                    backgroundColor: theme.vars ? theme.vars.palette.secondaryContainer.main : theme.palette.secondaryContainer.main,
-                    color: theme.vars ? theme.vars.palette.onSecondaryContainer.main : theme.palette.onSecondaryContainer.main,
+                ...(ownerState.variant === 'filled' && { // This assumes 'filled' maps to a tonal button style
+                    backgroundColor: theme.vars.palette.secondaryContainer.main,
+                    color: theme.vars.palette.onSecondaryContainer.main,
                      '&:hover': {
-                         backgroundColor: theme.vars ? `rgba(${theme.vars.palette.onSecondaryContainer.mainChannel} / 0.08)` : `rgba(0,0,0,0.08)`, // Example hover state by overlaying onSecondaryContainer
-                         boxShadow: theme.shadows[0], // M3 tonal often has no shadow or subtle
+                         // M3 hover often involves a state layer overlay.
+                         // This is a simplified example:
+                         backgroundColor: `rgba(${theme.vars.palette.onSecondaryContainer.mainChannel} / 0.08)`, 
+                         boxShadow: theme.shadows[0], 
                     }
                 }),
                 ...(ownerState.variant === 'text' && {
@@ -155,7 +164,6 @@ const m3Theme = extendTheme({
     MuiPaper: {
         styleOverrides: {
             root: {
-                // Use CSS variable for background color to ensure compatibility with experimental_extendTheme
                 backgroundColor: 'var(--mui-palette-background-paper)',
             }
         }
@@ -224,8 +232,8 @@ export default function M3HomePageExperiment() {
   };
 
   return (
-    <ThemeProvider theme={m3Theme}>
-      <CssBaseline enableColorScheme /> {/* enableColorScheme is important for CSS vars with extendTheme */}
+    <CssVarsProvider theme={m3Theme}>
+      <CssBaseline /> {/* Removed enableColorScheme */}
       {/* Simulate App Header and Sidebar (outside the scope of M3 page content) */}
       <Box sx={{ display: 'flex' }}>
         <Paper elevation={0} sx={{ width: 240, height: '100vh', p: 2, backgroundColor: 'background.default', borderRight: '1px solid', borderColor: 'divider' }}>
@@ -233,13 +241,12 @@ export default function M3HomePageExperiment() {
           <Typography variant="body2" color="text.secondary">Sidebar Placeholder</Typography>
         </Paper>
 
-        <Box component="main" sx={{ flexGrow: 1, p: 0, backgroundColor: 'background.default' }}> {/* Ensure main also gets bg */}
-          {/* Main content container using MUI Container for padding and max-width */}
+        <Box component="main" sx={{ flexGrow: 1, p: 0, backgroundColor: 'background.default' }}>
           <Container maxWidth="xl" sx={{ py: 3, px: {xs: 2, sm:3} }}>
             {/* Header for the page content area */}
-            <Paper elevation={1} sx={{ p: 2, mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Paper elevation={1} sx={{ p: 2, mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'surface.main' }}>
               <Typography variant="h5">Dashboard (M3 Experiment)</Typography>
-              <MuiButton variant="contained" color="primary">Upgrade</MuiButton>
+              <Button variant="contained" color="primary">Upgrade</Button>
             </Paper>
 
             {/* Greeting */}
@@ -248,7 +255,7 @@ export default function M3HomePageExperiment() {
             </Typography>
 
             {/* Motivational Quote Card - M3 Filled Card Style */}
-            <Card sx={{ mb: 4, backgroundColor: 'primaryContainer', color: 'onPrimaryContainer' }}>
+            <Card sx={{ mb: 4, backgroundColor: 'primaryContainer.main', color: 'onPrimaryContainer.main' }}>
               <CardContent sx={{ textAlign: 'center', p: 3 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 1 }}>
                     <MuiIcon component={Lightbulb} sx={{ mr: 1, fontSize: '1.5rem', color: 'inherit' }} />
@@ -278,17 +285,17 @@ export default function M3HomePageExperiment() {
                   </Link>
                 </Box>
                 <Box>
-                  <MuiButton variant="text" size="small" onClick={() => scrollSubjects('left')} sx={{ mr: 1, borderRadius: '50%', minWidth: 'auto', p: '6px' }}>
+                  <Button variant="text" size="small" onClick={() => scrollSubjects('left')} sx={{ mr: 1, borderRadius: '50%', minWidth: 'auto', p: '6px' }}>
                     <MuiIcon component={ChevronLeft} />
-                  </MuiButton>
-                  <MuiButton variant="text" size="small" onClick={() => scrollSubjects('right')} sx={{borderRadius: '50%', minWidth: 'auto', p: '6px' }}>
+                  </Button>
+                  <Button variant="text" size="small" onClick={() => scrollSubjects('right')} sx={{borderRadius: '50%', minWidth: 'auto', p: '6px' }}>
                     <MuiIcon component={ChevronRightIcon} />
-                  </MuiButton>
+                  </Button>
                 </Box>
               </Box>
               <Box ref={scrollContainerRef} sx={{ display: 'flex', overflowX: 'auto', py:1, gap: '20px', '&::-webkit-scrollbar': { display: 'none' }, scrollbarWidth: 'none' }}>
                 {subjectsM3.map((subject, index) => (
-                  <Card key={index} sx={{ minWidth: 220, height: 280, display: 'flex', flexDirection: 'column', position: 'relative' }}>
+                  <Card key={index} sx={{ minWidth: 220, height: 280, display: 'flex', flexDirection: 'column', position: 'relative', backgroundColor: 'surface.main' }}>
                      <Box sx={{width: '100%', height: '100%', position: 'relative', borderRadius: 'inherit'}}>
                         <Image src={subject.imageUrl} alt={subject.title} layout="fill" objectFit="cover" data-ai-hint={subject.dataAiHint} style={{ borderRadius: 'inherit' }}/>
                      </Box>
@@ -310,7 +317,7 @@ export default function M3HomePageExperiment() {
                 {learnWithItemsM3.map((item, index) => (
                   <Grid item xs={12} sm={6} md={3} key={index}>
                     <Link href={item.href} passHref style={{textDecoration: 'none'}}>
-                        <Card sx={{ height: 140, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', p: 2.5, position: 'relative', overflow: 'hidden', backgroundColor: 'secondaryContainer', color: 'onSecondaryContainer' }}>
+                        <Card sx={{ height: 140, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', p: 2.5, position: 'relative', overflow: 'hidden', backgroundColor: 'secondaryContainer.main', color: 'onSecondaryContainer.main' }}>
                           <Typography variant="h6" component="h3">{item.title}</Typography>
                           <MuiIcon component={item.icon} sx={{ fontSize: 50, position: 'absolute', right: -8, bottom: -8, opacity: 0.3, color: 'inherit' }} />
                         </Card>
@@ -335,8 +342,8 @@ export default function M3HomePageExperiment() {
                       </Box>
                       <MuiIcon component={exam.icon} sx={{ color: 'primary.main', fontSize: 28, mt:1, mb: 0.5 }} />
                       <Typography variant="h6" component="h3" sx={{textAlign: 'center', mb:2}}>{exam.title}</Typography>
-                      {exam.isNew && <Box component="span" sx={{position: 'absolute', top: 12, right: 12, backgroundColor: 'tertiary.main', color: 'onTertiaryContainer', px:1.5, py:0.5, borderRadius: '12px', fontSize: '0.75rem', fontWeight: 'medium'}}>New</Box>}
-                       <MuiButton variant="filled" fullWidth>Start Now</MuiButton> 
+                      {exam.isNew && <Box component="span" sx={{position: 'absolute', top: 12, right: 12, backgroundColor: 'tertiaryContainer.main', color: 'onTertiaryContainer.main', px:1.5, py:0.5, borderRadius: '12px', fontSize: '0.75rem', fontWeight: 'medium'}}>New</Box>}
+                       <Button variant="filled" fullWidth>Start Now</Button> 
                     </Card>
                   </Grid>
                 ))}
@@ -345,6 +352,7 @@ export default function M3HomePageExperiment() {
           </Container>
         </Box>
       </Box>
-    </ThemeProvider>
+    </CssVarsProvider>
   );
 }
+
