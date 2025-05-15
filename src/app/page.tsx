@@ -26,7 +26,7 @@ import {
   Brain,
 } from "lucide-react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "framer-motion"; // Keep for Dialog animation
 import { cn } from "@/lib/utils";
 import quotesData from '@/app/quotes.json';
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -35,6 +35,7 @@ import { SignupForm } from "@/components/signup-form";
 import { useToast } from '@/components/ui/use-toast';
 import Image from 'next/image';
 import MascotImage from '@/app/ChatGPT_Image_May_11__2025__03_07_50_PM-removebg-preview (3).png';
+import { gsap } from 'gsap';
 
 
 // Import local images for subjects
@@ -96,23 +97,6 @@ const mockExams = [
   },
 ];
 
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.07,
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
-};
-
-
 export default function HomePage() {
   const [greeting, setGreeting] = useState("Good day");
   const [userName, setUserName] = useState("Rudransh");
@@ -124,6 +108,14 @@ export default function HomePage() {
   const [authView, setAuthView] = useState<'login' | 'signup'>('login');
   const [isMounted, setIsMounted] = useState(false);
   const { toast } = useToast();
+
+  // Refs for GSAP animations
+  const greetingRef = useRef<HTMLHeadingElement>(null);
+  const quoteCardRef = useRef<HTMLDivElement>(null);
+  const subjectsSectionRef = useRef<HTMLDivElement>(null);
+  const learnWithSectionRef = useRef<HTMLDivElement>(null);
+  const mockExamsSectionRef = useRef<HTMLDivElement>(null);
+  const mascotButtonRef = useRef<HTMLButtonElement>(null);
 
 
   useEffect(() => {
@@ -154,6 +146,27 @@ export default function HomePage() {
       setQuote({ text: "The journey of a thousand miles begins with a single step.", author: "Lao Tzu" });
     }
   }, []);
+
+  useEffect(() => {
+    if (isMounted && isAuthenticated) { // Only animate if authenticated and mounted
+      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+
+      tl.from(greetingRef.current, { opacity: 0, y: -30, duration: 0.7 })
+        .from(mascotButtonRef.current, { opacity: 0, x: -20, duration: 0.5 }, "-=0.4")
+        .from(quoteCardRef.current, { opacity: 0, y: 30, duration: 0.7 }, "-=0.5")
+        
+        // Animate sections sequentially
+        .from(subjectsSectionRef.current?.querySelector('.section-title'), { opacity: 0, x: -20, duration: 0.5 }, "-=0.4")
+        .from(subjectsSectionRef.current?.querySelectorAll('.subject-card-item'), { opacity: 0, y: 20, stagger: 0.1, duration: 0.4 }, "<0.2")
+        
+        .from(learnWithSectionRef.current?.querySelector('.section-title'), { opacity: 0, x: -20, duration: 0.5 }, "-=0.3")
+        .from(learnWithSectionRef.current?.querySelectorAll('.learn-with-card-item'), { opacity: 0, scale: 0.9, y: 20, stagger: 0.1, duration: 0.4 }, "<0.2")
+
+        .from(mockExamsSectionRef.current?.querySelector('.section-title'), { opacity: 0, x: -20, duration: 0.5 }, "-=0.3")
+        .from(mockExamsSectionRef.current?.querySelectorAll('.exam-card-item'), { opacity: 0, scale: 0.9, y: 20, stagger: 0.1, duration: 0.4 }, "<0.2");
+    }
+  }, [isMounted, isAuthenticated]);
+
 
   const handleLoginSuccess = () => {
     if (typeof window !== "undefined") {
@@ -203,15 +216,16 @@ export default function HomePage() {
             showAuthPopup && !isAuthenticated ? "blur-sm pointer-events-none" : ""
           )}
         >
-          <motion.div initial="hidden" animate="show" variants={containerVariants}>
+          <div> {/* Removed Framer Motion containerVariants wrapper */}
             <div className="flex items-center mb-6">
-              <motion.h1
+              <h1
+                ref={greetingRef}
                 className="text-3xl font-bold text-foreground"
-                variants={itemVariants}
               >
                 {greeting}, {userName}!
-              </motion.h1>
+              </h1>
                <Button
+                ref={mascotButtonRef}
                 onClick={handleCyclePopupClick}
                 variant="outline"
                 size="sm"
@@ -222,7 +236,7 @@ export default function HomePage() {
               </Button>
             </div>
 
-            <motion.div variants={itemVariants} className="mb-8">
+            <div ref={quoteCardRef} className="mb-8">
               <Card className="bg-[hsl(var(--quote-card-bg))] rounded-xl shadow-lg p-5 text-center">
                 <CardHeader className="p-0 mb-2">
                   <CardTitle className="flex items-center justify-center text-[hsl(var(--quote-card-text))] text-lg">
@@ -237,10 +251,10 @@ export default function HomePage() {
                   <p className="text-sm text-[hsl(var(--quote-card-author-text))]">- {quote.author}</p>
                 </CardContent>
               </Card>
-            </motion.div>
+            </div>
 
-            <motion.div className="space-y-4 mb-8" variants={itemVariants}>
-              <div className="flex justify-between items-center">
+            <div ref={subjectsSectionRef} className="space-y-4 mb-8">
+              <div className="flex justify-between items-center section-title">
                 <div className="flex items-center space-x-2 cursor-pointer group">
                   <Bookmark className="w-5 h-5 text-primary" />
                   <h2 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">My subjects</h2>
@@ -275,7 +289,7 @@ export default function HomePage() {
               <div className="relative">
                 <div ref={scrollContainerRef} className="flex w-full space-x-[25px] pb-4 overflow-x-auto scrollbar-hide">
                   {subjects.map((subject, index) => (
-                    <motion.div key={index} variants={itemVariants} className="flex-shrink-0 group">
+                    <div key={index} className="flex-shrink-0 group subject-card-item">
                       <SubjectCard
                         title={subject.title}
                         imageUrl={subject.imageUrl}
@@ -283,20 +297,20 @@ export default function HomePage() {
                         className="w-[240px] h-[320px]"
                         data-ai-hint={subject.dataAiHint}
                       />
-                    </motion.div>
+                    </div>
                   ))}
                 </div>
               </div>
-            </motion.div>
+            </div>
 
-            <motion.div className="space-y-4 mb-8" variants={itemVariants}>
-              <h2 className="text-xl font-semibold text-foreground flex items-center">
+            <div ref={learnWithSectionRef} className="space-y-4 mb-8">
+              <h2 className="text-xl font-semibold text-foreground flex items-center section-title">
                 <GraduationCapIcon className="w-5 h-5 text-primary mr-2" />
                 Learn with OpennMind
               </h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {learnWithItems.map((item, index) => (
-                  <motion.div key={index} variants={itemVariants}>
+                  <div key={index} className="learn-with-card-item">
                     <Link href={item.href} passHref legacyBehavior>
                       <a>
                         <LearnWithCard
@@ -308,19 +322,19 @@ export default function HomePage() {
                         />
                       </a>
                     </Link>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
-            </motion.div>
+            </div>
 
-            <motion.div className="space-y-4" variants={itemVariants}>
-              <h2 className="text-xl font-semibold text-foreground flex items-center">
+            <div ref={mockExamsSectionRef} className="space-y-4">
+              <h2 className="text-xl font-semibold text-foreground flex items-center section-title">
                 <ClipboardCheck className="w-5 h-5 text-primary mr-2" />
                 Mock Exams
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {mockExams.map((exam, index) => (
-                  <motion.div key={index} variants={itemVariants}>
+                  <div key={index} className="exam-card-item">
                     <ExamCard
                       title={exam.title}
                       icon={exam.icon}
@@ -329,11 +343,11 @@ export default function HomePage() {
                       data-ai-hint={exam.dataAiHint}
                       bgColorClass={exam.bgColorClass}
                     />
-                  </motion.div>
+                  </div>
                 ))}
               </div>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
         </main>
         <AnimatePresence>
         {showAuthPopup && !isAuthenticated && (
@@ -367,4 +381,3 @@ export default function HomePage() {
     </div>
   );
 }
-
