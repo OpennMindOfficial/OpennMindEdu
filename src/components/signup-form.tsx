@@ -16,7 +16,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 
 interface SignupFormProps extends React.HTMLAttributes<HTMLDivElement> {
-  onSignupSuccess?: (name: string) => void; // Updated to accept name
+  onSignupSuccess?: (name: string) => void;
   onSwitchToLogin?: () => void; 
 }
 
@@ -28,18 +28,21 @@ export function SignupForm({ className, onSignupSuccess, onSwitchToLogin, ...pro
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!name || !email || !password) {
+    const trimmedName = name.trim(); // Trim the name
+    const trimmedEmail = email.trim(); // Trim email for validation
+
+    if (!trimmedName || !trimmedEmail || !password) { // Validate trimmed name and email
       toast({
         variant: "destructive",
         title: "Signup Failed",
-        description: "Please fill in all fields.",
+        description: "Please fill in all fields correctly.",
       });
       return;
     }
     // Simulate successful signup
-    console.log("Simulating signup for:", name, email);
+    console.log("Simulating signup for:", trimmedName, trimmedEmail);
     if (onSignupSuccess) {
-      onSignupSuccess(name); // Pass the entered name
+      onSignupSuccess(trimmedName); // Pass the trimmed and validated name
     }
   };
 
