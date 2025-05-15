@@ -105,7 +105,7 @@ const NavItem: React.FC<NavItemProps> = ({
           className={cn(
             "flex items-center py-2.5 rounded-md transition-all duration-150 ease-in-out group relative",
             "hover:bg-primary/10 dark:hover:bg-primary/15", 
-            isActive ? `${activeClass} font-medium` : "text-muted-foreground hover:text-foreground dark:hover:text-primary-foreground/90",
+            isActive ? `${activeClass} font-medium` : "text-muted-foreground hover:text-foreground dark:hover:text-foreground", // Changed dark:hover:text-primary-foreground/90 to dark:hover:text-foreground
             isExpanded ? "px-3 justify-start" : "px-3 justify-center",
           )}
           style={{ paddingLeft: itemPaddingLeft }}
@@ -425,7 +425,7 @@ export function Sidebar() {
             </div>
           ))}
            
-           <div className="mt-2 border-t border-border/50 pt-2"> {/* Removed mx-2 */}
+           <div className="mt-2 border-t border-border/50 pt-2 mx-2"> {/* Apply mx-2 here */}
              <NavItem
                 key={accountSettingsLink.href}
                 {...accountSettingsLink}
