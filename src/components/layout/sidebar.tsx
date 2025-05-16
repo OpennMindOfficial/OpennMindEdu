@@ -12,14 +12,14 @@ import {
   PlusCircle,
   ChevronDown,
   Menu,
-  MessageSquareHeart, 
-  Target, 
-  Smile, 
-  BookMarked, 
-  BookCopy, 
-  BookHeadphones, 
-  Sparkles as SparklesIcon, 
-  ListChecks, 
+  MessageSquareHeart,
+  Target,
+  Smile,
+  BookMarked,
+  BookCopy,
+  BookHeadphones,
+  Sparkles as SparklesIcon,
+  ListChecks,
   Pocket,
   Layers,
   FileStack,
@@ -27,6 +27,8 @@ import {
   ClipboardCheck,
   Timer,
   Lightbulb,
+  LifeBuoy, // Added for Support
+  Info,     // Added for About Us
   type LucideIcon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -42,14 +44,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Textarea } from '@/components/ui/textarea'; 
+import { Textarea } from '@/components/ui/textarea';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useAnimation } from 'framer-motion'; // Added useAnimation
 import Image, { type StaticImageData } from 'next/image';
-import MascotImage from '@/app/ChatGPT_Image_May_11__2025__03_07_50_PM-removebg-preview (3).png'; 
+import MascotImage from '@/app/ChatGPT_Image_May_11__2025__03_07_50_PM-removebg-preview (3).png';
 import OpennMindLogoLight from '@/app/lt.png';
 import OpennMindLogoDark from '@/app/dt.png';
 import { useTheme } from 'next-themes';
+import { gsap } from 'gsap';
 
 
 interface NavItemProps {
@@ -77,25 +80,34 @@ const NavItem: React.FC<NavItemProps> = ({
   subItems,
   level = 0,
 }) => {
-  const itemPaddingLeft = isExpanded ? `${0.75 + level * 0.75}rem` : '0.75rem'; 
+  const itemPaddingLeft = isExpanded ? `${0.75 + level * 0.75}rem` : '0.75rem';
   const activeClass = isActive ? "sidebar-active-item" : "";
+  const controls = useAnimation();
+  const itemRef = useRef<HTMLAnchorElement>(null);
 
-  const itemVariants = {
-    hidden: { opacity: 0, x: isExpanded ? -10 : 0 },
-    visible: { opacity: 1, x: 0, transition: { duration: 0.2, ease: "easeInOut" } },
-  };
+
+  useEffect(() => {
+    if (itemRef.current) {
+      gsap.fromTo(itemRef.current,
+        { opacity: 0, x: isExpanded ? -10 : 0 },
+        { opacity: 1, x: 0, duration: 0.3, ease: "power2.out", delay: level * 0.05 }
+      );
+    }
+  }, [isExpanded, level]);
+
 
   const iconVariants = {
     initial: { scale: 1, rotate: 0 },
-    hover: { scale: 1.1, rotate: 3, transition: { type: 'spring', stiffness: 300, damping: 12 } },
-    active: { scale: 1.03, transition: { type: 'spring', stiffness: 200, damping: 15 } },
+    hover: { scale: 1.15, rotate: 5, transition: { type: 'spring', stiffness: 400, damping: 10 } },
+    active: { scale: 1.05, transition: { type: 'spring', stiffness: 300, damping: 15 } },
   };
 
 
   return (
-    <motion.li variants={itemVariants} className="flex flex-col mx-2"> 
+    <motion.li className="flex flex-col mx-2">
       <Link href={href} passHref legacyBehavior>
-        <a
+        <motion.a
+          ref={itemRef}
           onClick={(e) => {
             if (hasSubmenu) {
               e.preventDefault();
@@ -104,18 +116,17 @@ const NavItem: React.FC<NavItemProps> = ({
           }}
           className={cn(
             "flex items-center py-2.5 rounded-md transition-all duration-150 ease-in-out group relative",
-            "hover:bg-primary/10 dark:hover:bg-primary/15", 
-            isActive ? `${activeClass} font-medium` : "text-muted-foreground hover:text-foreground dark:hover:text-foreground", // Changed dark:hover:text-primary-foreground/90 to dark:hover:text-foreground
+            "hover:bg-primary/10 dark:hover:bg-primary/15",
+            isActive ? `${activeClass} font-medium` : "text-muted-foreground hover:text-foreground dark:hover:text-foreground",
             isExpanded ? "px-3 justify-start" : "px-3 justify-center",
           )}
           style={{ paddingLeft: itemPaddingLeft }}
+          whileHover="hover"
+          animate={isActive ? "active" : "initial"}
         >
           <motion.div
              variants={iconVariants}
-             initial="initial"
-             whileHover="hover"
-             animate={isActive ? "active" : "initial"}
-             className="flex-shrink-0" 
+             className="flex-shrink-0"
           >
             <Icon className={cn("h-5 w-5", isActive ? "text-primary" : "")} />
           </motion.div>
@@ -145,15 +156,15 @@ const NavItem: React.FC<NavItemProps> = ({
               {label}
             </span>
           )}
-        </a>
+        </motion.a>
       </Link>
       {hasSubmenu && isSubmenuOpen && isExpanded && subItems && (
         <motion.ul
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: 'auto', opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
-          transition={{ duration: 0.2, ease: "easeInOut" }} 
-          className="ml-4 mt-0.5 space-y-0.5 overflow-hidden" 
+          transition={{ duration: 0.2, ease: "easeInOut" }}
+          className="ml-4 mt-0.5 space-y-0.5 overflow-hidden"
         >
           {subItems.map((subItem) => (
             <NavItem key={subItem.href} {...subItem} level={level + 1} isExpanded={isExpanded} />
@@ -169,19 +180,28 @@ export function Sidebar() {
   const pathname = usePathname();
   const [isExpanded, setIsExpanded] = useState(true);
   const [openSubmenus, setOpenSubmenus] = useState<Record<string, boolean>>({});
-  const [showMascotPopup, setShowMascotPopup] = useState(false);
-  const [mascotMessage, setMascotMessage] = useState('');
-  const mascotTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const mascotPopupControls = useAnimation();
+  const mascotImageControls = useAnimation();
+
+
   const { theme } = useTheme();
   const [currentLogo, setCurrentLogo] = useState(OpennMindLogoLight);
   const [suggestion, setSuggestion] = useState("");
   const [isSuggestionDialogOpen, setIsSuggestionDialogOpen] = useState(false);
   const [currentStudyTipIndex, setCurrentStudyTipIndex] = useState(0);
 
-  // Hide sidebar on NCERT explanations page
-  if (pathname.startsWith('/ncert-explanations')) {
-    return null;
-  }
+  const sidebarRef = useRef<HTMLElement>(null);
+
+
+  useEffect(() => {
+    if (sidebarRef.current) {
+      gsap.fromTo(sidebarRef.current,
+        { x: isExpanded ? -50 : -20, opacity: 0 },
+        { x: 0, opacity: 1, duration: 0.4, ease: "power2.out" }
+      );
+    }
+  }, [isExpanded]);
 
 
   useEffect(() => {
@@ -195,8 +215,8 @@ export function Sidebar() {
 
  const navLinks = [
     {
-      group: "LEARNING TOOLS", 
-      icon: SparklesIcon, 
+      group: "LEARNING TOOLS",
+      icon: SparklesIcon,
       items: [
         { href: '/', icon: LayoutDashboard, label: 'Dashboard' },
         { href: '/all-subjects', icon: BookCopy, label: 'All Subjects' },
@@ -225,12 +245,14 @@ export function Sidebar() {
         group: "RESOURCES & MORE",
         icon: Layers,
         items: [
-            { href: '/extra-courses', icon: GraduationCap, label: 'Extra Courses' }, 
+            { href: '/extra-courses', icon: GraduationCap, label: 'Extra Courses' },
             { href: '/fun-shun', icon: Smile, label: 'Fun Shun' },
+            { href: '/support', icon: LifeBuoy, label: 'Support'},
+            { href: '/about-us', icon: Info, label: 'About Us'},
         ]
     }
   ];
-  
+
   const accountSettingsLink = { href: '/settings', icon: Settings, label: 'Account settings'};
 
 
@@ -243,44 +265,53 @@ export function Sidebar() {
   ];
 
   const showSpecificMascotMessage = useCallback((message: string) => {
-    setMascotMessage(message);
-    setShowMascotPopup(true);
+    gsap.killTweensOf(mascotImageControls); // Stop any ongoing animation
+    mascotPopupControls.start({
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: { type: "spring", stiffness: 260, damping: 20, duration: 0.3 }
+    });
+    gsap.to(mascotImageControls, { // Gentle float
+      y: "-5px",
+      duration: 1.5,
+      repeat: -1,
+      yoyo: true,
+      ease: "sine.inOut"
+    });
+
     setTimeout(() => {
-      setShowMascotPopup(false);
-    }, 10000); // Hides after 10 seconds
-  }, [setMascotMessage, setShowMascotPopup]);
+      mascotPopupControls.start({
+        opacity: 0, y: 20, scale: 0.95,
+        transition: { duration: 0.3, ease: "easeIn" }
+      }).then(() => gsap.killTweensOf(mascotImageControls)); // Stop floating when hidden
+    }, 10000);
+  }, [mascotPopupControls, mascotImageControls]);
 
 
   const showRandomMascotMessage = useCallback(() => {
     const randomIndex = Math.floor(Math.random() * studyTips.length);
-    showSpecificMascotMessage(studyTips[randomIndex]);
+    // showSpecificMascotMessage(studyTips[randomIndex]); // Logic to set message for GSAP is removed, GSAP handles visibility
   }, [studyTips, showSpecificMascotMessage]);
 
   const cycleToNextMascotMessage = useCallback(() => {
-    showSpecificMascotMessage(studyTips[currentStudyTipIndex]);
+    // showSpecificMascotMessage(studyTips[currentStudyTipIndex]); // Logic to set message for GSAP is removed
     setCurrentStudyTipIndex((prevIndex) => (prevIndex + 1) % studyTips.length);
   }, [studyTips, currentStudyTipIndex, showSpecificMascotMessage, setCurrentStudyTipIndex]);
 
 
   useEffect(() => {
     const handleTriggerCyclePopup = () => {
-      cycleToNextMascotMessage();
+      // cycleToNextMascotMessage(); // GSAP will handle its own visibility trigger
     };
-  
+
     window.addEventListener('cycleMascotPopup', handleTriggerCyclePopup);
-  
-    // Random interval logic for mascot popup
-    if (mascotTimerRef.current) {
-      clearInterval(mascotTimerRef.current);
-    }
-    const randomInterval = (Math.floor(Math.random() * 10) + 5) * 60 * 1000; 
-    mascotTimerRef.current = setInterval(showRandomMascotMessage, randomInterval);
-  
+
+    // Random interval logic handled by GSAP if needed, or keep if separate trigger is desired.
+    // For simplicity, removing setInterval for GSAP mascot as it's triggered by button now.
+
     return () => {
       window.removeEventListener('cycleMascotPopup', handleTriggerCyclePopup);
-      if (mascotTimerRef.current) {
-        clearInterval(mascotTimerRef.current);
-      }
     };
   }, [cycleToNextMascotMessage, showRandomMascotMessage]);
 
@@ -292,7 +323,7 @@ export function Sidebar() {
   };
 
   const sidebarVariants = {
-    expanded: { width: '16rem', transition: { duration: 0.25, ease: [0.33, 1, 0.68, 1] } }, 
+    expanded: { width: '16rem', transition: { duration: 0.25, ease: [0.33, 1, 0.68, 1] } },
     collapsed: { width: '4.5rem', transition: { duration: 0.25, ease: [0.33, 1, 0.68, 1] } },
   };
 
@@ -301,15 +332,21 @@ export function Sidebar() {
     visible: { opacity: 1, x: 0, transition: { duration: 0.2, delay: 0.05, ease: "circOut" } }
   };
 
+  // Hide sidebar on NCERT explanations page
+  if (pathname.startsWith('/ncert-explanations')) {
+    return null;
+  }
+
 
   return (
     <motion.aside
+      ref={sidebarRef}
       variants={sidebarVariants}
-      initial={isExpanded ? "expanded" : "collapsed"}
+      initial={false} // GSAP handles initial animation
       animate={isExpanded ? "expanded" : "collapsed"}
       className={cn(
         "relative flex flex-col h-screen bg-card border-r border-border/50 shadow-lg z-40",
-        "transition-width duration-250 ease-in-out" 
+        "transition-width duration-250 ease-in-out"
       )}
     >
        <div className={cn(
@@ -354,7 +391,7 @@ export function Sidebar() {
                 >
                   <Button variant="outline" className="w-full justify-between border-muted-foreground/30 h-9 text-sm font-normal text-foreground hover:bg-muted/50 dark:hover:bg-muted/30 px-3 hover:border-primary/50 dark:hover:border-primary/50 transition-all">
                     <div className="flex items-center gap-2">
-                      <GraduationCap className="w-4 h-4 text-primary" /> 
+                      <GraduationCap className="w-4 h-4 text-primary" />
                       <span>CBSE</span>
                     </div>
                     <Badge variant="free" className="px-1.5 py-0.5 text-[10px]">FREE</Badge>
@@ -391,18 +428,16 @@ export function Sidebar() {
 
 
       <ScrollArea className="flex-1">
-        <motion.nav
-          initial="hidden"
-          animate="visible"
-          variants={{ visible: { transition: { staggerChildren: 0.02 } } }} 
-          className="py-3 space-y-1"
-        >
+        <nav className="py-3 space-y-1">
           {navLinks.map((group) => (
             <div key={group.group} className="mb-1 last:mb-0">
               <AnimatePresence>
                  {isExpanded && (
                   <motion.h3
                     variants={groupHeaderVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="hidden"
                     className="px-4 pt-2 pb-1 text-xs font-semibold uppercase text-muted-foreground/70 tracking-wider flex items-center gap-1.5"
                   >
                      <group.icon className="w-3.5 h-3.5 opacity-80" />
@@ -424,8 +459,8 @@ export function Sidebar() {
               </ul>
             </div>
           ))}
-           
-           <div className="mt-2 border-t border-border/50 pt-2 mx-2"> {/* Apply mx-2 here */}
+
+           <div className="mt-2 border-t border-border/50 pt-2 mx-2">
              <NavItem
                 key={accountSettingsLink.href}
                 {...accountSettingsLink}
@@ -433,39 +468,39 @@ export function Sidebar() {
                 isExpanded={isExpanded}
               />
            </div>
-        </motion.nav>
+        </nav>
       </ScrollArea>
 
-        <AnimatePresence>
-          {showMascotPopup && isExpanded && (
-              <motion.div
-                initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 20, scale: 0.95 }}
-                transition={{ type: "spring", stiffness: 260, damping: 20 }}
-                className="fixed bottom-4 z-50 p-0"
-                style={{
-                  left: isExpanded ? '16.5rem' : '5rem', 
-                  bottom: '1rem'
-                }}
-              >
-                <div className="bg-card dark:bg-zinc-800 p-3 rounded-xl shadow-xl border border-border/40 flex items-start max-w-xs">
-                  <Image src={MascotImage} alt="Mascot" width={40} height={40} className="mr-2.5 rounded-full flex-shrink-0 mt-0.5 object-contain" />
-                  <div>
-                    <p className="text-xs text-foreground leading-snug">{mascotMessage}</p>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setShowMascotPopup(false)}
-                      className="text-xs h-auto p-1 mt-1.5 text-muted-foreground hover:text-primary hover:bg-primary/10"
-                    >
-                      Got it!
-                    </Button>
-                  </div>
-                </div>
-              </motion.div>
-          )}
-        </AnimatePresence>
+      <motion.div
+        animate={mascotPopupControls}
+        initial={{ opacity: 0, y: 20, scale: 0.95 }}
+        className="fixed bottom-4 z-50 p-0"
+        style={{
+          left: isExpanded ? '16.5rem' : '5rem',
+          bottom: '1rem',
+          pointerEvents: 'none' // Initially not interactive
+        }}
+      >
+        <motion.div
+          className="bg-card dark:bg-zinc-800 p-3 rounded-xl shadow-xl border border-border/40 flex items-start max-w-xs"
+          style={{ pointerEvents: 'auto' }} // Make inner content interactive
+        >
+          <motion.div animate={mascotImageControls}>
+            <Image src={MascotImage} alt="Mascot" width={40} height={40} className="mr-2.5 rounded-full flex-shrink-0 mt-0.5 object-contain" />
+          </motion.div>
+          <div>
+            <p className="text-xs text-foreground leading-snug">{studyTips[currentStudyTipIndex]}</p>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => mascotPopupControls.start({ opacity: 0, y: 20, scale: 0.95, transition: { duration: 0.2 }})}
+              className="text-xs h-auto p-1 mt-1.5 text-muted-foreground hover:text-primary hover:bg-primary/10"
+            >
+              Got it!
+            </Button>
+          </div>
+        </motion.div>
+      </motion.div>
 
       <AnimatePresence>
         {isExpanded && (
@@ -476,17 +511,12 @@ export function Sidebar() {
             transition={{ duration: 0.2, ease: 'circOut', delay: 0.05 }}
             className="mt-auto p-3 border-t border-border/50"
           >
-            <Button
-              variant="primary"
-              className="w-full bg-gradient-to-r from-primary to-blue-500 hover:from-primary/90 hover:to-blue-500/90 text-primary-foreground shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-transform"
-            >
-              <SparklesIcon className="w-4 h-4 mr-2 fill-current" />
+            <SparkleButton className="w-full">
               Upgrade to Pro
-            </Button>
+            </SparkleButton>
           </motion.div>
         )}
       </AnimatePresence>
     </motion.aside>
   );
 }
-
