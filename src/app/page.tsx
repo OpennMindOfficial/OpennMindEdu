@@ -101,7 +101,7 @@ const mockExams = [
 
 export default function HomePage() {
   const [greeting, setGreeting] = useState("Good day");
-  const [userName, setUserName] = useState("Learner"); 
+  const [userName, setUserName] = useState("Learner");
   const [quote, setQuote] = useState({ text: "", author: "" });
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -132,7 +132,7 @@ export default function HomePage() {
             if (storedUserName) {
                 setUserName(storedUserName);
             } else {
-                setUserName("Learner"); 
+                setUserName("Learner");
             }
         }
     }
@@ -165,20 +165,19 @@ export default function HomePage() {
         subjectsSectionRef.current?.querySelector('.section-title'),
         learnWithSectionRef.current?.querySelector('.section-title'),
         mockExamsSectionRef.current?.querySelector('.section-title'),
-      ].filter(Boolean); // Filter out nulls, especially for section titles
+      ].filter(Boolean);
 
-      gsap.from(elementsToAnimate, {
-        opacity: 0,
-        y: 50,
-        duration: 0.8,
-        stagger: 0.2,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: pageRef.current,
-          start: "top 90%", 
-          toggleActions: "play none none none",
+      gsap.fromTo(elementsToAnimate,
+        { opacity: 0, y: 50 },
+        {
+          opacity: 1, y: 0, duration: 0.8, stagger: 0.2, ease: "power3.out",
+          scrollTrigger: {
+            trigger: pageRef.current,
+            start: "top 90%",
+            toggleActions: "play none none none",
+          }
         }
-      });
+      );
       
       const cardSections = [
         { ref: subjectsSectionRef, selector: '.subject-card-item' },
@@ -191,18 +190,18 @@ export default function HomePage() {
           const cards = gsap.utils.toArray<HTMLElement>(section.ref.current.querySelectorAll(section.selector));
           if (cards.length > 0) {
             console.log(`GSAP: Animating ${cards.length} cards for selector '${section.selector}' in section`, section.ref.current);
-            gsap.fromTo(cards, 
-              { opacity: 0, y: 30, scale: 0.95 }, 
-              { 
-                opacity: 1, 
-                y: 0, 
-                scale: 1, 
-                duration: 0.5, 
-                stagger: 0.1, 
+            gsap.fromTo(cards,
+              { autoAlpha: 0, y: 30, scale: 0.95 }, // Use autoAlpha
+              {
+                autoAlpha: 1, // Use autoAlpha
+                y: 0,
+                scale: 1,
+                duration: 0.5,
+                stagger: 0.1,
                 ease: "power2.out",
                 scrollTrigger: {
-                  trigger: section.ref.current, // Trigger when the section itself comes into view
-                  start: "top 85%", // Start animation when 85% of the section is visible
+                  trigger: section.ref.current,
+                  start: "top 85%",
                   toggleActions: "play none none none",
                 }
               }
@@ -223,7 +222,7 @@ export default function HomePage() {
         if (storedUserName) {
             setUserName(storedUserName);
         } else {
-            setUserName("Learner"); 
+            setUserName("Learner");
         }
     }
     setIsAuthenticated(true);
@@ -246,8 +245,8 @@ export default function HomePage() {
     }
     if (typeof window !== "undefined") {
         localStorage.setItem('isAuthenticated', 'true');
-        localStorage.setItem('userName', trimmedName); 
-        setUserName(trimmedName); 
+        localStorage.setItem('userName', trimmedName);
+        setUserName(trimmedName);
     }
     setIsAuthenticated(true);
     setShowAuthPopup(false);
@@ -271,7 +270,7 @@ export default function HomePage() {
   };
 
   if (!isMounted) {
-    return null; // Or a loading spinner
+    return null;
   }
 
   return (
@@ -282,7 +281,7 @@ export default function HomePage() {
         <main
           ref={pageRef}
           className={cn(
-            "flex-1 overflow-y-auto p-6 md:p-8 bg-background", 
+            "flex-1 overflow-y-auto p-6 md:p-8 bg-background",
             showAuthPopup && !isAuthenticated ? "blur-sm pointer-events-none" : ""
           )}
         >
@@ -366,7 +365,7 @@ export default function HomePage() {
                         title={subject.title}
                         imageUrl={subject.imageUrl}
                         bgColorClass={subject.bgColorClass}
-                        className="w-[240px] h-[320px]" 
+                        className="w-[240px] h-[320px]"
                         data-ai-hint={subject.dataAiHint}
                       />
                     </div>
@@ -382,7 +381,7 @@ export default function HomePage() {
               </h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {learnWithItems.map((item, index) => (
-                  <div key={index} className="learn-with-card-item">
+                  <div key={index} className="learn-with-card-item"> {/* GSAP target class */}
                     <Link href={item.href} passHref legacyBehavior>
                       <a>
                         <LearnWithCard
@@ -406,11 +405,10 @@ export default function HomePage() {
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {mockExams.map((exam, index) => (
-                  <div key={index} className="exam-card-item">
+                  <div key={index} className="exam-card-item"> {/* GSAP target class */}
                     <ExamCard
                       title={exam.title}
                       icon={exam.icon}
-                      // illustration={exam.illustration} // Now uses icon prop for consistency
                       isNew={exam.isNew}
                       data-ai-hint={exam.dataAiHint}
                       bgColorClass={exam.bgColorClass}
@@ -429,21 +427,21 @@ export default function HomePage() {
               setShowAuthPopup(true);
             }
           }}>
-            <DialogContent 
-              className="sm:max-w-md p-0" 
-              onInteractOutside={(e) => e.preventDefault()} 
+            <DialogContent
+              className="sm:max-w-md p-0"
+              onInteractOutside={(e) => e.preventDefault()}
               onEscapeKeyDown={(e) => e.preventDefault()}
               hideCloseButton={true}
             >
               {authView === 'login' ? (
-                <LoginForm 
-                  onLoginSuccess={handleLoginSuccess} 
-                  onSwitchToSignup={() => setAuthView('signup')} 
+                <LoginForm
+                  onLoginSuccess={handleLoginSuccess}
+                  onSwitchToSignup={() => setAuthView('signup')}
                 />
               ) : (
-                <SignupForm 
-                  onSignupSuccess={handleSignupSuccess} 
-                  onSwitchToLogin={() => setAuthView('login')} 
+                <SignupForm
+                  onSignupSuccess={handleSignupSuccess}
+                  onSwitchToLogin={() => setAuthView('login')}
                 />
               )}
             </DialogContent>

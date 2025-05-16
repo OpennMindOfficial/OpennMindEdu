@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { type LucideIcon } from "lucide-react";
 import { cn } from '@/lib/utils';
-import { gsap } from 'gsap';
+// Removed GSAP import as hover animation will be simplified or handled by page.tsx entry
 
 interface ExamCardProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
@@ -21,34 +21,34 @@ interface ExamCardProps extends React.HTMLAttributes<HTMLDivElement> {
 export function ExamCard({ title, icon: Icon, bgColorClass, textColorClass, isNew, className, ...props }: ExamCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (cardRef.current) {
-      const tl = gsap.timeline({ paused: true });
-      tl.to(cardRef.current, { y: -5, scale: 1.03, duration: 0.2, ease: "power1.out" });
+  // Temporarily removing internal GSAP hover to simplify and avoid conflicts
+  // useEffect(() => {
+  //   if (cardRef.current) {
+  //     const tl = gsap.timeline({ paused: true });
+  //     tl.to(cardRef.current, { y: -5, scale: 1.03, duration: 0.2, ease: "power1.out" });
 
-      const currentCardRef = cardRef.current; // Capture ref value
-      const playAnimation = () => tl.play();
-      const reverseAnimation = () => tl.reverse();
+  //     const currentCardRef = cardRef.current; 
+  //     const playAnimation = () => tl.play();
+  //     const reverseAnimation = () => tl.reverse();
 
-      currentCardRef.addEventListener('mouseenter', playAnimation);
-      currentCardRef.addEventListener('mouseleave', reverseAnimation);
+  //     currentCardRef.addEventListener('mouseenter', playAnimation);
+  //     currentCardRef.addEventListener('mouseleave', reverseAnimation);
       
-      return () => {
-        if (currentCardRef) {
-          currentCardRef.removeEventListener('mouseenter', playAnimation);
-          currentCardRef.removeEventListener('mouseleave', reverseAnimation);
-        }
-        // tl.kill(); // Kill the timeline if component unmounts
-      };
-    }
-  }, []);
+  //     return () => {
+  //       if (currentCardRef) {
+  //         currentCardRef.removeEventListener('mouseenter', playAnimation);
+  //         currentCardRef.removeEventListener('mouseleave', reverseAnimation);
+  //       }
+  //     };
+  //   }
+  // }, []);
 
   return (
     <div
       ref={cardRef}
       className={cn(
-        "relative group",
-        className 
+        "relative group transition-transform duration-200 ease-out hover:-translate-y-1 hover:scale-[1.02]", // Simplified CSS hover
+        className
       )}
       {...props}
     >
@@ -69,7 +69,7 @@ export function ExamCard({ title, icon: Icon, bgColorClass, textColorClass, isNe
         <CardContent className="p-4 pt-0 flex-grow flex items-end justify-end relative overflow-hidden">
           <div className={cn(
               "absolute right-[-10px] bottom-[-10px] w-16 h-16 opacity-30 z-0",
-              textColorClass ? textColorClass : "text-foreground/70" // Default if not provided
+              textColorClass ? textColorClass : "text-foreground/70"
              )}>
                <Icon
                  className="w-full h-full"
