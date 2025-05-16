@@ -9,19 +9,20 @@ import Link from "next/link";
 import { SparkleButton } from '@/components/common/sparkle-button';
 import { motion } from 'framer-motion';
 import React, { useRef, useEffect, useState } from 'react';
-import Image, { type StaticImageData } from 'next/image';
-import { useTheme } from 'next-themes';
-import OpennMindLogoLight from '@/app/lt.png';
-import OpennMindLogoDark from '@/app/dt.png';
+// Image and theme-related imports are no longer needed here as logo is removed
+// import Image, { type StaticImageData } from 'next/image';
+// import { useTheme } from 'next-themes';
+// import OpennMindLogoLight from '@/app/lt.png';
+// import OpennMindLogoDark from '@/app/dt.png';
 
 export function Header() {
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const { theme } = useTheme();
-  const [currentLogo, setCurrentLogo] = useState(OpennMindLogoLight);
+  // const { theme } = useTheme(); // No longer needed for logo
+  // const [currentLogo, setCurrentLogo] = useState(OpennMindLogoLight); // No longer needed
 
-  useEffect(() => {
-    setCurrentLogo(theme === 'dark' ? OpennMindLogoDark : OpennMindLogoLight);
-  }, [theme]);
+  // useEffect(() => { // No longer needed for logo
+  //   setCurrentLogo(theme === 'dark' ? OpennMindLogoDark : OpennMindLogoLight);
+  // }, [theme]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -49,13 +50,11 @@ export function Header() {
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
     >
-      <div className="flex items-center gap-2">
-        <Image src={currentLogo} alt="OpennMind Logo" width={36} height={36} priority className="rounded-sm" />
-        <span className="font-bold text-xl text-foreground">OpennMind</span>
-      </div>
+      {/* Logo section removed */}
 
-      <div className="flex-1 flex justify-center px-4">
-        <div className="relative w-full max-w-2xl">
+      {/* Search Bar Section - now flex-1 and will expand */}
+      <div className="flex-1 flex justify-start px-0 md:px-4 mr-4"> {/* Changed justify-center to justify-start and adjusted padding */}
+        <div className="relative w-full max-w-2xl"> {/* Kept max-w-2xl for search bar itself */}
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             ref={searchInputRef}
