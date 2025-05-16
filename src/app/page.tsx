@@ -113,11 +113,11 @@ export default function HomePage() {
 
   const pageRef = useRef<HTMLDivElement>(null);
   const greetingRef = useRef<HTMLHeadingElement>(null);
+  const mascotButtonRef = useRef<HTMLButtonElement>(null);
   const quoteCardRef = useRef<HTMLDivElement>(null);
   const subjectsSectionRef = useRef<HTMLDivElement>(null);
   const learnWithSectionRef = useRef<HTMLDivElement>(null);
   const mockExamsSectionRef = useRef<HTMLDivElement>(null);
-  const mascotButtonRef = useRef<HTMLButtonElement>(null);
 
 
   useEffect(() => {
@@ -162,10 +162,10 @@ export default function HomePage() {
         greetingRef.current,
         mascotButtonRef.current,
         quoteCardRef.current,
-        subjectsSectionRef.current,
-        learnWithSectionRef.current,
-        mockExamsSectionRef.current,
-      ].filter(Boolean);
+        subjectsSectionRef.current?.querySelector('.section-title'),
+        learnWithSectionRef.current?.querySelector('.section-title'),
+        mockExamsSectionRef.current?.querySelector('.section-title'),
+      ].filter(Boolean); // Filter out nulls, especially for section titles
 
       gsap.from(elementsToAnimate, {
         opacity: 0,
@@ -175,12 +175,11 @@ export default function HomePage() {
         ease: "power3.out",
         scrollTrigger: {
           trigger: pageRef.current,
-          start: "top 80%", // When 80% of the element is visible
+          start: "top 90%", 
           toggleActions: "play none none none",
         }
       });
       
-      // Stagger animation for cards within sections
       const cardSections = [
         { ref: subjectsSectionRef, selector: '.subject-card-item' },
         { ref: learnWithSectionRef, selector: '.learn-with-card-item' },
@@ -189,20 +188,28 @@ export default function HomePage() {
 
       cardSections.forEach(section => {
         if (section.ref && section.ref.current) {
-          const cards = gsap.utils.toArray(section.ref.current.querySelectorAll(section.selector));
-          gsap.from(cards, {
-            opacity: 0,
-            y: 30,
-            scale: 0.95,
-            duration: 0.5,
-            stagger: 0.1,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: section.ref.current,
-              start: "top 85%",
-              toggleActions: "play none none none",
-            }
-          });
+          const cards = gsap.utils.toArray<HTMLElement>(section.ref.current.querySelectorAll(section.selector));
+          if (cards.length > 0) {
+            console.log(`GSAP: Animating ${cards.length} cards for selector '${section.selector}' in section`, section.ref.current);
+            gsap.fromTo(cards, 
+              { opacity: 0, y: 30, scale: 0.95 }, 
+              { 
+                opacity: 1, 
+                y: 0, 
+                scale: 1, 
+                duration: 0.5, 
+                stagger: 0.1, 
+                ease: "power2.out",
+                scrollTrigger: {
+                  trigger: section.ref.current, // Trigger when the section itself comes into view
+                  start: "top 85%", // Start animation when 85% of the section is visible
+                  toggleActions: "play none none none",
+                }
+              }
+            );
+          } else {
+            console.warn(`GSAP: No cards found for selector '${section.selector}' in section`, section.ref.current);
+          }
         }
       });
     }
@@ -264,7 +271,7 @@ export default function HomePage() {
   };
 
   if (!isMounted) {
-    return null;
+    return null; // Or a loading spinner
   }
 
   return (
@@ -279,8 +286,24 @@ export default function HomePage() {
             showAuthPopup && !isAuthenticated ? "blur-sm pointer-events-none" : ""
           )}
         >
-          {/* Wrapper for scrollable content */}
           <div className="space-y-8">
+            <div ref={quoteCardRef} className="mb-8">
+              <Card className="bg-[hsl(var(--quote-card-bg))] rounded-xl shadow-lg p-5 text-center">
+                <CardHeader className="p-0 mb-2">
+                  <CardTitle className="flex items-center justify-center text-[hsl(var(--quote-card-text))] text-lg">
+                    <Lightbulb className="w-5 h-5 mr-2 text-[hsl(var(--quote-card-author-text))]" />
+                    Quote of the day
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <p className="text-lg font-medium text-[hsl(var(--quote-card-text))] mb-1.5">
+                    &ldquo;{quote.text}&rdquo;
+                  </p>
+                  <p className="text-sm text-[hsl(var(--quote-card-author-text))]">- {quote.author}</p>
+                </CardContent>
+              </Card>
+            </div>
+            
             <div>
               <div className="flex items-center mb-6">
                 <h1
@@ -299,23 +322,6 @@ export default function HomePage() {
                   <Brain className="w-4 h-4 mr-2"/>
                   Show Mascot Tip
                 </Button>
-              </div>
-
-              <div ref={quoteCardRef} className="mb-8">
-                <Card className="bg-[hsl(var(--quote-card-bg))] rounded-xl shadow-lg p-5 text-center">
-                  <CardHeader className="p-0 mb-2">
-                    <CardTitle className="flex items-center justify-center text-[hsl(var(--quote-card-text))] text-lg">
-                      <Lightbulb className="w-5 h-5 mr-2 text-[hsl(var(--quote-card-author-text))]" />
-                      Quote of the day
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-0">
-                    <p className="text-lg font-medium text-[hsl(var(--quote-card-text))] mb-1.5">
-                      &ldquo;{quote.text}&rdquo;
-                    </p>
-                    <p className="text-sm text-[hsl(var(--quote-card-author-text))]">- {quote.author}</p>
-                  </CardContent>
-                </Card>
               </div>
             </div>
 
@@ -404,7 +410,7 @@ export default function HomePage() {
                     <ExamCard
                       title={exam.title}
                       icon={exam.icon}
-                      illustration={exam.illustration}
+                      // illustration={exam.illustration} // Now uses icon prop for consistency
                       isNew={exam.isNew}
                       data-ai-hint={exam.dataAiHint}
                       bgColorClass={exam.bgColorClass}
@@ -413,8 +419,8 @@ export default function HomePage() {
                 ))}
               </div>
             </div>
-          </div> {/* End of space-y-8 wrapper for scrollable content */}
-          <div className="h-8 md:h-12"></div> {/* Ensures some space at the very bottom of the scroll */}
+          </div>
+          <div className="h-8 md:h-12"></div>
         </main>
         <AnimatePresence>
         {showAuthPopup && !isAuthenticated && (
