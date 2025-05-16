@@ -53,6 +53,7 @@ import OpennMindLogoLight from '@/app/lt.png';
 import OpennMindLogoDark from '@/app/dt.png';
 import { useTheme } from 'next-themes';
 import { gsap } from 'gsap';
+import { SparkleButton } from '@/components/common/sparkle-button'; // Import SparkleButton
 
 
 interface NavItemProps {
@@ -265,14 +266,15 @@ export function Sidebar() {
   ];
 
   const showSpecificMascotMessage = useCallback((message: string) => {
-    gsap.killTweensOf(mascotImageControls); // Stop any ongoing animation
-    mascotPopupControls.start({
+    gsap.killTweensOf(mascotImageControls.current); // Stop any ongoing animation
+    gsap.to(mascotPopupControls.current, {
       opacity: 1,
       y: 0,
       scale: 1,
-      transition: { type: "spring", stiffness: 260, damping: 20, duration: 0.3 }
+      duration: 0.3,
+      ease: "spring(1, 0.5, 260, 20)" // Approximate spring
     });
-    gsap.to(mascotImageControls, { // Gentle float
+    gsap.to(mascotImageControls.current, { // Gentle float
       y: "-5px",
       duration: 1.5,
       repeat: -1,
@@ -281,34 +283,31 @@ export function Sidebar() {
     });
 
     setTimeout(() => {
-      mascotPopupControls.start({
+      gsap.to(mascotPopupControls.current, {
         opacity: 0, y: 20, scale: 0.95,
-        transition: { duration: 0.3, ease: "easeIn" }
-      }).then(() => gsap.killTweensOf(mascotImageControls)); // Stop floating when hidden
+        duration: 0.3, ease: "easeIn"
+      }).then(() => gsap.killTweensOf(mascotImageControls.current)); // Stop floating when hidden
     }, 10000);
   }, [mascotPopupControls, mascotImageControls]);
 
 
   const showRandomMascotMessage = useCallback(() => {
     const randomIndex = Math.floor(Math.random() * studyTips.length);
-    // showSpecificMascotMessage(studyTips[randomIndex]); // Logic to set message for GSAP is removed, GSAP handles visibility
+     // showSpecificMascotMessage(studyTips[randomIndex]); // This line was commented out
   }, [studyTips, showSpecificMascotMessage]);
 
   const cycleToNextMascotMessage = useCallback(() => {
-    // showSpecificMascotMessage(studyTips[currentStudyTipIndex]); // Logic to set message for GSAP is removed
+    // showSpecificMascotMessage(studyTips[currentStudyTipIndex]); // This line was commented out
     setCurrentStudyTipIndex((prevIndex) => (prevIndex + 1) % studyTips.length);
   }, [studyTips, currentStudyTipIndex, showSpecificMascotMessage, setCurrentStudyTipIndex]);
 
 
   useEffect(() => {
     const handleTriggerCyclePopup = () => {
-      // cycleToNextMascotMessage(); // GSAP will handle its own visibility trigger
+      // cycleToNextMascotMessage(); // This line was commented out
     };
 
     window.addEventListener('cycleMascotPopup', handleTriggerCyclePopup);
-
-    // Random interval logic handled by GSAP if needed, or keep if separate trigger is desired.
-    // For simplicity, removing setInterval for GSAP mascot as it's triggered by button now.
 
     return () => {
       window.removeEventListener('cycleMascotPopup', handleTriggerCyclePopup);
@@ -336,6 +335,17 @@ export function Sidebar() {
   if (pathname.startsWith('/ncert-explanations')) {
     return null;
   }
+
+  // Refs for GSAP animations
+  const mascotPopupRef = useRef<HTMLDivElement>(null);
+  const mascotImageRef = useRef<HTMLDivElement>(null);
+
+  // Update GSAP animations to use refs
+  useEffect(() => {
+    // Assign refs to GSAP controls for direct manipulation
+    mascotPopupControls.current = mascotPopupRef.current;
+    mascotImageControls.current = mascotImageRef.current;
+  }, [mascotPopupControls, mascotImageControls]);
 
 
   return (
@@ -472,20 +482,20 @@ export function Sidebar() {
       </ScrollArea>
 
       <motion.div
-        animate={mascotPopupControls}
+        ref={mascotPopupRef} // Apply ref
         initial={{ opacity: 0, y: 20, scale: 0.95 }}
         className="fixed bottom-4 z-50 p-0"
         style={{
           left: isExpanded ? '16.5rem' : '5rem',
           bottom: '1rem',
-          pointerEvents: 'none' // Initially not interactive
+          pointerEvents: 'none' 
         }}
       >
         <motion.div
           className="bg-card dark:bg-zinc-800 p-3 rounded-xl shadow-xl border border-border/40 flex items-start max-w-xs"
-          style={{ pointerEvents: 'auto' }} // Make inner content interactive
+          style={{ pointerEvents: 'auto' }} 
         >
-          <motion.div animate={mascotImageControls}>
+          <motion.div ref={mascotImageRef}> {/* Apply ref */}
             <Image src={MascotImage} alt="Mascot" width={40} height={40} className="mr-2.5 rounded-full flex-shrink-0 mt-0.5 object-contain" />
           </motion.div>
           <div>
@@ -493,7 +503,7 @@ export function Sidebar() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => mascotPopupControls.start({ opacity: 0, y: 20, scale: 0.95, transition: { duration: 0.2 }})}
+              onClick={() => gsap.to(mascotPopupRef.current, { opacity: 0, y: 20, scale: 0.95, duration: 0.2 })} // Use GSAP to hide
               className="text-xs h-auto p-1 mt-1.5 text-muted-foreground hover:text-primary hover:bg-primary/10"
             >
               Got it!
