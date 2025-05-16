@@ -76,7 +76,6 @@ const mockExams = [
   {
     title: "Random exam",
     icon: Layers3,
-    illustration: randomExamImage,
     isNew: false,
     dataAiHint:"random exam",
     bgColorClass: "bg-sky-100 dark:bg-sky-800/40"
@@ -84,7 +83,6 @@ const mockExams = [
   {
     title: "Custom exam",
     icon: PlusCircle,
-    illustration: customExamImage,
     isNew: true,
     dataAiHint: "custom exam",
     bgColorClass: "bg-emerald-100 dark:bg-emerald-800/40"
@@ -92,7 +90,6 @@ const mockExams = [
   {
     title: "Timed exam",
     icon: Timer,
-    illustration: timedExamImage,
     isNew: true,
     dataAiHint: "timed exam clock",
     bgColorClass: "bg-pink-100 dark:bg-pink-800/40"
@@ -156,8 +153,11 @@ export default function HomePage() {
     }
   }, []);
 
-  useEffect(() => {
+ useEffect(() => {
     if (isMounted && isAuthenticated && pageRef.current) {
+      const commonFrom = { opacity: 0, y: 30, immediateRender: false };
+      const commonTo = { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" };
+
       const elementsToAnimate = [
         greetingRef.current,
         mascotButtonRef.current,
@@ -168,49 +168,100 @@ export default function HomePage() {
       ].filter(Boolean);
 
       gsap.fromTo(elementsToAnimate,
-        { opacity: 0, y: 50 },
+        commonFrom,
         {
-          opacity: 1, y: 0, duration: 0.8, stagger: 0.2, ease: "power3.out",
+          ...commonTo,
+          stagger: 0.15,
           scrollTrigger: {
             trigger: pageRef.current,
             start: "top 90%",
             toggleActions: "play none none none",
+             markers: true, // For debugging general page load
           }
         }
       );
       
-      const cardSections = [
-        { ref: subjectsSectionRef, selector: '.subject-card-item' },
-        { ref: learnWithSectionRef, selector: '.learn-with-card-item' },
-        { ref: mockExamsSectionRef, selector: '.exam-card-item' },
-      ];
-
-      cardSections.forEach(section => {
-        if (section.ref && section.ref.current) {
-          const cards = gsap.utils.toArray<HTMLElement>(section.ref.current.querySelectorAll(section.selector));
-          if (cards.length > 0) {
-            console.log(`GSAP: Animating ${cards.length} cards for selector '${section.selector}' in section`, section.ref.current);
-            gsap.fromTo(cards,
-              { autoAlpha: 0, y: 30, scale: 0.95 }, // Use autoAlpha
-              {
-                autoAlpha: 1, // Use autoAlpha
-                y: 0,
-                scale: 1,
-                duration: 0.5,
-                stagger: 0.1,
-                ease: "power2.out",
-                scrollTrigger: {
-                  trigger: section.ref.current,
-                  start: "top 85%",
-                  toggleActions: "play none none none",
-                }
+      // Subjects Cards Animation
+      if (subjectsSectionRef.current) {
+        console.log("GSAP Debug: subjectsSectionRef.current exists:", !!subjectsSectionRef.current);
+        const subjectCards = gsap.utils.toArray<HTMLElement>(subjectsSectionRef.current.querySelectorAll('.subject-card-item'));
+        console.log("GSAP Debug: Found subjectCards:", subjectCards.length, subjectCards);
+        if (subjectCards.length > 0) {
+          gsap.fromTo(subjectCards,
+            { autoAlpha: 0, y: 30, scale: 0.95, immediateRender: false },
+            {
+              autoAlpha: 1, y: 0, scale: 1, duration: 0.5, stagger: 0.1, ease: "power2.out",
+              scrollTrigger: {
+                trigger: subjectsSectionRef.current,
+                start: "top 85%",
+                toggleActions: "play none none reset",
+                markers: true,
               }
-            );
-          } else {
-            console.warn(`GSAP: No cards found for selector '${section.selector}' in section`, section.ref.current);
-          }
+            }
+          );
+        } else {
+          console.warn("GSAP Warn: No .subject-card-item elements found in subjectsSectionRef.");
         }
-      });
+      } else {
+        console.warn("GSAP Warn: subjectsSectionRef.current is null or undefined.");
+      }
+
+      // Learn With Cards Animation
+      if (learnWithSectionRef.current) {
+        console.log("GSAP Debug: learnWithSectionRef.current exists:", !!learnWithSectionRef.current);
+        const learnWithCardNodes = learnWithSectionRef.current.querySelectorAll('.learn-with-card-item');
+        console.log("GSAP Debug: Raw learnWithCardNodes NodeList:", learnWithCardNodes);
+        const learnWithCards = gsap.utils.toArray<HTMLElement>(learnWithCardNodes);
+        console.log("GSAP Debug: Found learnWithCards:", learnWithCards.length, learnWithCards);
+        if (learnWithCards.length > 0) {
+          gsap.fromTo(learnWithCards,
+            { autoAlpha: 0, y: 20, scale: 0.9, immediateRender: false },
+            {
+              autoAlpha: 1, y: 0, scale: 1, duration: 0.4, stagger: 0.07, ease: "power2.out",
+              scrollTrigger: {
+                trigger: learnWithSectionRef.current,
+                start: "top 85%", 
+                toggleActions: "play none none reset",
+                markers: true, // For specific debugging
+                invalidateOnRefresh: true,
+              }
+            }
+          );
+        } else {
+          console.warn("GSAP Warn: No .learn-with-card-item elements found in learnWithSectionRef.");
+        }
+      } else {
+         console.warn("GSAP Warn: learnWithSectionRef.current is null or undefined.");
+      }
+      
+      // Mock Exams Cards Animation
+      if (mockExamsSectionRef.current) {
+        console.log("GSAP Debug: mockExamsSectionRef.current exists:", !!mockExamsSectionRef.current);
+        const mockExamCardNodes = mockExamsSectionRef.current.querySelectorAll('.exam-card-item');
+        console.log("GSAP Debug: Raw mockExamCardNodes NodeList:", mockExamCardNodes);
+        const mockExamCards = gsap.utils.toArray<HTMLElement>(mockExamCardNodes);
+        console.log("GSAP Debug: Found mockExamCards:", mockExamCards.length, mockExamCards);
+
+        if (mockExamCards.length > 0) {
+          gsap.fromTo(mockExamCards,
+            { autoAlpha: 0, y: 20, scale: 0.9, immediateRender: false },
+            {
+              autoAlpha: 1, y: 0, scale: 1, duration: 0.4, stagger: 0.07, ease: "power2.out",
+              scrollTrigger: {
+                trigger: mockExamsSectionRef.current,
+                start: "top 85%",
+                toggleActions: "play none none reset",
+                markers: true, // For specific debugging
+                invalidateOnRefresh: true,
+              }
+            }
+          );
+        } else {
+          console.warn("GSAP Warn: No .exam-card-item elements found in mockExamsSectionRef.");
+        }
+      } else {
+         console.warn("GSAP Warn: mockExamsSectionRef.current is null or undefined.");
+      }
     }
   }, [isMounted, isAuthenticated]);
 
@@ -381,7 +432,7 @@ export default function HomePage() {
               </h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {learnWithItems.map((item, index) => (
-                  <div key={index} className="learn-with-card-item"> {/* GSAP target class */}
+                  <div key={index} className="learn-with-card-item">
                     <Link href={item.href} passHref legacyBehavior>
                       <a>
                         <LearnWithCard
@@ -405,7 +456,7 @@ export default function HomePage() {
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {mockExams.map((exam, index) => (
-                  <div key={index} className="exam-card-item"> {/* GSAP target class */}
+                  <div key={index} className="exam-card-item">
                     <ExamCard
                       title={exam.title}
                       icon={exam.icon}
