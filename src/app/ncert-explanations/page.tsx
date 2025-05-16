@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 // Header component removed
 import { SourcesSidebar, type SourceItem } from "@/components/ncert/sources-sidebar";
 import { NotebookGuide } from "@/components/ncert/notebook-guide";
@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Settings, Share2, StickyNote, ArrowLeft, Info, Play, ThumbsUp, ThumbsDown, MoreVertical, Video } from "lucide-react";
 import { Input } from '@/components/ui/input';
-import { motion } from 'framer-motion';
+import { gsap } from 'gsap'; // Import GSAP
 import Link from 'next/link';
 import { Sparkles } from "lucide-react";
 
@@ -41,6 +41,19 @@ export default function NcertExplanationsPage() {
   const [sources, setSources] = useState<SourceItem[]>(initialSources);
   const [chatInput, setChatInput] = useState('');
 
+  const pageHeaderRef = useRef<HTMLDivElement>(null);
+  const notebookGuideRef = useRef<HTMLDivElement>(null);
+  const rightColumnRef = useRef<HTMLDivElement>(null); // For the entire right column
+
+  useEffect(() => {
+    const tl = gsap.timeline({ defaults: { ease: "power3.out" }});
+
+    tl.fromTo(pageHeaderRef.current, { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.3 })
+      .fromTo(notebookGuideRef.current, { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.4 }, "-=0.1")
+      .fromTo(rightColumnRef.current, { opacity: 0, x: 20 }, { opacity: 1, x: 0, duration: 0.4 }, "<"); // Animate right column slightly after/with notebook guide
+  }, []);
+
+
   const handleSourceToggle = (id: string) => {
     setSources(prevSources =>
       prevSources.map(source =>
@@ -53,15 +66,13 @@ export default function NcertExplanationsPage() {
 
   return (
     // Removed Header component from here
-    <div className="flex h-screen flex-row bg-muted/30 dark:bg-background"> {/* Changed to flex-row */}
+    <div className="flex h-screen flex-row bg-muted/30 dark:bg-background overflow-hidden"> {/* Changed to flex-row and added overflow-hidden */}
       <SourcesSidebar sources={sources} onSourceToggle={handleSourceToggle} />
 
       <div className="flex flex-1 flex-col overflow-hidden"> {/* This will be the main content area */}
         {/* Page-specific Header */}
-        <motion.div 
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
+        <div 
+          ref={pageHeaderRef}
           className="flex items-center justify-between p-4 border-b border-border bg-card dark:bg-zinc-800/50 shadow-sm"
         >
           <div className="flex items-center gap-3">
@@ -83,20 +94,18 @@ export default function NcertExplanationsPage() {
               <Share2 className="w-4 h-4" />
             </Button>
             <Avatar className="h-8 w-8">
-              <AvatarImage src="https://picsum.photos/seed/user1/40/40" alt="User Avatar" data-ai-hint="person user"/>
+              <AvatarImage src="https://placehold.co/40x40.png" alt="User Avatar" data-ai-hint="person user"/>
               <AvatarFallback>U</AvatarFallback>
             </Avatar>
           </div>
-        </motion.div>
+        </div>
 
         {/* Main Content Grid */}
         <div className="flex-1 overflow-y-auto p-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
             {/* Center Column (Notebook Guide & Chat) */}
-            <motion.div 
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.4, delay: 0.1 }}
+            <div 
+              ref={notebookGuideRef}
               className="lg:col-span-2 flex flex-col space-y-6 bg-card dark:bg-zinc-800/70 p-6 rounded-xl shadow-lg border border-border/20"
             >
               <NotebookGuide />
@@ -130,23 +139,20 @@ export default function NcertExplanationsPage() {
                       </Button>
                   </div>
               </div>
-            </motion.div>
+            </div>
 
             {/* Right Column (Video Overview, Audio Overview & Help) */}
-            <motion.div 
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.4, delay: 0.2 }}
+            <div 
+              ref={rightColumnRef}
               className="space-y-6"
             >
               <VideoOverview title="Newton's Laws Explained - Video" currentTime="5:23" totalTime="12:45" />
               <AudioOverview title="Science in Motion - Audio Summary" currentTime="1:41" totalTime="3:01" />
               <HelpUnderstand questions={helpUnderstandQuestions} />
-            </motion.div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
 }
-

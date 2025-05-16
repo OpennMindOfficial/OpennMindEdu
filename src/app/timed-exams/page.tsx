@@ -1,12 +1,13 @@
 
-'use client'; // Add use client for motion
+'use client'; 
 
 import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { motion } from 'framer-motion'; // Import motion
 import { Timer, BookOpen, Brain, Play } from "lucide-react";
+import React, { useEffect, useRef } from 'react'; // Import React hooks
+import { gsap } from 'gsap'; // Import GSAP
 
 const sampleTimedExams = [
   {
@@ -39,46 +40,49 @@ const sampleTimedExams = [
   }
 ];
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-};
-
 export default function TimedExamsPage() {
+  const pageRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!pageRef.current) return;
+    const tl = gsap.timeline({ defaults: { ease: "power3.out" }});
+
+    tl.fromTo(titleRef.current, { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.5 });
+
+    if (gridRef.current) {
+      const cards = gridRef.current.querySelectorAll('.exam-item-card');
+      if (cards.length > 0) {
+        tl.fromTo(cards, 
+          { opacity: 0, y: 20, scale: 0.95 },
+          { opacity: 1, y: 0, scale: 1, duration: 0.4, stagger: 0.1 }, 
+          "-=0.3"
+        );
+      }
+    }
+  }, []);
+
   return (
     <div className="flex h-screen bg-background text-foreground overflow-hidden">
       <Sidebar />
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header />
-        <main className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 bg-gradient-to-br from-background to-muted/20 dark:from-zinc-900/50 dark:to-background">
-          <motion.div
+        <main ref={pageRef} className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 bg-gradient-to-br from-background to-muted/20 dark:from-zinc-900/50 dark:to-background">
+          <div
+            ref={titleRef}
             className="flex items-center gap-3 mb-8"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
           >
             <Timer className="w-7 h-7 text-primary" />
             <h1 className="text-2xl md:text-3xl font-bold text-foreground">Timed Exams</h1>
-          </motion.div>
+          </div>
 
-          <motion.div
+          <div
+            ref={gridRef}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-            variants={containerVariants}
-            initial="hidden"
-            animate="show"
           >
             {sampleTimedExams.map((exam, index) => (
-              <motion.div key={index} variants={itemVariants}>
+              <div key={index} className="exam-item-card"> {/* Added class for GSAP targeting */}
                 <Card className="bg-card/80 dark:bg-card/70 border border-border/20 rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300 ease-out flex flex-col h-full group">
                   <CardHeader className="pb-3">
                     <div className="flex items-center gap-3 mb-2">
@@ -100,9 +104,9 @@ export default function TimedExamsPage() {
                     </Button>
                   </CardContent>
                 </Card>
-              </motion.div>
+              </div>
             ))}
-             <motion.div variants={itemVariants}>
+             <div className="exam-item-card"> {/* Added class for GSAP targeting */}
                 <Card className="bg-muted/30 dark:bg-card/50 border-2 border-dashed border-border/30 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 ease-out flex flex-col h-full items-center justify-center p-6 text-center">
                   <CardHeader className="p-0 mb-2">
                      <Timer className="w-10 h-10 text-muted-foreground mx-auto mb-2" />
@@ -114,8 +118,8 @@ export default function TimedExamsPage() {
                     </p>
                   </CardContent>
                 </Card>
-              </motion.div>
-          </motion.div>
+              </div>
+          </div>
         </main>
       </div>
     </div>

@@ -29,9 +29,9 @@ import {
   ListChecks, // New icon for overview
   Trophy, // New icon for overview
 } from "lucide-react";
-import { motion } from 'framer-motion';
 import { cn } from "@/lib/utils";
-import React from 'react';
+import React, { useEffect, useRef } from 'react'; 
+import { gsap } from 'gsap'; 
 import Image from "next/image"; // Import Image for potential future use in cards
 
 // Enhanced Overview Data
@@ -77,20 +77,21 @@ const recentAchievementsData = [
 ];
 
 
-const containerVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.08, duration: 0.5 } }
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 15, scale: 0.98 },
-  visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.4, ease: "easeOut" } }
-};
-
-
 export default function PerformanceTrackingPage() {
   const pageDescription = "Monitor your learning journey and track your progress.";
   const truncatedDescription = pageDescription.length > 20 ? pageDescription.substring(0, 20) + '...' : pageDescription;
+  
+  const pageRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (pageRef.current) {
+      const sections = pageRef.current.querySelectorAll('.animated-section');
+      gsap.fromTo(sections, 
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.5, stagger: 0.1, ease: "power3.out" }
+      );
+    }
+  }, []);
 
   return (
     <div className="flex h-screen bg-background text-foreground overflow-hidden">
@@ -98,14 +99,12 @@ export default function PerformanceTrackingPage() {
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header />
         <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 bg-muted/20 dark:bg-zinc-900/30">
-          <motion.div 
+          <div 
+            ref={pageRef}
             className="space-y-6"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
           >
             {/* Page Header */}
-            <motion.div variants={itemVariants} className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div className="animated-section flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
                 <h1 className="text-2xl md:text-3xl font-bold text-foreground">Performance Insights</h1>
                 <p className="text-sm text-muted-foreground">{truncatedDescription}</p>
@@ -127,10 +126,10 @@ export default function PerformanceTrackingPage() {
                   <Filter className="w-3.5 h-3.5 mr-1.5" /> Filters
                 </Button>
               </div>
-            </motion.div>
+            </div>
 
             {/* Overview Cards */}
-            <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+            <div className="animated-section grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
               {overviewData.map((item, index) => (
                 <Card key={index} className={cn(
                     "bg-card dark:bg-card/80 border-0 rounded-xl shadow-lg transition-all hover:shadow-xl hover:-translate-y-1",
@@ -145,12 +144,12 @@ export default function PerformanceTrackingPage() {
                   </CardContent>
                 </Card>
               ))}
-            </motion.div>
+            </div>
 
             {/* Charts Section & Recent Achievements */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-5">
               {/* Your Focus Score (Radar Chart Placeholder) */}
-              <motion.div variants={itemVariants} className="lg:col-span-1">
+              <div className="animated-section lg:col-span-1">
                 <Card className="bg-card dark:bg-card/80 border-0 rounded-xl shadow-lg h-full">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4">
                     <CardTitle className="text-base font-semibold text-foreground">Focus Score</CardTitle>
@@ -164,10 +163,10 @@ export default function PerformanceTrackingPage() {
                     </div>
                   </CardContent>
                 </Card>
-              </motion.div>
+              </div>
 
               {/* Daily Study Progress (Line Chart Placeholder) */}
-              <motion.div variants={itemVariants} className="lg:col-span-1">
+              <div className="animated-section lg:col-span-1">
                 <Card className="bg-card dark:bg-card/80 border-0 rounded-xl shadow-lg h-full">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4">
                     <CardTitle className="text-base font-semibold text-foreground">Daily Study</CardTitle>
@@ -180,10 +179,10 @@ export default function PerformanceTrackingPage() {
                     </div>
                   </CardContent>
                 </Card>
-              </motion.div>
+              </div>
               
               {/* Recent Achievements */}
-              <motion.div variants={itemVariants} className="lg:col-span-1">
+              <div className="animated-section lg:col-span-1">
                 <Card className="bg-card dark:bg-card/80 border-0 rounded-xl shadow-lg h-full">
                   <CardHeader className="p-4 pb-2">
                     <CardTitle className="text-base font-semibold text-foreground">Recent Achievements</CardTitle>
@@ -201,11 +200,11 @@ export default function PerformanceTrackingPage() {
                      {recentAchievementsData.length === 0 && <p className="text-xs text-muted-foreground text-center pt-8">No achievements yet. Keep studying!</p>}
                   </CardContent>
                 </Card>
-              </motion.div>
+              </div>
             </div>
             
             {/* Subject Performance Table */}
-            <motion.div variants={itemVariants}>
+            <div className="animated-section">
               <Card className="bg-card dark:bg-card/80 border-0 rounded-xl shadow-lg">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4">
                   <CardTitle className="text-base font-semibold text-foreground">Subject Performance</CardTitle>
@@ -243,11 +242,11 @@ export default function PerformanceTrackingPage() {
                   </div>
                 </CardContent>
               </Card>
-            </motion.div>
+            </div>
 
              {/* Study vs Break Time (Bar Chart Placeholder) & Calendar (Can be a future addition) */}
              <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 md:gap-5">
-                <motion.div variants={itemVariants} className="lg:col-span-3">
+                <div className="animated-section lg:col-span-3">
                     <Card className="bg-card dark:bg-card/80 border-0 rounded-xl shadow-lg h-full">
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4">
                             <CardTitle className="text-base font-semibold text-foreground">Study vs Break Ratio</CardTitle>
@@ -260,8 +259,8 @@ export default function PerformanceTrackingPage() {
                             </div>
                         </CardContent>
                     </Card>
-                </motion.div>
-                <motion.div variants={itemVariants} className="lg:col-span-2">
+                </div>
+                <div className="animated-section lg:col-span-2">
                     <Card className="bg-card dark:bg-card/80 border-0 rounded-xl shadow-lg h-full">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4">
                         <CardTitle className="text-base font-semibold text-foreground">Study Calendar</CardTitle>
@@ -283,14 +282,13 @@ export default function PerformanceTrackingPage() {
                         </div>
                     </CardContent>
                     </Card>
-                </motion.div>
+                </div>
             </div>
             
-          </motion.div>
+          </div>
            <div className="h-8"></div> {/* Add some bottom padding */}
         </main>
       </div>
     </div>
   );
 }
-

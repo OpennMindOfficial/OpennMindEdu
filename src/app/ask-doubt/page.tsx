@@ -18,6 +18,7 @@ import { askDoubt, type AskDoubtInput, type AskDoubtOutput } from '@/ai/flows/as
 import { checkDoubt, type CheckDoubtInput, type CheckDoubtOutput } from '@/ai/flows/ask-doubt-check-job-flow'; // Corrected import path
 import Image from 'next/image'; // Import next/image
 import { motion, AnimatePresence } from 'framer-motion'; // Import motion
+import { gsap } from 'gsap'; // Import GSAP
 
 // Define message structure
 interface ChatMessage {
@@ -60,6 +61,13 @@ export default function AskDoubtPage() {
   const [doubtIdToCheck, setDoubtIdToCheck] = useState(''); // State for doubt ID input
   const { toast } = useToast();
 
+  const pageRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLDivElement>(null);
+  const statusCheckCardRef = useRef<HTMLDivElement>(null);
+  const chatCardRef = useRef<HTMLDivElement>(null);
+  const backgroundIllustrationRef = useRef<HTMLDivElement>(null);
+
+
   useEffect(() => {
     // Scroll to bottom when new messages are added
     if (chatContainerRef.current) {
@@ -77,6 +85,17 @@ export default function AskDoubtPage() {
        }
      ]);
    }, []);
+
+  useEffect(() => {
+    if (!pageRef.current) return;
+    const tl = gsap.timeline({ defaults: { ease: "power3.out" }});
+
+    tl.fromTo(backgroundIllustrationRef.current, { opacity: 0 }, { opacity: 1, duration: 1, delay: 0.5 })
+      .fromTo(titleRef.current, { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.5 }, "-=0.7")
+      .fromTo(statusCheckCardRef.current, { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.5 }, "-=0.3")
+      .fromTo(chatCardRef.current, { opacity: 0, scale: 0.95 }, { opacity: 1, scale: 1, duration: 0.5 }, "-=0.3");
+  }, []);
+
 
   const handleSend = async () => {
     if (!input.trim() && !photo) {
@@ -272,13 +291,11 @@ export default function AskDoubtPage() {
       <Sidebar />
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header />
-        <main className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 bg-transparent relative"> {/* Made main bg transparent and relative */}
+        <main ref={pageRef} className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 bg-transparent relative"> {/* Made main bg transparent and relative */}
            {/* Background Illustration */}
-           <motion.div
+           <div
+             ref={backgroundIllustrationRef}
              className="absolute inset-0 z-[-1] overflow-hidden opacity-20 dark:opacity-10 pointer-events-none"
-             initial={{ opacity: 0 }}
-             animate={{ opacity: 1 }}
-             transition={{ duration: 1, delay: 0.5 }}
            >
               {/* Large faint brain illustration or abstract pattern */}
               <Brain className="absolute -right-20 -bottom-20 w-96 h-96 text-primary/30 transform rotate-12" strokeWidth={0.5}/>
@@ -292,23 +309,17 @@ export default function AskDoubtPage() {
                 <line x1="30" y1="30" x2="70" y2="70" stroke="currentColor" strokeOpacity="0.2" strokeWidth="1"/>
                 <line x1="70" y1="30" x2="30" y2="70" stroke="currentColor" strokeOpacity="0.2" strokeWidth="1"/>
               </svg>
-           </motion.div>
-          <motion.div
+           </div>
+          <div
+            ref={titleRef}
             className="flex items-center gap-3"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
           >
              <Brain className="w-7 h-7 text-primary" />
              <h1 className="text-2xl md:text-3xl font-bold text-foreground">Ask Your Doubt</h1>
-          </motion.div>
+          </div>
 
            {/* Doubt Status Check Section with animation */}
-           <motion.div
-             initial={{ opacity: 0, x: -20 }}
-             animate={{ opacity: 1, x: 0 }}
-             transition={{ duration: 0.5, delay: 0.1 }}
-           >
+           <div ref={statusCheckCardRef}>
              <Card className="bg-card/80 dark:bg-card/70 border border-border/20 backdrop-blur-lg rounded-xl shadow-lg p-4 mb-6">
                <div className="flex items-center gap-3 mb-2">
                   <FileQuestion className="w-5 h-5 text-accent" />
@@ -333,14 +344,10 @@ export default function AskDoubtPage() {
                  </Button>
                </div>
              </Card>
-           </motion.div>
+           </div>
 
           {/* Main Chat Card with animation */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
+          <div ref={chatCardRef}>
             <Card className="bg-card/80 dark:bg-card/70 border border-border/20 backdrop-blur-lg rounded-xl flex flex-col h-[calc(100vh-320px)] shadow-xl overflow-hidden"> {/* Adjusted height to account for status check card */}
               {/* Header with Subject Selector */}
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 border-b border-border/20 px-4 py-3 bg-card/90 dark:bg-card/80 sticky top-0 z-10">
@@ -526,11 +533,10 @@ export default function AskDoubtPage() {
                 </AnimatePresence>
               </CardContent> {/* Closing CardContent */}
             </Card> {/* Closing Card */}
-          </motion.div>
+          </div>
 
         </main> {/* Closing main */}
       </div> {/* Closing content wrapper div */}
     </div> // Closing main wrapper div
   ); // Closing return
 } // Closing function
-

@@ -1,14 +1,13 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
 import { SubjectCard } from "@/components/ui/subject-card";
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { motion } from 'framer-motion';
 import {
   ChevronRight,
   Bookmark,
@@ -25,6 +24,7 @@ import {
 import Link from 'next/link';
 import Image, { type StaticImageData } from 'next/image';
 import { cn } from '@/lib/utils';
+import { gsap } from 'gsap';
 
 // Import local images for subjects (assuming they are in src/app)
 import itImage from '../it.png';
@@ -100,24 +100,6 @@ const chaptersBySubject: Record<string, Chapter[]> = {
   ],
 };
 
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { staggerChildren: 0.05 } },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
-};
-
-const pageTransitionVariants = {
-  initial: { opacity: 0, x: -20 },
-  animate: { opacity: 1, x: 0 },
-  exit: { opacity: 0, x: 20 },
-};
-
-
 const getStatusIcon = (status: Chapter['status']) => {
   switch (status) {
     case 'completed':
@@ -134,6 +116,30 @@ const getStatusIcon = (status: Chapter['status']) => {
 export default function QuestionBankPage() {
   const [selectedSubject, setSelectedSubject] = useState<SelectedSubjectDetails | null>(null);
   const [activeTab, setActiveTab] = useState<string>("questionbank");
+
+  const subjectSelectionRef = useRef<HTMLDivElement>(null);
+  const chapterListRef = useRef<HTMLDivElement>(null);
+  const chapterHeaderRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!selectedSubject && subjectSelectionRef.current) {
+      const title = subjectSelectionRef.current.querySelector('.page-title');
+      const subtitle = subjectSelectionRef.current.querySelector('.page-subtitle');
+      const cards = subjectSelectionRef.current.querySelectorAll('.subject-card-item');
+      
+      const tl = gsap.timeline({ defaults: { ease: "power3.out" }});
+      if (title) tl.fromTo(title, { opacity: 0, y: -15 }, { opacity: 1, y: 0, duration: 0.4 });
+      if (subtitle) tl.fromTo(subtitle, { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.4 }, "-=0.2");
+      if (cards.length > 0) tl.fromTo(cards, { opacity: 0, y: 20, scale: 0.98 }, { opacity: 1, y: 0, scale: 1, duration: 0.3, stagger: 0.05 }, "-=0.2");
+    
+    } else if (selectedSubject && chapterListRef.current && chapterHeaderRef.current) {
+      const listItems = chapterListRef.current.querySelectorAll('li > a'); // Target the anchor tags inside li for stagger
+      const tl = gsap.timeline({ defaults: { ease: "power3.out" }});
+      tl.fromTo(chapterHeaderRef.current, { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.5 })
+        .fromTo(chapterListRef.current.querySelector('.tabs-list'), { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.4}, "-=0.3")
+        .fromTo(listItems, { opacity: 0, x: -20 }, { opacity: 1, x: 0, stagger: 0.05, duration: 0.3 }, "-=0.2");
+    }
+  }, [selectedSubject]);
 
   const handleSubjectSelect = (subject: SubjectForQB) => {
     setSelectedSubject({
@@ -156,34 +162,27 @@ export default function QuestionBankPage() {
         <Sidebar />
         <div className="flex flex-col flex-1 overflow-hidden">
           <Header />
-          <main className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8">
-            <motion.div
-              initial="hidden"
-              animate="show"
-              variants={containerVariants}
-            >
-              <motion.div variants={itemVariants} className="flex items-center gap-3 mb-6">
+          <main ref={subjectSelectionRef} className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8">
+            <div> {/* Wrapper for GSAP targeting */}
+              <div className="flex items-center gap-3 mb-6 page-title">
                  <BookOpen className="w-7 h-7 text-primary" />
                  <h1 className="text-2xl md:text-3xl font-bold text-foreground">
                     Question Bank
                  </h1>
-              </motion.div>
-              <motion.h2
-                className="text-xl md:text-2xl font-semibold text-foreground mb-6"
-                variants={itemVariants}
+              </div>
+              <h2
+                className="text-xl md:text-2xl font-semibold text-foreground mb-6 page-subtitle"
               >
                 Select a Subject
-              </motion.h2>
-              <motion.div
+              </h2>
+              <div
                 className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
-                variants={containerVariants}
               >
                 {qbSubjects.map((subject) => (
-                  <motion.div
+                  <div
                     key={subject.id}
-                    variants={itemVariants}
                     onClick={() => handleSubjectSelect(subject)}
-                    className="cursor-pointer"
+                    className="cursor-pointer subject-card-item"
                   >
                     <SubjectCard
                       title={subject.title}
@@ -192,10 +191,10 @@ export default function QuestionBankPage() {
                       className="w-full h-[280px] md:h-[300px]" 
                       data-ai-hint={subject.dataAiHint || subject.title.toLowerCase().split(" ")[0]}
                     />
-                  </motion.div>
+                  </div>
                 ))}
-              </motion.div>
-            </motion.div>
+              </div>
+            </div>
           </main>
         </div>
       </div>
@@ -208,21 +207,13 @@ export default function QuestionBankPage() {
       <Sidebar />
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header />
-        <motion.main 
+        <main 
           className="flex-1 overflow-y-auto bg-muted/20 dark:bg-zinc-900/30"
-          key="chapter-list-view" // Add key for AnimatePresence
-          variants={pageTransitionVariants}
-          initial="initial"
-          animate="animate"
-          exit="exit"
-          transition={{ duration: 0.3 }}
         >
           {/* Background and Header Section */}
-          <motion.div
+          <div
+            ref={chapterHeaderRef}
             className="relative p-6 md:p-8 pt-6 md:pt-8 bg-gradient-to-br from-primary/20 to-background dark:from-primary/10 dark:to-zinc-900/50 min-h-[200px] md:min-h-[220px] flex flex-col justify-end"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
           >
              {selectedSubject.imageUrl && (
                <Image
@@ -253,12 +244,12 @@ export default function QuestionBankPage() {
                 </Button>
               </div>
             </div>
-          </motion.div>
+          </div>
 
           {/* Tabs and Content Section */}
-          <div className="container mx-auto max-w-5xl p-0 md:p-0 -mt-2 md:-mt-4 relative z-20">
+          <div ref={chapterListRef} className="container mx-auto max-w-5xl p-0 md:p-0 -mt-2 md:-mt-4 relative z-20">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <div className="flex justify-center bg-transparent py-2">
+              <div className="flex justify-center bg-transparent py-2 tabs-list">
                 <TabsList className="bg-card/70 dark:bg-zinc-800/70 backdrop-blur-md border border-border/20 shadow-md rounded-lg px-1.5 py-1 h-auto">
                   <TabsTrigger value="all" className="px-3 py-1.5 text-xs sm:text-sm data-[state=active]:bg-primary/10 data-[state=active]:text-primary hover:bg-muted/50 dark:hover:bg-muted/30 data-[state=active]:shadow-sm rounded-md">
                     <LayoutGrid className="w-4 h-4 mr-1.5" /> All
@@ -276,42 +267,38 @@ export default function QuestionBankPage() {
               </div>
 
               <TabsContent value="questionbank" className="mt-0"> 
-                <motion.div
+                <div
                   className="bg-card dark:bg-zinc-800/80 border border-border/20 rounded-xl shadow-xl backdrop-blur-md"
-                  initial="hidden"
-                  animate="show"
-                  variants={containerVariants}
                 >
                   {selectedSubject.chapters.length > 0 ? (
                     <ul className="divide-y divide-border/10 dark:divide-border/5">
                       {selectedSubject.chapters.map((chapter, index) => (
-                        <Link href={`/questionbank/${selectedSubject.id}/${chapter.id}`} key={chapter.id} passHref legacyBehavior>
-                          <motion.a
-                            className="flex items-center justify-between p-4 hover:bg-muted/30 dark:hover:bg-muted/20 transition-colors duration-150 cursor-pointer first:rounded-t-xl last:rounded-b-xl"
-                            variants={itemVariants}
-                            whileHover={{ x: 2 }}
-                            transition={{ type: "spring", stiffness: 400, damping: 15 }}
-                          >
-                            <div className="flex items-center gap-3">
-                              {getStatusIcon(chapter.status)}
-                              <span className="text-sm font-medium text-foreground">{chapter.name}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <span className="text-xs text-muted-foreground">
-                                  {chapter.questionCount} questions
-                                </span>
-                                <ChevronRight className="w-4 h-4 text-muted-foreground/70" />
-                            </div>
-                          </motion.a>
-                        </Link>
+                        <li key={chapter.id}>
+                          <Link href={`/questionbank/${selectedSubject.id}/${chapter.id}`} passHref legacyBehavior>
+                            <a
+                              className="flex items-center justify-between p-4 hover:bg-muted/30 dark:hover:bg-muted/20 transition-colors duration-150 cursor-pointer first:rounded-t-xl last:rounded-b-xl"
+                            >
+                              <div className="flex items-center gap-3">
+                                {getStatusIcon(chapter.status)}
+                                <span className="text-sm font-medium text-foreground">{chapter.name}</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                  <span className="text-xs text-muted-foreground">
+                                    {chapter.questionCount} questions
+                                  </span>
+                                  <ChevronRight className="w-4 h-4 text-muted-foreground/70" />
+                              </div>
+                            </a>
+                          </Link>
+                        </li>
                       ))}
                     </ul>
                   ) : (
-                    <motion.div className="p-6 text-center text-muted-foreground" variants={itemVariants}>
+                    <div className="p-6 text-center text-muted-foreground">
                       No chapters available for this subject yet.
-                    </motion.div>
+                    </div>
                   )}
-                </motion.div>
+                </div>
               </TabsContent>
               <TabsContent value="all">
                  <Card className="bg-card dark:bg-zinc-800/80 border border-border/20 rounded-xl shadow-xl backdrop-blur-md p-6">
@@ -331,9 +318,8 @@ export default function QuestionBankPage() {
             </Tabs>
           </div>
            <div className="pb-8"></div> 
-        </motion.main>
+        </main>
       </div>
     </div>
   );
 }
-

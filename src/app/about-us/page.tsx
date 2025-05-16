@@ -10,12 +10,15 @@ import { gsap } from 'gsap';
 import Image from 'next/image'; // Import Image
 
 export default function AboutUsPage() {
+  const pageRef = useRef<HTMLDivElement>(null);
   const pageTitleRef = useRef<HTMLDivElement>(null);
   const missionCardRef = useRef<HTMLDivElement>(null);
   const storyCardRef = useRef<HTMLDivElement>(null);
   const teamCardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (!pageRef.current) return;
+
     const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
 
     if (pageTitleRef.current) {
@@ -28,9 +31,9 @@ export default function AboutUsPage() {
     const cardsToAnimate = [missionCardRef.current, storyCardRef.current, teamCardRef.current].filter(Boolean);
     if (cardsToAnimate.length > 0) {
       tl.fromTo(cardsToAnimate,
-        { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 0.5, stagger: 0.2 },
-        "-=0.3" // Start slightly after the title animation
+        { opacity: 0, y: 20, scale: 0.98 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.5, stagger: 0.2 },
+        "-=0.3" 
       );
     }
   }, []);
@@ -40,9 +43,9 @@ export default function AboutUsPage() {
       <Sidebar />
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header />
-        <main className="flex-1 overflow-y-auto p-6 md:p-8 lg:p-10 space-y-8 bg-muted/30 dark:bg-muted/10">
+        <main ref={pageRef} className="flex-1 overflow-y-auto p-6 md:p-8 lg:p-10 space-y-8 bg-muted/30 dark:bg-muted/10">
           <div className="max-w-4xl mx-auto">
-            <div // Removed Framer Motion props from here
+            <div 
               ref={pageTitleRef}
               className="flex items-center gap-3 mb-10 text-center flex-col"
             >

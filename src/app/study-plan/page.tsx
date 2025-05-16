@@ -1,6 +1,7 @@
+
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,8 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { PlusCircle, Trash2, ListChecks } from "lucide-react";
-import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { gsap } from 'gsap'; // Import GSAP
 
 interface StudyTask {
   id: string;
@@ -24,6 +25,12 @@ export default function StudyPlanPage() {
   const [newTaskInput, setNewTaskInput] = useState('');
   const [mounted, setMounted] = useState(false);
 
+  const pageRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLDivElement>(null);
+  const addTaskCardRef = useRef<HTMLDivElement>(null);
+  const currentTasksCardRef = useRef<HTMLDivElement>(null);
+  const taskListRef = useRef<HTMLUListElement>(null); // For staggering list items
+
   // Load tasks from localStorage on mount
   useEffect(() => {
     setMounted(true); // Ensure this runs only on client
@@ -34,16 +41,35 @@ export default function StudyPlanPage() {
       }
     } catch (error) {
       console.error("Failed to parse study tasks from localStorage", error);
-      // Optionally, clear corrupted data: localStorage.removeItem('studyTasks');
     }
   }, []);
 
   // Save tasks to localStorage whenever tasks change
   useEffect(() => {
-    if (mounted) { // Only run on client after initial mount
+    if (mounted) { 
       localStorage.setItem('studyTasks', JSON.stringify(tasks));
     }
   }, [tasks, mounted]);
+
+  useEffect(() => {
+    if (!pageRef.current) return;
+    const tl = gsap.timeline({ defaults: { ease: "power3.out" }});
+
+    tl.fromTo(titleRef.current, { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.5 })
+      .fromTo(addTaskCardRef.current, { opacity: 0, scale: 0.95 }, { opacity: 1, scale: 1, duration: 0.5 }, "-=0.3")
+      .fromTo(currentTasksCardRef.current, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, "-=0.3");
+      
+    // Animate task items when tasks array changes
+    if (taskListRef.current) {
+      const taskItems = taskListRef.current.querySelectorAll('li');
+      if (taskItems.length > 0) {
+        gsap.fromTo(taskItems, 
+          { opacity: 0, y: 10 },
+          { opacity: 1, y: 0, duration: 0.3, stagger: 0.05, ease: "easeOut" }
+        );
+      }
+    }
+  }, [tasks, mounted]); // Re-run list item animation when tasks change
 
   const handleAddTask = () => {
     if (newTaskInput.trim() === '') return;
@@ -53,7 +79,7 @@ export default function StudyPlanPage() {
       completed: false,
       createdAt: Date.now(),
     };
-    setTasks(prevTasks => [newTask, ...prevTasks]); // Add to the beginning for newest first feel
+    setTasks(prevTasks => [newTask, ...prevTasks]); 
     setNewTaskInput('');
   };
 
@@ -84,24 +110,18 @@ export default function StudyPlanPage() {
       <Sidebar />
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header />
-        <main className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 bg-muted/30 dark:bg-zinc-900/50">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+        <main ref={pageRef} className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 bg-muted/30 dark:bg-zinc-900/50">
+          <div
+            ref={titleRef}
             className="flex items-center gap-3"
           >
             <ListChecks className="w-7 h-7 text-primary" />
             <h1 className="text-2xl md:text-3xl font-bold text-foreground">
               My Study Plan
             </h1>
-          </motion.div>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-          >
+          <div ref={addTaskCardRef}>
             <Card className="bg-card/90 dark:bg-card/80 border border-border/20 rounded-xl shadow-lg backdrop-blur-md">
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg text-foreground">Add a New Study Task</CardTitle>
@@ -128,13 +148,9 @@ export default function StudyPlanPage() {
                 </div>
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
+          <div ref={currentTasksCardRef}>
             <Card className="bg-card/90 dark:bg-card/80 border border-border/20 rounded-xl shadow-lg backdrop-blur-md">
               <CardHeader>
                 <CardTitle className="text-lg text-foreground">Current Tasks</CardTitle>
@@ -146,15 +162,11 @@ export default function StudyPlanPage() {
                   </p>
                 ) : (
                   <ScrollArea className="h-[calc(100vh-500px)] pr-3 -mr-3"> {/* Adjusted height */}
-                    <ul className="space-y-3">
+                    <ul ref={taskListRef} className="space-y-3">
                       {sortedTasks.map((task) => (
-                        <motion.li
+                        <li
                           key={task.id}
-                          layout // Animate layout changes (add/remove)
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, x: -20, transition: { duration: 0.2 } }}
-                          transition={{ duration: 0.3, ease: "easeOut" }}
+                          // layout // Framer Motion prop removed
                           className={cn(
                             "flex items-center justify-between p-3 rounded-lg transition-colors duration-200",
                             task.completed ? "bg-green-500/10 dark:bg-green-700/20" : "bg-muted/40 dark:bg-zinc-800/50 hover:bg-muted/60 dark:hover:bg-zinc-800/70"
@@ -191,14 +203,14 @@ export default function StudyPlanPage() {
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>
-                        </motion.li>
+                        </li>
                       ))}
                     </ul>
                   </ScrollArea>
                 )}
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
         </main>
       </div>
     </div>

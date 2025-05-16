@@ -1,16 +1,17 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { UploadCloud, Link as LinkIcon, Sparkles, GraduationCap, FileText, Zap } from "lucide-react";
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { useTheme } from 'next-themes'; // Import useTheme
+import { useTheme } from 'next-themes'; 
+import { gsap } from 'gsap'; 
 
 const headingOptions = [
   {
@@ -64,7 +65,10 @@ export default function PdfToNotesPage() {
   const [file, setFile] = useState<File | null>(null);
   const [link, setLink] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
-  const { theme } = useTheme(); // Get the current theme
+  const { theme } = useTheme(); 
+
+  const pageRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null); // Ref for the main content container
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -72,6 +76,15 @@ export default function PdfToNotesPage() {
     }, 3000); 
 
     return () => clearInterval(intervalId);
+  }, []);
+
+  useEffect(() => {
+    if (contentRef.current) {
+      gsap.fromTo(contentRef.current,
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }
+      );
+    }
   }, []);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -124,21 +137,16 @@ export default function PdfToNotesPage() {
       <Sidebar />
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header />
-        <main className="flex-1 overflow-y-auto px-6 md:px-8 pb-6 md:pb-8 pt-6 md:pt-8 flex flex-col items-center justify-start bg-gradient-to-br from-background to-zinc-900/30 dark:from-black dark:to-zinc-900/50 text-foreground">
-          <motion.div
-            className="w-full max-w-2xl text-center space-y-4" // Reduced space-y from 6 to 4
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+        <main ref={pageRef} className="flex-1 overflow-y-auto px-6 md:px-8 pb-6 md:pb-8 pt-6 md:pt-8 flex flex-col items-center justify-start bg-gradient-to-br from-background to-zinc-900/30 dark:from-black dark:to-zinc-900/50 text-foreground">
+          <div
+            ref={contentRef}
+            className="w-full max-w-2xl text-center space-y-4" 
           >
             <AnimatePresence mode="wait">
-              <motion.h1
+              <h1
                 key={currentHeadingIndex}
                 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight min-h-[3em] flex flex-col justify-center items-center"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.5 }}
+                // GSAP will handle animation, Framer Motion props removed from here
               >
                 <span>
                   {currentHeading.text1}{' '}
@@ -176,7 +184,7 @@ export default function PdfToNotesPage() {
                   {currentHeading.icon3 && <currentHeading.icon3 className={cn("inline-block w-10 h-10 mb-1 sm:w-12 sm:h-12 md:w-14 md:h-14 align-middle", currentHeading.color6 || 'text-primary')} />}
                   <span className={currentHeading.color6}>{currentHeading.text6}</span>
                 </span>
-              </motion.h1>
+              </h1>
             </AnimatePresence>
 
             <Card className="bg-card/70 dark:bg-zinc-800/60 border border-dashed border-border/50 rounded-xl shadow-xl backdrop-blur-md p-6 md:p-8">
@@ -243,7 +251,7 @@ export default function PdfToNotesPage() {
                 privacy policy
               </a>.
             </p>
-          </motion.div>
+          </div>
         </main>
       </div>
     </div>
@@ -266,4 +274,3 @@ const Loader2 = (props: React.SVGProps<SVGSVGElement>) => (
     <path d="M21 12a9 9 0 1 1-6.219-8.56" />
   </svg>
 );
-

@@ -36,8 +36,9 @@ import { useToast } from '@/components/ui/use-toast';
 import Image from 'next/image';
 import MascotImage from '@/app/ChatGPT_Image_May_11__2025__03_07_50_PM-removebg-preview (3).png';
 import { gsap } from 'gsap';
-// ThreeScene import removed
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
+gsap.registerPlugin(ScrollTrigger);
 
 // Import local images for subjects
 import itImage from './it.png';
@@ -100,7 +101,7 @@ const mockExams = [
 
 export default function HomePage() {
   const [greeting, setGreeting] = useState("Good day");
-  const [userName, setUserName] = useState("Rudransh"); 
+  const [userName, setUserName] = useState("Learner"); 
   const [quote, setQuote] = useState({ text: "", author: "" });
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -110,13 +111,13 @@ export default function HomePage() {
   const [isMounted, setIsMounted] = useState(false);
   const { toast } = useToast();
 
+  const pageRef = useRef<HTMLDivElement>(null);
   const greetingRef = useRef<HTMLHeadingElement>(null);
   const quoteCardRef = useRef<HTMLDivElement>(null);
   const subjectsSectionRef = useRef<HTMLDivElement>(null);
   const learnWithSectionRef = useRef<HTMLDivElement>(null);
   const mockExamsSectionRef = useRef<HTMLDivElement>(null);
   const mascotButtonRef = useRef<HTMLButtonElement>(null);
-  // threeSceneSectionRef removed
 
 
   useEffect(() => {
@@ -156,25 +157,54 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    if (isMounted && isAuthenticated) { 
-      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
-      const commonAnimationProps = { opacity: 0, y: 30, duration: 0.7 };
-      const sectionTitleAnimationProps = { opacity: 0, x: -20, duration: 0.5 };
-      const cardItemAnimationProps = { opacity: 0, y: 20, stagger: 0.1, duration: 0.4 };
+    if (isMounted && isAuthenticated && pageRef.current) {
+      const elementsToAnimate = [
+        greetingRef.current,
+        mascotButtonRef.current,
+        quoteCardRef.current,
+        subjectsSectionRef.current,
+        learnWithSectionRef.current,
+        mockExamsSectionRef.current,
+      ].filter(Boolean);
 
-      tl.from(greetingRef.current, { ...commonAnimationProps, y: -30, delay: 0.1 })
-        .from(mascotButtonRef.current, { opacity: 0, x: -20, duration: 0.5 }, "-=0.4")
-        .from(quoteCardRef.current, { ...commonAnimationProps, delay: 0.1}, "-=0.5")
-        
-        .from(subjectsSectionRef.current?.querySelector('.section-title'), { ...sectionTitleAnimationProps, delay: 0.1 }, "-=0.4")
-        .from(subjectsSectionRef.current?.querySelectorAll('.subject-card-item'), { ...cardItemAnimationProps, delay: 0.1 }, "<0.2")
-        
-        .from(learnWithSectionRef.current?.querySelector('.section-title'), { ...sectionTitleAnimationProps, delay: 0.1 }, "-=0.3")
-        .from(learnWithSectionRef.current?.querySelectorAll('.learn-with-card-item'), { ...cardItemAnimationProps, scale: 0.9, delay: 0.1 }, "<0.2")
+      gsap.from(elementsToAnimate, {
+        opacity: 0,
+        y: 50,
+        duration: 0.8,
+        stagger: 0.2,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: pageRef.current,
+          start: "top 80%", // When 80% of the element is visible
+          toggleActions: "play none none none",
+        }
+      });
+      
+      // Stagger animation for cards within sections
+      const cardSections = [
+        { ref: subjectsSectionRef, selector: '.subject-card-item' },
+        { ref: learnWithSectionRef, selector: '.learn-with-card-item' },
+        { ref: mockExamsSectionRef, selector: '.exam-card-item' },
+      ];
 
-        .from(mockExamsSectionRef.current?.querySelector('.section-title'), { ...sectionTitleAnimationProps, delay: 0.1 }, "-=0.3")
-        .from(mockExamsSectionRef.current?.querySelectorAll('.exam-card-item'), { ...cardItemAnimationProps, scale: 0.9, delay: 0.1 }, "<0.2");
-        // Removed animation for threeSceneSectionRef
+      cardSections.forEach(section => {
+        if (section.ref && section.ref.current) {
+          const cards = gsap.utils.toArray(section.ref.current.querySelectorAll(section.selector));
+          gsap.from(cards, {
+            opacity: 0,
+            y: 30,
+            scale: 0.95,
+            duration: 0.5,
+            stagger: 0.1,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: section.ref.current,
+              start: "top 85%",
+              toggleActions: "play none none none",
+            }
+          });
+        }
+      });
     }
   }, [isMounted, isAuthenticated]);
 
@@ -238,11 +268,12 @@ export default function HomePage() {
   }
 
   return (
-    <div className="flex h-screen bg-background text-foreground">
+    <div className="flex h-screen bg-background text-foreground overflow-hidden">
       <Sidebar />
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header />
         <main
+          ref={pageRef}
           className={cn(
             "flex-1 overflow-y-auto p-6 md:p-8 bg-background", 
             showAuthPopup && !isAuthenticated ? "blur-sm pointer-events-none" : ""
@@ -383,10 +414,7 @@ export default function HomePage() {
               </div>
             </div>
           </div> {/* End of space-y-8 wrapper for scrollable content */}
-
-          {/* Removed the Three.js Scene Section */}
           <div className="h-8 md:h-12"></div> {/* Ensures some space at the very bottom of the scroll */}
-
         </main>
         <AnimatePresence>
         {showAuthPopup && !isAuthenticated && (
@@ -420,5 +448,3 @@ export default function HomePage() {
     </div>
   );
 }
-
-    

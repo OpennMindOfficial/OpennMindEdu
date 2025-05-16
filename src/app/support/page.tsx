@@ -43,36 +43,25 @@ export default function SupportPage() {
 
     const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
 
-    // Animate the page title container
-    if (pageTitleRef.current) {
-      tl.fromTo(pageTitleRef.current, 
+    tl.fromTo(pageTitleRef.current, 
         { opacity: 0, y: -30 }, 
-        { opacity: 1, y: 0, duration: 0.5 }
+        { opacity: 1, y: 0, duration: 0.5, delay: 0.1 }
+      )
+      .fromTo([searchCardRef.current, faqCardRef.current, contactCardRef.current].filter(Boolean), 
+        { opacity: 0, y: 20, scale: 0.98 }, 
+        { opacity: 1, y: 0, scale: 1, duration: 0.5, stagger: 0.15 }, 
+        "-=0.3" 
       );
-    }
-
-    // Animate the main cards
-    const cards = [searchCardRef.current, faqCardRef.current, contactCardRef.current].filter(Boolean);
-    if (cards.length > 0) {
-      tl.fromTo(cards, 
-        { opacity: 0, y: 20 }, 
-        { opacity: 1, y: 0, duration: 0.5, stagger: 0.2 }, 
-        "-=0.3" // Start slightly after the title animation begins to overlap
-      );
-    }
     
-    // Animate accordion items if they exist and FAQ card is present
     if (faqCardRef.current) {
         const validAccordionItems = accordionItemRefs.current.filter(el => el !== null);
         if (validAccordionItems.length > 0) {
-            tl.fromTo(validAccordionItems,
+            gsap.fromTo(validAccordionItems,
                 { opacity: 0, y: 15 },
-                { opacity: 1, y: 0, stagger: 0.1, duration: 0.4 },
-                "-=0.2" // Overlap with the FAQ card animation
+                { opacity: 1, y: 0, stagger: 0.1, duration: 0.4, delay: 0.5, ease: "power2.out" }
             );
         }
     }
-
   }, []);
 
   return (
