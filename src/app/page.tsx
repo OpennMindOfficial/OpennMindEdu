@@ -155,8 +155,8 @@ export default function HomePage() {
 
  useEffect(() => {
     if (isMounted && isAuthenticated && pageRef.current) {
-      const commonFrom = { opacity: 0, y: 30, immediateRender: false };
-      const commonTo = { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" };
+      const commonFrom = { autoAlpha: 0, y: 30, immediateRender: false };
+      const commonTo = { autoAlpha: 1, y: 0, duration: 0.7, ease: "power3.out" };
 
       const elementsToAnimate = [
         greetingRef.current,
@@ -176,7 +176,7 @@ export default function HomePage() {
             trigger: pageRef.current,
             start: "top 90%",
             toggleActions: "play none none none",
-             markers: true, // For debugging general page load
+            // markers: true, // For debugging general page load - REMOVED
           }
         }
       );
@@ -195,7 +195,7 @@ export default function HomePage() {
                 trigger: subjectsSectionRef.current,
                 start: "top 85%",
                 toggleActions: "play none none reset",
-                markers: true,
+                // markers: true, // REMOVED
               }
             }
           );
@@ -222,7 +222,7 @@ export default function HomePage() {
                 trigger: learnWithSectionRef.current,
                 start: "top 85%", 
                 toggleActions: "play none none reset",
-                markers: true, // For specific debugging
+                // markers: true, // For specific debugging - REMOVED
                 invalidateOnRefresh: true,
               }
             }
@@ -251,7 +251,7 @@ export default function HomePage() {
                 trigger: mockExamsSectionRef.current,
                 start: "top 85%",
                 toggleActions: "play none none reset",
-                markers: true, // For specific debugging
+                // markers: true, // For specific debugging - REMOVED
                 invalidateOnRefresh: true,
               }
             }
