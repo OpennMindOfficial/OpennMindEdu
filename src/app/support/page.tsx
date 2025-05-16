@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Search, LifeBuoy, Mail, MessageSquare } from "lucide-react";
-import { motion } from 'framer-motion';
 import { gsap } from 'gsap';
 
 const faqData = [
@@ -32,19 +31,48 @@ const faqData = [
 ];
 
 export default function SupportPage() {
-  const pageTitleRef = useRef<HTMLHeadingElement>(null);
+  const pageContainerRef = useRef<HTMLDivElement>(null);
+  const pageTitleRef = useRef<HTMLDivElement>(null);
   const searchCardRef = useRef<HTMLDivElement>(null);
   const faqCardRef = useRef<HTMLDivElement>(null);
   const contactCardRef = useRef<HTMLDivElement>(null);
   const accordionItemRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
+    if (!pageContainerRef.current) return;
+
     const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
-    tl.from(pageTitleRef.current, { opacity: 0, y: -30, duration: 0.5 })
-      .from(searchCardRef.current, { opacity: 0, y: 20, duration: 0.5 }, "-=0.3")
-      .from(faqCardRef.current, { opacity: 0, y: 20, duration: 0.5 }, "-=0.3")
-      .from(accordionItemRefs.current.filter(el => el !== null), { opacity: 0, y: 15, stagger: 0.1, duration: 0.4 }, "-=0.2")
-      .from(contactCardRef.current, { opacity: 0, y: 20, duration: 0.5 }, "-=0.3");
+
+    // Animate the page title container
+    if (pageTitleRef.current) {
+      tl.fromTo(pageTitleRef.current, 
+        { opacity: 0, y: -30 }, 
+        { opacity: 1, y: 0, duration: 0.5 }
+      );
+    }
+
+    // Animate the main cards
+    const cards = [searchCardRef.current, faqCardRef.current, contactCardRef.current].filter(Boolean);
+    if (cards.length > 0) {
+      tl.fromTo(cards, 
+        { opacity: 0, y: 20 }, 
+        { opacity: 1, y: 0, duration: 0.5, stagger: 0.2 }, 
+        "-=0.3" // Start slightly after the title animation begins to overlap
+      );
+    }
+    
+    // Animate accordion items if they exist and FAQ card is present
+    if (faqCardRef.current) {
+        const validAccordionItems = accordionItemRefs.current.filter(el => el !== null);
+        if (validAccordionItems.length > 0) {
+            tl.fromTo(validAccordionItems,
+                { opacity: 0, y: 15 },
+                { opacity: 1, y: 0, stagger: 0.1, duration: 0.4 },
+                "-=0.2" // Overlap with the FAQ card animation
+            );
+        }
+    }
+
   }, []);
 
   return (
@@ -52,24 +80,21 @@ export default function SupportPage() {
       <Sidebar />
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header />
-        <main className="flex-1 overflow-y-auto p-6 md:p-8 lg:p-10 space-y-8 bg-muted/30 dark:bg-muted/10">
+        <main ref={pageContainerRef} className="flex-1 overflow-y-auto p-6 md:p-8 lg:p-10 space-y-8 bg-muted/30 dark:bg-muted/10">
           <div className="max-w-4xl mx-auto">
-            <motion.div
+            <div
               ref={pageTitleRef}
               className="flex items-center gap-3 mb-8"
-              initial={{ opacity: 0, y: -20 }} // GSAP will override this, but good fallback
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
             >
               <LifeBuoy className="w-8 h-8 text-primary" />
               <h1 className="text-2xl md:text-3xl font-bold text-foreground">Help & Support</h1>
-            </motion.div>
+            </div>
 
-            <motion.div ref={searchCardRef}>
-              <Card className="mb-8 bg-card dark:bg-card/80 border-0 rounded-xl shadow-lg">
+            <div ref={searchCardRef} className="mb-8">
+              <Card className="bg-card dark:bg-card border-0 rounded-xl shadow-lg">
                 <CardHeader>
-                  <CardTitle className="text-xl font-semibold">Search Help</CardTitle>
-                  <CardDescription>Find answers to your questions quickly.</CardDescription>
+                  <CardTitle className="text-xl font-semibold text-foreground">Search Help</CardTitle>
+                  <CardDescription className="text-muted-foreground">Find answers to your questions quickly.</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="relative">
@@ -82,19 +107,19 @@ export default function SupportPage() {
                   </div>
                 </CardContent>
               </Card>
-            </motion.div>
+            </div>
 
-            <motion.div ref={faqCardRef}>
-              <Card className="mb-8 bg-card dark:bg-card/80 border-0 rounded-xl shadow-lg">
+            <div ref={faqCardRef} className="mb-8">
+              <Card className="bg-card dark:bg-card border-0 rounded-xl shadow-lg">
                 <CardHeader>
-                  <CardTitle className="text-xl font-semibold">Frequently Asked Questions</CardTitle>
+                  <CardTitle className="text-xl font-semibold text-foreground">Frequently Asked Questions</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <Accordion type="single" collapsible className="w-full">
                     {faqData.map((faq, index) => (
                       <div key={index} ref={el => accordionItemRefs.current[index] = el}>
                         <AccordionItem value={`item-${index}`}>
-                          <AccordionTrigger className="text-base font-medium hover:no-underline text-foreground/90">
+                          <AccordionTrigger className="text-base font-medium hover:no-underline text-foreground/90 dark:text-foreground/90">
                             {faq.question}
                           </AccordionTrigger>
                           <AccordionContent className="text-sm text-muted-foreground leading-relaxed">
@@ -106,13 +131,13 @@ export default function SupportPage() {
                   </Accordion>
                 </CardContent>
               </Card>
-            </motion.div>
+            </div>
 
-            <motion.div ref={contactCardRef}>
-              <Card className="bg-card dark:bg-card/80 border-0 rounded-xl shadow-lg">
+            <div ref={contactCardRef}>
+              <Card className="bg-card dark:bg-card border-0 rounded-xl shadow-lg">
                 <CardHeader>
-                  <CardTitle className="text-xl font-semibold">Still Need Help?</CardTitle>
-                  <CardDescription>Our support team is here to assist you.</CardDescription>
+                  <CardTitle className="text-xl font-semibold text-foreground">Still Need Help?</CardTitle>
+                  <CardDescription className="text-muted-foreground">Our support team is here to assist you.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex items-start gap-4 p-4 bg-muted/50 dark:bg-zinc-800/60 rounded-lg">
@@ -135,7 +160,7 @@ export default function SupportPage() {
                   </div>
                 </CardContent>
               </Card>
-            </motion.div>
+            </div>
             <div className="h-8"></div>
           </div>
         </main>
