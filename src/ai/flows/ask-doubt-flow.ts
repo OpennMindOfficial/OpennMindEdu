@@ -76,7 +76,7 @@ const askDoubtFlow = ai.defineFlow(
     inputSchema: AskDoubtInputSchema,
     outputSchema: AskDoubtOutputSchema,
   },
-  async (input) => {
+  async (input: AskDoubtInput): Promise<AskDoubtOutput> => {
       if (!input.doubtText && !input.imageDataUri) {
         return { explanation: "Please provide either a text description of your doubt or an image." };
       }

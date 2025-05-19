@@ -5,7 +5,7 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit'; // Use genkit's zod export
-import { defineFlow, defineTool } from '@genkit-ai/core'; // Use @genkit-ai/core
+import { defineFlow } from '@genkit-ai/core'; // Only import defineFlow, not defineTool
 
 // Define the input schema using Zod
 const CheckDoubtInputSchema = z.object({
@@ -27,36 +27,29 @@ const mockDoubtDatabase: { [key: string]: { status: string; response?: string } 
   'doubt_789': { status: 'in_progress' },
 };
 
-// Define a tool to get the status of a doubt from the mock database
-const getDoubtStatusTool = defineTool(
-  {
-    name: 'getDoubtStatus',
-    description: 'Retrieves the status and response for a given doubt ID from the database.',
-    inputSchema: CheckDoubtInputSchema,
-    outputSchema: CheckDoubtOutputSchema,
-  },
-  async (input) => {
-    console.log(`[getDoubtStatus Tool] Checking doubt ID: ${input.doubtId}`);
-    const doubt = mockDoubtDatabase[input.doubtId];
-    if (doubt) {
-      console.log(`[getDoubtStatus Tool] Found doubt: ${JSON.stringify(doubt)}`);
-      return { status: doubt.status, response: doubt.response };
-    } else {
-       console.log(`[getDoubtStatus Tool] Doubt ID ${input.doubtId} not found.`);
-       return { status: 'not_found' };
-    }
+// Define a function to get the status of a doubt from the mock database
+const getDoubtStatusTool = async (input: CheckDoubtInput): Promise<CheckDoubtOutput> => {
+  console.log(`[getDoubtStatus Tool] Checking doubt ID: ${input.doubtId}`);
+  const doubt = mockDoubtDatabase[input.doubtId];
+  if (doubt) {
+    console.log(`[getDoubtStatus Tool] Found doubt: ${JSON.stringify(doubt)}`);
+    return { status: doubt.status, response: doubt.response };
+  } else {
+    console.log(`[getDoubtStatus Tool] Doubt ID ${input.doubtId} not found.`);
+    return { status: 'not_found' };
   }
-);
+};
 
 
 // Define the Genkit flow using the corrected import
-const checkDoubtFlow = defineFlow(
+const checkDoubtFlow = ai.defineFlow(
   {
     name: 'checkDoubtFlow',
     inputSchema: CheckDoubtInputSchema,
     outputSchema: CheckDoubtOutputSchema,
+    description: 'Checks the status of a previously submitted doubt.'
   },
-  async (input) => {
+  async (input: CheckDoubtInput): Promise<CheckDoubtOutput> => {
     console.log(`[checkDoubtFlow] Received input: ${JSON.stringify(input)}`);
 
     // Use the tool to get the doubt status
@@ -67,7 +60,6 @@ const checkDoubtFlow = defineFlow(
        console.error("[checkDoubtFlow] Tool call failed or returned undefined.");
        return { status: 'error', response: "Failed to check the doubt status." };
     }
-
 
     let responseMessage = '';
 
@@ -89,9 +81,6 @@ const checkDoubtFlow = defineFlow(
     }
 
     console.log(`[checkDoubtFlow] Final response message: ${responseMessage}`);
-    // Return only the necessary fields defined in the output schema
-    // Note: The response message here includes more than just the optional tutor response.
-    // Adjusting to return the *status* and the crafted *responseMessage* based on the status.
     return { status: doubtStatusResult.status, response: responseMessage };
   }
 );
